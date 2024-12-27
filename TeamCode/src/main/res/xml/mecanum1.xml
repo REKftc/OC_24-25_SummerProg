@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
+        <LynxModule name="Expansion Hub 2" port="2">
+            <goBILDA5202SeriesMotor name="hslides" port="3" />
+            <goBILDA5203SeriesMotor name="driveRB" port="2" />
+            <goBILDA5202SeriesMotor name="vslidesL" port="0" />
+            <goBILDA5202SeriesMotor name="vslidesR" port="1" />
+
+            <DigitalDevice name="vlimitswitch" port="4" />
+            <goBILDAPinpoint name="pinpoint" port="1" bus="1"/>
+
+            <Servo name="depoWrist" port="1" />
+            <Servo name="clawSmallTilt" port="2" />
+            <Servo name="depoHslide" port="0" />
+            <Servo name="clawBigTilt" port="5" />
+            <Servo name="claw" port="4" />
+
+
+        </LynxModule>
+        <LynxModule name="Control Hub" port="173">
+            <goBILDA5203SeriesMotor name="driveRF" port="0" />
+            <goBILDA5203SeriesMotor name="driveLF" port="2" />
+            <goBILDA5203SeriesMotor name="driveLB" port="3" />
+            <goBILDA5202SeriesMotor name="intake" port="1" />
+
+            <SparkFunOTOS name="sensor_otos" port="0" bus="0"/>
+
+            <Servo name="intakeTilt" port="5" />
+            <Servo name="latch" port="3" />
+            <Servo name="hang" port="0" />
+
+
+            <RevColorSensorV3 name="colorSensorF" port="1" bus="1" />
+
+            <DigitalDevice name="hlimitswitch" port="0" />
+
+            <DigitalDevice name="led_white" port="5" />
+            <DigitalDevice name="led_yellow" port="2" />
+            <DigitalDevice name="led_red" port="3" />
+            <DigitalDevice name="led_blue" port="4" />
+            <DigitalDevice name="led_green" port="6" />
+
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>
