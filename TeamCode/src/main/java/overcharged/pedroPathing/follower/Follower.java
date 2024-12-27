@@ -30,8 +30,10 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import overcharged.components.OcMotor;
+import overcharged.pedroPathing.localization.Localizer;
 import overcharged.pedroPathing.localization.Pose;
 import overcharged.pedroPathing.localization.PoseUpdater;
+import overcharged.pedroPathing.localization.localizers.TwoWheelPinpointIMULocalizer;
 import overcharged.pedroPathing.pathGeneration.BezierPoint;
 import overcharged.pedroPathing.pathGeneration.MathFunctions;
 import overcharged.pedroPathing.pathGeneration.Path;
@@ -997,7 +999,7 @@ public class Follower {
     /**
      * This resets the IMU, if applicable.
      */
-    public void resetIMU() {
+    private void resetIMU() throws InterruptedException {
         poseUpdater.resetIMU();
     }
 }

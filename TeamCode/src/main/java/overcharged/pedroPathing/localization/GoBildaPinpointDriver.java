@@ -1,6 +1,3 @@
-package overcharged.pedroPathing.localization;
-
-
 
 /*   MIT License
  *   Copyright (c) [2024] [Base 10 Assets, LLC]
@@ -23,6 +20,8 @@ package overcharged.pedroPathing.localization;
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+
+package overcharged.pedroPathing.localization;
 
 import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToInt;
 

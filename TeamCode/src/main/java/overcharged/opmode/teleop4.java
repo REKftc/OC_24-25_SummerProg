@@ -356,13 +356,13 @@ public class teleop4 extends OpMode {
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>105){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>40){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>140){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>100){
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             intakeStep = 0;
@@ -554,7 +554,7 @@ public class teleop4 extends OpMode {
             slideHeight = SlideHeight.MID;
             vslideOut = true;
             dDelay = true;
-            robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1.2f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.mid+50, 1.2f);
             depoDelay = System.currentTimeMillis();
         }
 
