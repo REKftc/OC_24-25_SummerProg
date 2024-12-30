@@ -1,6 +1,9 @@
 package overcharged.pedroPathing.util;
 
+import overcharged.pedroPathing.follower.Follower;
 import overcharged.pedroPathing.localization.PoseUpdater;
+
+import java.util.ArrayList;
 
 /**
  * This is the DashboardPoseTracker class. This tracks the pose history of the robot through a

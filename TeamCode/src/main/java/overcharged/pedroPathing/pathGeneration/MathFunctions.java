@@ -2,7 +2,6 @@ package overcharged.pedroPathing.pathGeneration;
 
 import overcharged.pedroPathing.localization.Pose;
 
-
 /**
  * This is the MathFunctions class. This contains many useful math related methods that I use in
  * other classes to simplify code elsewhere.

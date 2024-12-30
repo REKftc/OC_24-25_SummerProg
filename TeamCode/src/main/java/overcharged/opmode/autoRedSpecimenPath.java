@@ -1,3 +1,4 @@
+
 package overcharged.opmode;
 
 import static overcharged.config.RobotConstants.TAG_SL;
@@ -83,10 +84,10 @@ public class autoRedSpecimenPath extends OpMode{
     private Pose redRightBasket = new Pose();
 
     // OTHER POSES
-    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward;
+    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack;
     private Pose startPose = new Pose(135, 64, 0);
 
-    private Path redPark, redPark2, slightMove;
+    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2;
 
     private PathChain preload;
 
@@ -95,11 +96,14 @@ public class autoRedSpecimenPath extends OpMode{
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(118,64,0);
-       // atSpecimen = new Pose(117,70,0);
+        beforeSpecimen = new Pose(120,64,0);
+        // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(133,64,0);
-        backUp = new Pose(118,64,0);
-        goPark = new Pose(132,110,0);
+        backUp = new Pose(122,64,0);
+        goPark = new Pose(122,101,0);
+        goRotate = new Pose(122,95, Math.PI);
+        bitForward = new Pose(114,95, Math.PI);
+        bitBack = new Pose(133,100, Math.PI);
     }
 
 
@@ -121,7 +125,7 @@ public class autoRedSpecimenPath extends OpMode{
                 .setPathEndTimeoutConstraint(0)
                 .build();
 
-       // slightMove = new Path(new BezierLine(new Point(beforeSpecimen), new Point(atSpecimen)));
+        // slightMove = new Path(new BezierLine(new Point(beforeSpecimen), new Point(atSpecimen)));
         //slightMove.setConstantHeadingInterpolation(0);
 
         slightMove = new Path(new BezierLine(new Point(startPose), new Point(goForward)));
@@ -130,6 +134,12 @@ public class autoRedSpecimenPath extends OpMode{
         redPark.setConstantHeadingInterpolation(0);
         redPark2 = new Path(new BezierLine(new Point(backUp), new Point(goPark)));
         redPark2.setConstantHeadingInterpolation(0);
+        nextRotate = new Path(new BezierLine(new Point(goPark), new Point(goRotate)));
+        nextRotate.setConstantHeadingInterpolation(Math.PI);
+        bitRotate = new Path(new BezierLine(new Point(goRotate), new Point(bitForward)));
+        bitRotate.setConstantHeadingInterpolation(Math.PI);
+        toSample2 = new Path(new BezierLine(new Point(bitForward), new Point(bitBack)));
+        toSample2.setConstantHeadingInterpolation(Math.PI);
 
     }
 
@@ -155,12 +165,13 @@ public class autoRedSpecimenPath extends OpMode{
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setFlat();
                     robot.depoWrist.setIn();
-                    waitFor(1000);
+                    robot.claw.setOpen();
                     setPathState(12);
                 }
                 break;
             case 12: // scores initial specimen
                 if(!follower.isBusy()) {
+                    waitFor(1000);
                     robot.claw.setClose();
                     waitFor(1000);
                     setPathState(13);
@@ -204,18 +215,75 @@ public class autoRedSpecimenPath extends OpMode{
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-100, 1f);
                     vslideGoBottom = true;
                     waitFor(500);
                     robot.intakeTilt.setTransfer();
-                    setPathState(100);
+                    setPathState(18);
                 }
                 break;
             case 18:
                 if(!follower.isBusy()) {
                     follower.followPath(redPark2);
+                    setPathState(19);
+                }
+                break;
+            case 19:
+                if(!follower.isBusy()) {
+                    waitFor(1000);
+                    follower.followPath(nextRotate);
+                    nextRotate.setLinearHeadingInterpolation(goRotate.getHeading(), Math.PI);
+                    setPathState(20);
+                }
+                break;
+            case 20:
+                if(!follower.isBusy()) {
+                    waitFor(1000);
+                    robot.intakeTilt.setOut();
+                    robot.intake.in();
+                    setPathState(21);
+                }
+                break;
+            case 21:
+                if(!follower.isBusy()) {
+                    waitFor(1000);
+                    follower.followPath(bitRotate);
+                    bitRotate.setLinearHeadingInterpolation(bitForward.getHeading(), Math.PI);
+                    setPathState(22);
+                }
+                break;
+            case 22:
+                if(!follower.isBusy()) {
+                    robot.intakeTilt.setTransfer();
+                    waitFor(1000);
+                    robot.intake.off();
+                    setPathState(23);
+                }
+                break;
+            case 23:
+                if(!follower.isBusy()) {
+                    robot.claw.setClose();
+                    waitFor(1000);
+                    robot.intakeTilt.setOut();
+                    waitFor(1000);
+                    robot.clawBigTilt.setWall();
+                    robot.clawSmallTilt.setWall();
+                    setPathState(24);
+                }
+                break;
+            case 24:
+                if(!follower.isBusy()) {
+                    robot.claw.setClose();
+                    waitFor(1000);
+                    robot.intakeTilt.setOut();
+                    waitFor(1000);
+                    robot.clawBigTilt.setWall();
+                    robot.clawSmallTilt.setWall();
                     setPathState(100);
                 }
                 break;
+
+
 
 
             case 100: // EMPTY TEST CASE
@@ -256,7 +324,7 @@ public class autoRedSpecimenPath extends OpMode{
             RobotLog.ii(TAG_SL, "Going down");
         } else if (hlimitswitch.getState() && hSlideGoBottom) {
             robot.latch.setInit();
-           // robot.intakeTilt.setTransfer();
+            // robot.intakeTilt.setTransfer();
             robot.hslides.hslides.setPower(0);
             robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             hSlideGoBottom = false;
@@ -331,4 +399,3 @@ public class autoRedSpecimenPath extends OpMode{
         }
     }
 }
-

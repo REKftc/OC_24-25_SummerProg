@@ -1,6 +1,5 @@
 package overcharged.pedroPathing.localization.localizers;
 
-import overcharged.pedroPathing.localization.SparkFunOTOSCorrected;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -22,18 +21,18 @@ import overcharged.pedroPathing.pathGeneration.Vector;
  *
  * forward on robot is the x positive direction
  *
- *    /--------------\
- *    |     ____     |
- *    |     ----     |
- *    | ||        || |
- *    | ||        || |  ----> left (y positive)
- *    |              |
- *    |              |
- *    \--------------/
- *           |
- *           |
- *           V
- *    forward (x positive)
+ *                         forward (x positive)
+ *                                △
+ *                                |
+ *                                |
+ *                         /--------------\
+ *                         |              |
+ *                         |              |
+ *                         | ||        || |
+ *  left (y positive) <--- | ||        || |  
+ *                         |     ____     |
+ *                         |     ----     |
+ *                         \--------------/
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 7/20/2024
@@ -83,11 +82,11 @@ public class OTOSLocalizer extends Localizer {
         // For the OTOS, left/right is the y axis and forward/backward is the x axis, with left being
         // positive y and forward being positive x. PI/2 radians is facing forward, and clockwise
         // rotation is negative rotation.
-        otos.setOffset(new SparkFunOTOS.Pose2D(-7.25,0,Math.PI/2));
+        otos.setOffset(new SparkFunOTOS.Pose2D(0,0,Math.PI / 2));
 
         // TODO: replace these with your tuned multipliers
-        otos.setAngularScalar(0.9752);
-        otos.setLinearScalar(1.0571);
+        otos.setLinearScalar(1.0);
+        otos.setAngularScalar(1.0);
 
         otos.calibrateImu();
         otos.resetTracking();
@@ -109,7 +108,12 @@ public class OTOSLocalizer extends Localizer {
      */
     @Override
     public Pose getPose() {
-        return MathFunctions.addPoses(startPose, new Pose(otosPose.x, otosPose.y, otosPose.h));
+        Pose pose = new Pose(otosPose.x, otosPose.y, otosPose.h);
+
+        Vector vec = pose.getVector();
+        vec.rotateVector(startPose.getHeading());
+
+        return MathFunctions.addPoses(startPose, new Pose(vec.getXComponent(), vec.getYComponent(), pose.getHeading()));
     }
 
     /**

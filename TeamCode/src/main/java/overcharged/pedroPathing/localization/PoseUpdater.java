@@ -5,10 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import overcharged.pedroPathing.localization.localizers.ThreeWheelIMULocalizer;
-import overcharged.pedroPathing.localization.localizers.ThreeWheelLocalizer;
 import overcharged.pedroPathing.localization.localizers.PinpointLocalizer;
-import overcharged.pedroPathing.localization.localizers.TwoWheelLocalizer;
 import overcharged.pedroPathing.pathGeneration.MathFunctions;
 import overcharged.pedroPathing.pathGeneration.Vector;
 
@@ -61,6 +58,7 @@ public class PoseUpdater {
         }
 
         this.localizer = localizer;
+        imu = localizer.getIMU();
     }
 
     /**
@@ -262,10 +260,10 @@ public class PoseUpdater {
      */
     public Vector getVelocity() {
         if (currentVelocity == null) {
-//            currentVelocity = new Vector();
-//            currentVelocity.setOrthogonalComponents(getPose().getX() - previousPose.getX(), getPose().getY() - previousPose.getY());
-//            currentVelocity.setMagnitude(MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime - previousPoseTime) / Math.pow(10.0, 9)));
-            currentVelocity = localizer.getVelocityVector();
+            currentVelocity = new Vector();
+            currentVelocity.setOrthogonalComponents(getPose().getX() - previousPose.getX(), getPose().getY() - previousPose.getY());
+            currentVelocity.setMagnitude(MathFunctions.distance(getPose(), previousPose) / ((currentPoseTime - previousPoseTime) / Math.pow(10.0, 9)));
+//            currentVelocity = localizer.getVelocityVector();
             return MathFunctions.copyVector(currentVelocity);
         } else {
             return MathFunctions.copyVector(currentVelocity);
@@ -351,7 +349,7 @@ public class PoseUpdater {
     /**
      *
      */
-    public void resetIMU() throws InterruptedException {
+    public void resetIMU() {
         localizer.resetIMU();
     }
 }
