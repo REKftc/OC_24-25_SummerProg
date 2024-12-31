@@ -84,10 +84,10 @@ public class autoRedSpecimenPath extends OpMode{
     private Pose redRightBasket = new Pose();
 
     // OTHER POSES
-    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack;
+    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample;
     private Pose startPose = new Pose(135, 64, 0);
 
-    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2;
+    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample;
 
     private PathChain preload;
 
@@ -103,7 +103,8 @@ public class autoRedSpecimenPath extends OpMode{
         goPark = new Pose(122,101,0);
         goRotate = new Pose(122,95, Math.PI);
         bitForward = new Pose(114,95, Math.PI);
-        bitBack = new Pose(133,100, Math.PI);
+        bitBack = new Pose(120,100, Math.PI);
+        toSample = new Pose(124,102, Math.PI);
     }
 
 
@@ -140,6 +141,8 @@ public class autoRedSpecimenPath extends OpMode{
         bitRotate.setConstantHeadingInterpolation(Math.PI);
         toSample2 = new Path(new BezierLine(new Point(bitForward), new Point(bitBack)));
         toSample2.setConstantHeadingInterpolation(Math.PI);
+        grabSample = new Path(new BezierLine(new Point(bitBack), new Point(toSample)));
+        grabSample.setConstantHeadingInterpolation(Math.PI);
 
     }
 
@@ -215,7 +218,7 @@ public class autoRedSpecimenPath extends OpMode{
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-100, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
                     vslideGoBottom = true;
                     waitFor(500);
                     robot.intakeTilt.setTransfer();
@@ -279,10 +282,37 @@ public class autoRedSpecimenPath extends OpMode{
                     waitFor(1000);
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setWall();
+                    setPathState(25);
+                }
+                break;
+            case 25:
+                if(!follower.isBusy()) {
+                    follower.followPath(toSample2);
+                    toSample2.setLinearHeadingInterpolation(bitBack.getHeading(), Math.PI);
+                    setPathState(26);
+                }
+                break;
+            case 26:
+                if(!follower.isBusy()) {
+                    waitFor(500);
+                    robot.claw.setOpen();
+                    setPathState(27);
+                }
+                break;
+            case 27:
+                if(!follower.isBusy()) {
+                    waitFor(500);
+                    follower.followPath(grabSample);
+                    grabSample.setLinearHeadingInterpolation(toSample.getHeading(), Math.PI);
+                    setPathState(28);
+                }
+                break;
+            case 28:
+                if(!follower.isBusy()) {
+                    robot.claw.setClose();
                     setPathState(100);
                 }
                 break;
-
 
 
 

@@ -356,15 +356,15 @@ public class teleop4 extends OpMode {
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>40){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>1){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>100){
-            robot.intake.in();
-            intakeMode = IntakeMode.IN;
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>5){
+            robot.intake.off();
+            intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
         }
