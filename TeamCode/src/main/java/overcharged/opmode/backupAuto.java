@@ -68,10 +68,10 @@ public class backupAuto extends OpMode{
     //TODO: Starting from here are the poses for the paths
     public void firstBucket(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        initBucket = new Pose(126,30,Math.toRadians(130));
-        beforeBucket = new Pose(120,24,Math.toRadians(130));
-        ready2Score = new Pose(125,19,Math.toRadians(130));
-        wallScore = new Pose(122,15.6,Math.PI);
+        initBucket = new Pose(126,30,3*Math.PI/4);
+        beforeBucket = new Pose(120,24,3*Math.PI/4);
+        ready2Score = new Pose(129.5,14,3*Math.PI/4);
+        wallScore = new Pose(125,8.5,Math.PI);
     }
 
 
@@ -110,7 +110,7 @@ public class backupAuto extends OpMode{
             case 10: // scores initial specimen
                 totalTime = pathTimer.getElapsedTime();
                 pathTimer.resetTimer();
-                follower.followPath(preload, false);
+                follower.followPath(preload, true);
                 setPathState(12);
                 break;
             case 12:
@@ -126,7 +126,7 @@ public class backupAuto extends OpMode{
                 }
                 break;
             case 13:
-                follower.holdPoint(new BezierPoint(new Point(134.6,8.8,Point.CARTESIAN)),Math.toRadians(130));
+                //follower.holdPoint(new BezierPoint(new Point(129.5,14,Point.CARTESIAN)),Math.toRadians(135));
                 robot.clawBigTilt.setBucket();
                 robot.depoHslide.setInit();
                 waitFor(900);

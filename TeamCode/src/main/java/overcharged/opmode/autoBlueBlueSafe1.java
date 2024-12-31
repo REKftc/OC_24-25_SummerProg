@@ -31,42 +31,6 @@ public class autoBlueBlueSafe1 extends OpMode{
     // Other init
     private int pathState;
 
-    // LOCATIONS
-    // GUIDE:
-    // (0,0) is the corner. (144, 144) is the opposite.
-
-    // TODO: Here are all the Sample Poses
-    // Blue side Blue Element Poses
-    //
-    private Pose blueBlueLeftSample = new Pose();
-    private Pose blueBlueMidSample = new Pose();
-    private Pose blueBlueRightSample = new Pose();
-    // Blue side Neutral Element Poses
-    //
-    private Pose blueNeutLeftSample = new Pose();
-    private Pose blueNeutMidSample = new Pose();
-    private Pose blueNeutRightSample = new Pose();
-    // Red Side Red Element Poses
-    //
-    private Pose redRedLeftSample = new Pose();
-    private Pose redRedMidSample = new Pose();
-    private Pose redRedRightSample = new Pose();
-    // Red Side Neutral Element Poses
-    //
-    private Pose redNeutLeftSample = new Pose();
-    private Pose redNeutMidSample = new Pose();
-    private Pose redNeutRightSample = new Pose();
-
-    // TODO: Here are the Basket and Observation Zone positions
-    // Blue side Left Basket Pose
-    private Pose blueLeftBasket = new Pose();
-    // Blue side Right Basket Pose
-    private Pose blueRightBasket = new Pose();
-    // Red side Left Basket Pose
-    private Pose redLeftBasket = new Pose();
-    // Red side Right Basket Pose
-    private Pose redRightBasket = new Pose();
-
     // OTHER POSES
     private Pose moveOutPoint, beforeFirst, aBitForward, goToBBLlineUp, goToBBL, startToObs;
     private Pose startPose = new Pose(9.5+48, 144-7, 0);

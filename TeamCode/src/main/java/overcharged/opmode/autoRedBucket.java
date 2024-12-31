@@ -68,8 +68,8 @@ public class autoRedBucket extends OpMode{
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
         initBucket = new Pose(126,30,3*Math.PI/4);
         beforeBucket = new Pose(120,24,3*Math.PI/4);
-        ready2Score = new Pose(124,19,3*Math.PI/4);
-        wallScore = new Pose(122.5,17,Math.PI);
+        ready2Score = new Pose(129.5,14,3*Math.PI/4);
+        wallScore = new Pose(125,8.5,Math.PI);
     }
 
 
