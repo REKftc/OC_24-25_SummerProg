@@ -15,6 +15,8 @@ import overcharged.pedroPathing.localization.Localizer;
 import overcharged.pedroPathing.localization.Pose;
 import overcharged.pedroPathing.pathGeneration.MathFunctions;
 import overcharged.pedroPathing.pathGeneration.Vector;
+import overcharged.pedroPathing.util.NanoTimer;
+import org.opencv.core.Mat;
 
 /**
  * This is the Pinpoint class. This class extends the Localizer superclass and is a
@@ -53,8 +55,11 @@ public class PinpointLocalizer extends Localizer {
     private GoBildaPinpointDriver odo;
     private double previousHeading;
     private double totalHeading;
+    private long deltaTimeNano;
+    private NanoTimer timer;
+    private Pose currentVelocity;
+    private Pose previousPinpointPose;
 
-    private ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     /**
      * This creates a new PinpointLocalizer from a HardwareMap, with a starting Pose at (0,0)
@@ -77,7 +82,7 @@ public class PinpointLocalizer extends Localizer {
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         //This uses mm, to use inches divide these numbers by 25.4
-        odo.setOffsets(-69, 43.5); //these are tuned for 3110-0002-0001 Product Insight #1
+        setOffsets(7.25-1.75,8.5-7.75 , DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
         //57.35, 62.35
         //TODO: If you find that the gobilda Yaw Scaling is incorrect you can edit this here
         //odo.setYawScalar(1.0);
@@ -92,10 +97,11 @@ public class PinpointLocalizer extends Localizer {
 
         setStartPose(setStartPose);
         totalHeading = 0;
-        previousHeading = startPose.getHeading();
-
-        resetPinpoint();
-        timer.reset();
+        timer = new NanoTimer();
+        previousPinpointPose = new Pose();
+        currentVelocity = new Pose();
+        deltaTimeNano = 1;
+        previousHeading = setStartPose.getHeading();
     }
     /**
      * This returns the current pose estimate.
@@ -104,17 +110,7 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public Pose getPose() {
-        Pose2D rawPose = odo.getPosition();
-        Pose pose = new Pose(rawPose.getX(DistanceUnit.INCH), rawPose.getY(DistanceUnit.INCH), rawPose.getHeading(AngleUnit.RADIANS));
-
-//        Pose pose1 = MathFunctions.addPoses(startPose, MathFunctions.rotatePose(pose, startPose.getHeading(), false));
-//        Pose pose2 = MathFunctions.addPoses(startPose, MathFunctions.rotatePose(pose, startPose.getHeading(), true));
-
-//        Log.d("PinpointLocalizer_logger", "PP pose: " + new PoseMessage(pose));
-//        Log.d("PinpointLocalizer_logger", "PP pose heading false: " + new PoseMessage(pose1));
-//        Log.d("PinpointLocalizer_logger", "PP pose heading true: " + new PoseMessage(pose2));
-
-        return MathFunctions.addPoses(startPose, MathFunctions.rotatePose(pose, startPose.getHeading(), false));
+        return MathFunctions.addPoses(startPose, MathFunctions.rotatePose(previousPinpointPose, startPose.getHeading(), false));
     }
 
     /**
@@ -124,8 +120,7 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public Pose getVelocity() {
-        Pose2D pose = odo.getVelocity();
-        return new Pose(pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH), pose.getHeading(AngleUnit.RADIANS));
+        return currentVelocity.copy();
     }
 
     /**
@@ -135,10 +130,7 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public Vector getVelocityVector() {
-        Pose2D pose = odo.getVelocity();
-        Vector returnVector = new Vector();
-        returnVector.setOrthogonalComponents(pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH));
-        return returnVector;
+        return currentVelocity.getVector();
     }
 
     /**
@@ -148,7 +140,9 @@ public class PinpointLocalizer extends Localizer {
      * @param setStart the new start pose
      */
     @Override
-    public void setStartPose(Pose setStart) {startPose = setStart;}
+    public void setStartPose(Pose setStart) {
+        this.startPose = setStart;
+    }
 
     /**
      * This sets the current pose estimate. Changing this should just change the robot's current
@@ -158,9 +152,8 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public void setPose(Pose setPose) {
-        resetPinpoint();
-        Pose setPinpointPose = MathFunctions.subtractPoses(setPose, startPose);
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, setPinpointPose.getX(), setPinpointPose.getY(), AngleUnit.RADIANS, setPinpointPose.getHeading()));
+        Pose setNewPose = MathFunctions.subtractPoses(setPose, startPose);
+        odo.setPosition(new Pose2D(DistanceUnit.INCH, setNewPose.getX(), setNewPose.getY(), AngleUnit.RADIANS, setNewPose.getHeading()));
     }
 
     /**
@@ -168,9 +161,16 @@ public class PinpointLocalizer extends Localizer {
      */
     @Override
     public void update() {
+        deltaTimeNano = timer.getElapsedTime();
+        timer.resetTimer();
         odo.update();
-        totalHeading += MathFunctions.getSmallestAngleDifference(odo.getHeading(), previousHeading);
-        previousHeading = odo.getHeading();
+        Pose2D pinpointPose = odo.getPosition();
+        Pose currentPinpointPose = new Pose(pinpointPose.getX(DistanceUnit.INCH), pinpointPose.getY(DistanceUnit.INCH), pinpointPose.getHeading(AngleUnit.RADIANS));
+        totalHeading += MathFunctions.getSmallestAngleDifference(currentPinpointPose.getHeading(), previousHeading);
+        previousHeading = currentPinpointPose.getHeading();
+        Pose deltaPose = MathFunctions.subtractPoses(currentPinpointPose, previousPinpointPose);
+        currentVelocity = new Pose(deltaPose.getX() / (deltaTimeNano / Math.pow(10.0, 9)), deltaPose.getY() / (deltaTimeNano / Math.pow(10.0, 9)), deltaPose.getHeading() / (deltaTimeNano / Math.pow(10.0, 9)));
+        previousPinpointPose = currentPinpointPose;
     }
 
     /**
@@ -212,17 +212,39 @@ public class PinpointLocalizer extends Localizer {
     }
 
     /**
+     * This sets the offsets and converts inches to millimeters
+     * @param xOffset How far to the side from the center of the robot is the x-pod? Use positive values if it's to the left and negative if it's to the right.
+     * @param yOffset How far forward from the center of the robot is the y-pod? Use positive values if it's forward and negative if it's to the back.
+     * @param unit The units that the measurements are given in
+     */
+    private void setOffsets(double xOffset, double yOffset, DistanceUnit unit) {
+        odo.setOffsets(unit.toMm(xOffset), unit.toMm(yOffset));
+    }
+
+    /**
      * This resets the IMU.
      */
     @Override
-    public void resetIMU() {
+    public void resetIMU()  {
         odo.recalibrateIMU();
+
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * This resets the OTOS.
      */
-    public void resetPinpoint(){
+    private void resetPinpoint() {
         odo.resetPosAndIMU();
+
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

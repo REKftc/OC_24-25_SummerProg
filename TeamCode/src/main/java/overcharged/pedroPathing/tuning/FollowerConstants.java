@@ -44,7 +44,7 @@ public class FollowerConstants {
 
     // Translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.1,
+            0.075,
             0,
             0,
             0);
@@ -62,7 +62,7 @@ public class FollowerConstants {
 
     // Heading error PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            1,
+            0.8,
             0,
             0,
             0);
@@ -73,10 +73,10 @@ public class FollowerConstants {
 
     // Drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients drivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.025,
+            0.01,
             0,
             0.00001,
-            0.6,
+            0.5,
             0);
 
     // Feed forward constant added on to the drive PIDF
@@ -89,10 +89,10 @@ public class FollowerConstants {
 
 
     // Mass of robot in kilograms
-    public static double mass = 10.65942;
+    public static double mass = 16;
 
     // Centripetal force to power scaling
-    public static double centripetalScaling = 0.0005;
+    public static double centripetalScaling = 0.000425;
 
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
@@ -161,8 +161,8 @@ public class FollowerConstants {
     // These activate / deactivate the secondary PIDs. These take over at errors under a set limit for
     // the translational, heading, and drive PIDs.
     public static boolean useSecondaryTranslationalPID = false;
-    public static boolean useSecondaryHeadingPID = false;
-    public static boolean useSecondaryDrivePID = false;
+    public static boolean useSecondaryHeadingPID = true;
+    public static boolean useSecondaryDrivePID = true;
 
 
     // the limit at which the translational PIDF switches between the main and secondary translational PIDFs,
@@ -192,9 +192,9 @@ public class FollowerConstants {
 
     // Secondary heading error PIDF coefficients
     public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            5,
+            2.8,
             0,
-            0.08,
+            0.05,
             0);
 
     // Feed forward constant added on to the secondary heading PIDF
@@ -206,10 +206,10 @@ public class FollowerConstants {
 
     // Secondary drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients secondaryDrivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.02,
+            0.005,
             0,
-            0.000005,
-            0.6,
+            0.0000035,
+            0.5,
             0);
 
     // Feed forward constant added on to the secondary drive PIDF

@@ -338,7 +338,7 @@ public class teleop4 extends OpMode {
                     intTiltDelay = true;
                 }
                 else{
-                    robot.intakeTilt.setOut();
+                    robot.intakeTilt.setInOut();
                 }
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
@@ -782,7 +782,8 @@ public class teleop4 extends OpMode {
         /// Telems TODO: DO NOT DELETE ANYTHING
         telemetry.addData("Current Mode:",mode);
         //telemetry.addData("intake mode", intakeMode);
-        //telemetry.addData("h limit switch: ",   hlimitswitch.getState());
+        telemetry.addData("h limit switch: ",   hlimitswitch.getState());
+        telemetry.addData("h slide motor power", robot.hslides.getPower());
         //telemetry.addData("v limit switch: ",   vlimitswitch.getState());
         //telemetry.addData("vslideRPower:", robot.vSlides.vSlidesL.getPower());
         //telemetry.addData("vslideLPower:", robot.vSlides.vSlidesR.getPower());

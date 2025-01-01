@@ -76,6 +76,8 @@ public class teleOneMan extends OpMode {
     int intakeStep = 0;
     int modeCount = 1;
     int tempLocation;
+    float turnConstant = 1;
+
     boolean intakeDelay = false;
     boolean intakeOn = false;
     boolean intTiltDelay = false;
@@ -177,7 +179,7 @@ public class teleOneMan extends OpMode {
         // Joystick and bumper handling
         double y = gamepad1.left_stick_y;
         double x = -gamepad1.left_stick_x * 1.1;
-        double rx = -gamepad1.right_stick_x;
+        double rx = -gamepad1.right_stick_x*turnConstant;
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
         // Slowmode Settings for Heights
@@ -197,6 +199,7 @@ public class teleOneMan extends OpMode {
 
         // Check if left bumper is pressed to enable hslide control
         if (hSlideisOut) {
+            turnConstant = 0.5f;
             // Use the left joystick Y-axis to control hslide movement
             float slidePower = -gamepad1.right_stick_y;  // Invert to match expected joystick behavior
 
@@ -235,6 +238,7 @@ public class teleOneMan extends OpMode {
 
         // Logic for bringing hslides back in
         if (!hlimitswitch.getState() && hSlideGoBottom) {
+            turnConstant = 1f;
             robot.latch.setInit();
             robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.hslides.hslides.setPower(-1.3f);
@@ -314,7 +318,7 @@ public class teleOneMan extends OpMode {
                     intTiltDelay = true;
                 }
                 else{
-                    robot.intakeTilt.setOut();
+                    robot.intakeTilt.setInOut();
                 }
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;

@@ -57,7 +57,7 @@ public class backupAuto extends OpMode{
 
     // OTHER POSES
     private Pose initBucket, beforeBucket, ready2Score, wallScore;
-    private Pose startPose = new Pose(135, 56, 0);
+    private Pose startPose = new Pose(136, 32, Math.toRadians(90));
 
     private Path firstScore, inchBucket, goSafe, goBack, floorCycle;
 
@@ -79,17 +79,17 @@ public class backupAuto extends OpMode{
     public void buildPaths() {
 
         preload = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose),new Point(initBucket)))
-                .setLinearHeadingInterpolation(startPose.getHeading(), initBucket.getHeading())
-                .addPath(new BezierLine(new Point(initBucket), new Point(ready2Score)))
-                .setConstantHeadingInterpolation(ready2Score.getHeading())
+                .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
+                .setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
+                //.addPath(new BezierLine(new Point(initBucket), new Point(ready2Score)))
+                //.setConstantHeadingInterpolation(ready2Score.getHeading())
                 .setPathEndTimeoutConstraint(3.0)
                 .build();
 
 
 
-        goSafe = new Path(new BezierLine(new Point(135,9.5,Point.CARTESIAN), new Point(beforeBucket)));
-        goSafe.setConstantHeadingInterpolation(-Math.PI/2);
+        goSafe = new Path(new BezierLine(new Point(ready2Score), new Point(beforeBucket)));
+        goSafe.setConstantHeadingInterpolation(Math.PI);
 
         goBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket)));
         goBack.setConstantHeadingInterpolation(Math.PI);
@@ -110,7 +110,7 @@ public class backupAuto extends OpMode{
             case 10: // scores initial specimen
                 totalTime = pathTimer.getElapsedTime();
                 pathTimer.resetTimer();
-                follower.followPath(preload, true);
+                follower.followPath(preload, false);
                 setPathState(12);
                 break;
             case 12:
@@ -126,7 +126,7 @@ public class backupAuto extends OpMode{
                 }
                 break;
             case 13:
-                //follower.holdPoint(new BezierPoint(new Point(129.5,14,Point.CARTESIAN)),Math.toRadians(135));
+                follower.holdPoint(new BezierPoint(new Point(129.5,14,Point.CARTESIAN)),Math.toRadians(135));
                 robot.clawBigTilt.setBucket();
                 robot.depoHslide.setInit();
                 waitFor(900);
@@ -194,7 +194,7 @@ public class backupAuto extends OpMode{
                     robot.intake.out();
                     setPathState(17);
                 }
-                else if (pathTimer.getElapsedTime()>2500){
+                else if (pathTimer.getElapsedTime()>2300){
                     robot.intake.off();
                     robot.intakeTilt.setTransfer();
                     hSlideGoBottom = true;
@@ -210,10 +210,10 @@ public class backupAuto extends OpMode{
                     robot.intakeTilt.setTransfer();
                     follower.followPath(floorCycle);
                     if(floorRep==3) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(190), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(185), Math.PI);
                     }
                     else if(floorRep==2) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(210), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(205), Math.PI);
                     }
                     else if(floorRep==1) {
                         floorCycle.setLinearHeadingInterpolation(Math.toRadians(225), Math.PI);
@@ -293,6 +293,7 @@ public class backupAuto extends OpMode{
         autoPath();
         telemetry.addLine("TValue: "+follower.getCurrentTValue());
         telemetry.addLine("Path: " + pathState);
+        telemetry.addLine("Position: " + follower.getPose());
         telemetry.addLine("color: "+robot.sensorF.getColor());
         telemetry.addLine("vLimit" + vlimitswitch.getState());
         telemetry.addLine("hLimit" + hlimitswitch.getState());
