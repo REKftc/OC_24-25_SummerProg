@@ -27,13 +27,14 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "BACKUP bucket", group = "Autonomous")
-public class backupAuto extends OpMode{
+@Autonomous(name = "less turn bucket", group = "Autonomous")
+public class autoBucketNT extends OpMode{
 
     //stuff
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean scored = false;
+    boolean in = true;
 
     long totalTime;
 
@@ -56,10 +57,10 @@ public class backupAuto extends OpMode{
     // (0,0) is the corner. (144, 144) is the opposite.
 
     // OTHER POSES
-    private Pose initBucket, beforeBucket, ready2Score, wallScore;
+    private Pose initBucket, beforeBucket, ready2Score, wallScore, beforeBucket2, beforeBucket3;
     private Pose startPose = new Pose(136, 32, Math.toRadians(90));
 
-    private Path firstScore, inchBucket, goSafe, goBack, floorCycle;
+    private Path firstScore, inchBucket, goSafe, goBack, floorCycle, secondBack;
 
     private PathChain preload;
 
@@ -69,8 +70,9 @@ public class backupAuto extends OpMode{
     public void firstBucket(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
         initBucket = new Pose(126,30,3*Math.PI/4);
-        beforeBucket = new Pose(120,24,3*Math.PI/4);
-        ready2Score = new Pose(129.5,17,3*Math.PI/4);
+        beforeBucket = new Pose(120,24, Math.PI);
+        beforeBucket2 = new Pose(120,14,Math.PI);
+        ready2Score = new Pose(136,19,Math.PI/2);
         wallScore = new Pose(125,9.2,Math.PI);
     }
 
@@ -80,7 +82,8 @@ public class backupAuto extends OpMode{
 
         preload = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
-                .setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
+                .setConstantHeadingInterpolation(startPose.getHeading())
+                //.setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
                 //.addPath(new BezierLine(new Point(initBucket), new Point(ready2Score)))
                 //.setConstantHeadingInterpolation(ready2Score.getHeading())
                 .setPathEndTimeoutConstraint(3.0)
@@ -93,6 +96,9 @@ public class backupAuto extends OpMode{
 
         goBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket)));
         goBack.setConstantHeadingInterpolation(Math.PI);
+
+        secondBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket2)));
+        secondBack.setConstantHeadingInterpolation(Math.PI);
 
         floorCycle = new Path(new BezierLine(new Point(beforeBucket), new Point(wallScore)));
         floorCycle.setConstantHeadingInterpolation(Math.PI);
@@ -126,8 +132,9 @@ public class backupAuto extends OpMode{
                 }
                 break;
             case 13:
-                follower.holdPoint(new BezierPoint(new Point(ready2Score)),Math.toRadians(135));
+                //follower.holdPoint(new BezierPoint(new Point(ready2Score)),Math.toRadians(135));
                 robot.clawBigTilt.setBucket();
+                robot.clawSmallTilt.setLeft();
                 robot.depoHslide.setInit();
                 waitFor(900);
                 robot.claw.setBig();
@@ -146,19 +153,19 @@ public class backupAuto extends OpMode{
                     pathTimer.resetTimer();
                     if(floorRep == 3) {
                         follower.followPath(goSafe);
-                        goSafe.setLinearHeadingInterpolation(beforeBucket.getHeading(), Math.toRadians(185));
+                        goSafe.setLinearHeadingInterpolation(beforeBucket.getHeading(), Math.toRadians(180));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
                     else if(floorRep==2){
-                        follower.followPath(goBack);
-                        goBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(205));
+                        follower.followPath(secondBack);
+                        goBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(180));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
                     else if(floorRep==1){
-                        follower.followPath(goBack);
-                        goBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(225));
+                        follower.followPath(secondBack);
+                        goBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(200));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
@@ -168,17 +175,18 @@ public class backupAuto extends OpMode{
                 if(!follower.isBusy()) {
                     robot.latch.setOut();
                     robot.intakeTilt.setOut();
+                    in = false;
                     if(floorRep==3) {
-                        follower.holdPoint(new BezierPoint(new Point(beforeBucket)), Math.toRadians(185));
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.7f);
+                        follower.holdPoint(new BezierPoint(new Point(beforeBucket)), Math.toRadians(180));
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.8f);
                     }
                     else if(floorRep==2) {
-                        follower.holdPoint(new BezierPoint(new Point(beforeBucket)), Math.toRadians(205));
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 0.80f);
+                        follower.holdPoint(new BezierPoint(new Point(beforeBucket2)), Math.toRadians(180));
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.80f);
                     }
                     else if(floorRep==1) {
-                        follower.holdPoint(new BezierPoint(new Point(beforeBucket)), Math.toRadians(225));
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET3, 1f);
+                        follower.holdPoint(new BezierPoint(new Point(beforeBucket2)), Math.toRadians(200));
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 0.55f);
                     }
                     robot.intake.in();
                     waitFor(300);
@@ -194,7 +202,7 @@ public class backupAuto extends OpMode{
                     robot.intake.out();
                     setPathState(17);
                 }
-                else if (pathTimer.getElapsedTime()>2300){
+                else if (pathTimer.getElapsedTime()>2100){
                     robot.intake.off();
                     robot.intakeTilt.setTransfer();
                     hSlideGoBottom = true;
@@ -206,17 +214,17 @@ public class backupAuto extends OpMode{
             case 17:
                 waitFor(300);
                 robot.intake.off();
-                if(hlimitswitch.getState()) {
+                if(in) {
                     robot.intakeTilt.setTransfer();
                     follower.followPath(floorCycle);
                     if(floorRep==3) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(185), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(180), Math.PI);
                     }
                     else if(floorRep==2) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(205), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(180), Math.PI);
                     }
                     else if(floorRep==1) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(225), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(200), Math.PI);
                     }
                     waitFor(200);
                     robot.claw.setClose();
@@ -294,13 +302,15 @@ public class backupAuto extends OpMode{
         telemetry.addLine("TValue: "+follower.getCurrentTValue());
         telemetry.addLine("Path: " + pathState);
         telemetry.addLine("Position: " + follower.getPose());
-        telemetry.addLine("color: "+robot.sensorF.getColor());
-        telemetry.addLine("vLimit" + vlimitswitch.getState());
-        telemetry.addLine("hLimit" + hlimitswitch.getState());
+        telemetry.addLine("heading: " + follower.getTotalHeading());
+        //telemetry.addLine("color: "+robot.sensorF.getColor());
+        //telemetry.addLine("vLimit" + vlimitswitch.getState());
+        //telemetry.addLine("hLimit" + hlimitswitch.getState());
         telemetry.addLine("Rep Count"+ floorRep);
 
         //functions
         if (!hlimitswitch.getState() && hSlideGoBottom) {
+            in = true;
             robot.latch.setInit();
             robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.hslides.hslides.setPower(-1);

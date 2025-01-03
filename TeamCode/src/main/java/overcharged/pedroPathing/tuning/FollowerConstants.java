@@ -65,7 +65,7 @@ public class FollowerConstants {
             0.8,
             0,
             0,
-            0);
+            0.5);
 
     // Feed forward constant added on to the heading PIDF
     public static double headingPIDFFeedForward = 0.01;
@@ -192,7 +192,7 @@ public class FollowerConstants {
 
     // Secondary heading error PIDF coefficients
     public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            2.8,
+            3.3,
             0,
             0.05,
             0);

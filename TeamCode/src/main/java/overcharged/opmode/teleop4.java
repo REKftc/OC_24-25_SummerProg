@@ -100,6 +100,7 @@ public class teleop4 extends OpMode {
     boolean moveCount = false;
     boolean sense = false;
     boolean highTransfer = false;
+    boolean outH = false;
 
     boolean redSpec = false;
     boolean red = true;
@@ -240,12 +241,18 @@ public class teleop4 extends OpMode {
         robot.driveRightBack.setPower(backRightPower);
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
+            outH = true;
+            robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.5f;
-            robot.hslides.moveEncoderTo(robot.hslides.OUT,1.3f);
+            turnConstant = 0.44f;
+            robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
+            if (robot.hslides.getPower() == 0){
+                hSlideisOut = true;
+            }
         }
 
         if (gamepad1.a && Button.TRANSFER.canPress(timestamp)) { // hSlide mode
+            outH = true;
             hSlideisOut = !hSlideisOut;
             robot.latch.setOut();
             turnConstant = 0.5f;
@@ -258,16 +265,17 @@ public class teleop4 extends OpMode {
 
         // Logic for bringing hslides back in
         if (!hlimitswitch.getState() && hSlideGoBottom) {
+            outH = false;
             turnConstant = 1f;
             robot.latch.setInit();
             robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.hslides.hslides.setPower(-1.3f);
+            robot.hslides.hslides.setPower(-1f);
             RobotLog.ii(TAG_SL, "Going down");
         } else if (hlimitswitch.getState() && hSlideGoBottom) {
+            robot.hslides.hslides.setPower(0);
             robot.latch.setInit();
             latched = true;
             robot.intakeTilt.setTransfer();
-            robot.hslides.hslides.setPower(0);
             robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             hSlideisOut = false;
             clawDelay = System.currentTimeMillis();
@@ -279,7 +287,6 @@ public class teleop4 extends OpMode {
                 gamepad1.rumble(400);
             }
             RobotLog.ii(TAG_SL, "Force stopped");
-            gamepad2.rumble(400);
         }
         if (hlimitswitch.getState() && highTransfer){
             robot.intakeTilt.setTransfer();
@@ -348,7 +355,6 @@ public class teleop4 extends OpMode {
         }
 
         if(intakeOutDelay){
-            hSlideGoBottom = true;
             intakeOutDelay = false;
             robot.intake.in();
             intakeMode = IntakeMode.IN;
@@ -356,13 +362,15 @@ public class teleop4 extends OpMode {
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>1){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>200){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
+            //HSLIDE BOTTOM
+            hSlideGoBottom = true;
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>5){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
@@ -391,21 +399,7 @@ public class teleop4 extends OpMode {
         }
         //H Slides go back
         if(gamepad1.y && Button.TRANSFER.canPress(timestamp)){
-            robot.intakeTilt.setHigh();
-            robot.latch.setInit();
-            robot.depoWrist.setIn();
-            outakeTime = System.currentTimeMillis();
-            intakeOutDelay = true;
-            hSlideisOut = false;
-            robot.intake.in();
-            intakeMode = IntakeMode.IN;
-            highTransfer = true;
-            intakeTransfer = true;
-            robot.claw.setOpen();
-            clawOpen = true;
-            vslideOut = false;
-            slideLength = SlideLength.IN;
-            intakeTransfer = true;
+            transferNow();
         }
 
         if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>120){ // Transfer System
@@ -699,7 +693,10 @@ public class teleop4 extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
-                    transferNow();
+                    if (outH){
+                        outH = false;
+                        transferNow();
+                    }
                 }
                 else{
                     gamepad1.rumble(400);
@@ -715,7 +712,10 @@ public class teleop4 extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
-                    transferNow();
+                    if (outH){
+                        outH = false;
+                        transferNow();
+                    }
                 }
                 else{
                     gamepad1.rumble(400);
@@ -782,8 +782,8 @@ public class teleop4 extends OpMode {
         /// Telems TODO: DO NOT DELETE ANYTHING
         telemetry.addData("Current Mode:",mode);
         //telemetry.addData("intake mode", intakeMode);
-        telemetry.addData("h limit switch: ",   hlimitswitch.getState());
-        telemetry.addData("h slide motor power", robot.hslides.getPower());
+        //telemetry.addData("h limit switch: ",   hlimitswitch.getState());
+        //telemetry.addData("h slide motor power", robot.hslides.getPower());
         //telemetry.addData("v limit switch: ",   vlimitswitch.getState());
         //telemetry.addData("vslideRPower:", robot.vSlides.vSlidesL.getPower());
         //telemetry.addData("vslideLPower:", robot.vSlides.vSlidesR.getPower());
@@ -828,12 +828,12 @@ public class teleop4 extends OpMode {
     }
 
     public void transferNow(){
+        intakeOutDelay = true;
+        robot.clawBigTilt.setTransfer();
         robot.intakeTilt.setHigh();
         robot.latch.setInit();
         robot.depoWrist.setIn();
         outakeTime = System.currentTimeMillis();
-        intakeOutDelay = true;
-        hSlideisOut = false;
         robot.intake.in();
         intakeMode = IntakeMode.IN;
         highTransfer = true;

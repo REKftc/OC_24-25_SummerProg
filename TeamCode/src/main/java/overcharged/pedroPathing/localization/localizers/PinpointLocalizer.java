@@ -82,10 +82,10 @@ public class PinpointLocalizer extends Localizer {
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         //This uses mm, to use inches divide these numbers by 25.4
-        setOffsets(7.25-1.75,8.5-7.75 , DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
+        setOffsets(5.8,0.8 , DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
         //57.35, 62.35
         //TODO: If you find that the gobilda Yaw Scaling is incorrect you can edit this here
-        //odo.setYawScalar(1.0);
+        odo.setYawScalar(0.98);
         //TODO: Set your encoder resolution here, I have the Gobilda Odometry products already included.
         //TODO: If you would like to use your own odometry pods input the ticks per mm in the commented part below
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
