@@ -22,8 +22,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen +3 faster", group = "Autonomous")
-public class autoRedSpecimenFast3 extends OpMode {
+@Autonomous(name = "blue specimen +3 faster", group = "Autonomous")
+public class autoBlueSpecimenFast3 extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
@@ -234,7 +234,7 @@ public class autoRedSpecimenFast3 extends OpMode {
                 }
                 break;
             case 18:
-                if(robot.sensorF.getColor() == colorSensor.Color.RED){
+                if(robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intakeTilt.setTransfer();
                     hSlideGoBottom = true;
                     waitFor(250);
