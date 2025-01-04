@@ -22,8 +22,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen intake", group = "Autonomous")
-public class autoRedSpecimenIntake extends OpMode {
+@Autonomous(name = "red specimen +3", group = "Autonomous")
+public class autoRedSpecimen3 extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     // Init
@@ -87,7 +87,7 @@ public class autoRedSpecimenIntake extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(116,64,Math.PI);
+        beforeSpecimen = new Pose(115,64,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(119,64, Math.PI);
@@ -95,14 +95,14 @@ public class autoRedSpecimenIntake extends OpMode {
         goRotate = new Pose(125,117, Math.PI);
         bitForward = new Pose(123,116.5, 3*Math.PI/4);
         bitBack = new Pose(123,117.5, Math.PI);
-        toSample = new Pose(131,112, Math.PI);
-        secondScore = new Pose(129,67, Math.PI);
+        toSample = new Pose(132,116, Math.PI);
+        secondScore = new Pose(131,67, Math.PI);
         bitCloser = new Pose(114,61, Math.PI);
         bitBitBack = new Pose(122,59, Math.PI);
         thirdSample = new Pose(122,105, Math.PI);
         getThirdSample = new Pose(131,110, Math.PI);
-        thirdScore = new Pose(129,61, Math.PI);
-        thirdScoreCloser = new Pose(114,55, Math.PI);
+        thirdScore = new Pose(131,62, Math.PI);
+        thirdScoreCloser = new Pose(113,56, Math.PI);
         fourthScore = new Pose(129,70, Math.PI);
         fourthScoreCloser = new Pose(114,64, Math.PI);
 
@@ -179,26 +179,12 @@ public class autoRedSpecimenIntake extends OpMode {
                 pathTimer.resetTimer();
                 robot.claw.setClose();
                 waitFor(300);
-                follower.followPath(slightMove);
-                slightMove.setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(180));
-                setPathState(11);
-                break;
-            case 11: // scores initial specimen
-                if(!follower.isBusy()) {
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+95, 1.2f);
-                    robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoHslide.setOut();
-                    robot.clawSmallTilt.setFlat();
-                    setPathState(12);
-                }
-                break;
-            case 12: // scores initial specimen
-                if(!follower.isBusy()) {
-                    waitFor(200);
-                    follower.followPath(preload);
-                    setPathState(13);
-                }
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid+95, 1.2f);
+                follower.followPath(preload);
+                robot.clawBigTilt.setOut();
+                robot.depoHslide.setOut();
+                robot.clawSmallTilt.setFlat();
+                setPathState(13);
                 break;
             case 13: // scores initial specimen
                 if(!follower.isBusy()) {
@@ -217,11 +203,9 @@ public class autoRedSpecimenIntake extends OpMode {
                 break;
             case 15:
                 if(!follower.isBusy()) {
-                    waitFor(200);
                     robot.depoHslide.setInit();
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
-                    waitFor(100);
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
@@ -232,7 +216,7 @@ public class autoRedSpecimenIntake extends OpMode {
                 break;
             case 16:
                 if(!follower.isBusy()) {
-                    waitFor(200);
+                    waitFor(100);
                     follower.followPath(redPark2);
                     setPathState(17);
                 }
@@ -272,108 +256,7 @@ public class autoRedSpecimenIntake extends OpMode {
                     robot.clawSmallTilt.setWall();
                     waitFor(700);
                     robot.claw.setOpen();
-                    waitFor(200);
-                    setPathState(21);
-                }
-                break;
-            case 21: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(nextRotate);
-                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
-                    robot.claw.setOpen();
-                    robot.intake.in();
-                    setPathState(22);
-                }
-                break;
-            case 22:
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
-                    robot.latch.setOut();
-                    waitFor(500);
-                    robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.9f);
-                    setPathState(23);
-                }
-                break;
-            case 23:
-                if(robot.sensorF.getColor() == colorSensor.Color.RED){
-                    robot.intakeTilt.setTransfer();
-                    hSlideGoBottom = true;
-                    waitFor(100);
-                    robot.intake.off();
-                    setPathState(24);
-                }
-                break;
-            case 24:
-                if(hlimitswitch.getState()){
-                    waitFor(200);
-                    robot.claw.setClose();
-                    waitFor(200);
-                    setPathState(25);
-                }
-                break;
-            case 25: // scores initial specimen
-                if(!follower.isBusy()) {
-                    robot.intakeTilt.setOut();
-                    waitFor(200);
-                    robot.clawBigTilt.setWall();
-                    robot.clawSmallTilt.setWall();
                     waitFor(700);
-                    robot.claw.setOpen();
-                    waitFor(200);
-                    setPathState(26);
-                }
-                break;
-            case 26: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(bitRotate);
-                    bitRotate.setLinearHeadingInterpolation(bitForward.getHeading(), Math.toRadians(145));
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
-                    robot.claw.setOpen();
-                    robot.intake.in();
-                    setPathState(27);
-                }
-                break;
-            case 27:
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(bitForward)), Math.toRadians(145));
-                    robot.latch.setOut();
-                    waitFor(500);
-                    robot.hslides.moveEncoderTo(400, 0.9f);
-                    setPathState(28);
-                }
-                break;
-            case 28:
-                if(robot.sensorF.getColor() == colorSensor.Color.RED){
-                    robot.intakeTilt.setTransfer();
-                    hSlideGoBottom = true;
-                    waitFor(100);
-                    robot.intake.off();
-                    setPathState(29);
-                }
-                break;
-            case 29:
-                if(hlimitswitch.getState()){
-                    waitFor(200);
-                    robot.claw.setClose();
-                    waitFor(500);
-                    follower.followPath(toSample2);
-                    toSample2.setLinearHeadingInterpolation(bitBack.getHeading(), Math.toRadians(180));
-                    setPathState(30);
-                }
-                break;
-            case 30: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(bitBack)), Math.toRadians(180));
-                    robot.intakeTilt.setOut();
-                    waitFor(700);
-                    robot.clawBigTilt.setWall();
-                    robot.clawSmallTilt.setWall();
-                    waitFor(750);
-                    robot.claw.setOpen();
-                    waitFor(800);
                     setPathState(31);
                 }
                 break;
@@ -385,7 +268,8 @@ public class autoRedSpecimenIntake extends OpMode {
                 break;
             case 32: // scores initial specimen
                 if(!follower.isBusy()) {
-                    waitFor(700);
+                    follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(180));
+                    waitFor(500);
                     robot.claw.setClose();
                     setPathState(33);
                 }
@@ -400,7 +284,7 @@ public class autoRedSpecimenIntake extends OpMode {
             case 34: // scores initial specimen
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(secondScore)), Math.toRadians(180));
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+95, 1.2f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+90, 1.2f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
@@ -417,18 +301,16 @@ public class autoRedSpecimenIntake extends OpMode {
             case 36: // scores initial specimen
                 if(!follower.isBusy()) {
                     robot.claw.setOpen();
-                    waitFor(700);
+                    waitFor(150);
                     follower.followPath(getGetBack);
                     setPathState(37);
                 }
                 break;
             case 37: // scores initial specimen
                 if(!follower.isBusy()) {
-                    waitFor(500);
                     robot.depoHslide.setInit();
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
-                    waitFor(550);
                     robot.claw.setOpen();
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setWall();
@@ -451,7 +333,7 @@ public class autoRedSpecimenIntake extends OpMode {
                 break;
             case 40: // scores initial specimen
                 if(!follower.isBusy()) {
-                    waitFor(700);
+                    waitFor(600);
                     robot.claw.setClose();
                     setPathState(41);
                 }
@@ -466,8 +348,7 @@ public class autoRedSpecimenIntake extends OpMode {
             case 42: // scores initial specimen
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(180));
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+95, 1.2f);
-                    robot.claw.setClose();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+93, 1.2f);
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
                     robot.clawSmallTilt.setFlat();
@@ -483,84 +364,16 @@ public class autoRedSpecimenIntake extends OpMode {
             case 44: // scores initial specimen
                 if(!follower.isBusy()) {
                     robot.claw.setOpen();
-                    waitFor(700);
+                    waitFor(150);
                     follower.followPath(getGetBack);
                     setPathState(45);
                 }
                 break;
             case 45: // scores initial specimen
                 if(!follower.isBusy()) {
-                    waitFor(500);
                     robot.depoHslide.setInit();
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
-                    waitFor(550);
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
-                    vslideGoBottom = true;
-                    setPathState(46);
-                }
-                break;
-            case 46: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(toSample3);
-                    setPathState(47);
-                }
-                break;
-            case 47: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(grabSample3);
-                    setPathState(48);
-                }
-                break;
-            case 48: // scores initial specimen
-                if(!follower.isBusy()) {
-                    waitFor(700);
-                    robot.claw.setClose();
-                    setPathState(49);
-                }
-                break;
-            case 49: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(scoreSample4);
-                    robot.vSlides.moveEncoderTo(80, 1.2f);
-                    setPathState(50);
-                }
-                break;
-            case 50: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(180));
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+95, 1.2f);
-                    robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoHslide.setOut();
-                    robot.clawSmallTilt.setFlat();
-                    setPathState(51);
-                }
-                break;
-            case 51: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(scoredSample4);
-                    setPathState(52);
-                }
-                break;
-            case 52: // scores initial specimen
-                if(!follower.isBusy()) {
-                    robot.claw.setOpen();
-                    waitFor(700);
-                    follower.followPath(getGetBack);
-                    setPathState(53);
-                }
-                break;
-            case 53: // scores initial specimen
-                if(!follower.isBusy()) {
-                    waitFor(500);
-                    robot.depoHslide.setInit();
-                    robot.intakeTilt.setOut();
-                    robot.depoWrist.setIn();
-                    waitFor(550);
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
