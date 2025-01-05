@@ -83,7 +83,6 @@ public class PinpointLocalizer extends Localizer {
 
         //This uses mm, to use inches divide these numbers by 25.4
         setOffsets(5.8,0.8 , DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
-        //57.35, 62.35
         //TODO: If you find that the gobilda Yaw Scaling is incorrect you can edit this here
         odo.setYawScalar(0.98);
         //TODO: Set your encoder resolution here, I have the Gobilda Odometry products already included.

@@ -30,6 +30,7 @@ public class autoSubGambling extends OpMode{
 
     //vars
     boolean yes = false;
+    boolean shake = false;
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
 
@@ -77,25 +78,30 @@ public class autoSubGambling extends OpMode{
                 setPathState(11);
                 break;
             case 11: ;
+                follower.holdPoint(staySigma);
                 robot.intake.in();
                 waitFor(500);
                 robot.intakeTilt.setFlat();
                 waitFor(400);
                 robot.intakeTilt.setOut();
+                shaker();
                 pathTimer.resetTimer();
                 setPathState(12);
                 break;
             case 12:
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.intakeTilt.setHigh();
+                    shaker();
                     setPathState(13);
                 }
                 else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intake.out();
+                    shaker();
                     setPathState(121);
                 }
                 else if (pathTimer.getElapsedTime()>1500){
                     robot.intake.out();
+                    shaker();
                     setPathState(121);
                 }
                 break;
@@ -229,6 +235,16 @@ public class autoSubGambling extends OpMode{
         }
         else{
 
+        }
+    }
+
+    public void shaker(){
+        shake = !shake;
+        while (shake){
+            follower.followPath(new Path( new BezierLine(new Point(follower.getPose().getX(),follower.getPose().getY()),new Point(follower.getPose().getX()-1,follower.getPose().getY()))));
+            waitFor(500);
+            follower.followPath(new Path( new BezierLine(new Point(follower.getPose().getX(),follower.getPose().getY()),new Point(follower.getPose().getX()+1,follower.getPose().getY()))));
+            waitFor(500);
         }
     }
 

@@ -27,8 +27,8 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "less turn bucket", group = "1Autonomous")
-public class autoBucketNT extends OpMode{
+@Autonomous(name = "less turn safe", group = "1Autonomous")
+public class autoBucketSafe extends OpMode{
 
     //stuff
     boolean vslideGoBottom = false;
@@ -58,9 +58,9 @@ public class autoBucketNT extends OpMode{
 
     // OTHER POSES
     private Pose initBucket, beforeBucket, ready2Score, wallScore, beforeBucket2, beforeBucket3;
-    private Pose startPose = new Pose(136, 32, Math.toRadians(90));
+    private Pose startPose = new Pose(136, 32, Math.toRadians(180));
 
-    private Path firstScore, inchBucket, goSafe, goBack, floorCycle, secondBack;
+    private Path firstScore, inchBucket, goSafe, goBack, floorCycle, secondBack, thirdBack;
 
     private PathChain preload;
 
@@ -69,9 +69,10 @@ public class autoBucketNT extends OpMode{
     //TODO: Starting from here are the poses for the paths
     public void firstBucket(){
         beforeBucket = new Pose(120,24, Math.PI);
-        beforeBucket2 = new Pose(120,14, Math.PI);
-        ready2Score = new Pose(136,18.5,Math.PI/2);
-        wallScore = new Pose(125,8.2, Math.PI);
+        beforeBucket2 = new Pose(120,14,Math.PI);
+        beforeBucket3 = new Pose(120,10,Math.toRadians(190));
+        ready2Score = new Pose(136,18.8,Math.PI/2);
+        wallScore = new Pose(126,9.2,Math.PI);
     }
 
 
@@ -79,9 +80,9 @@ public class autoBucketNT extends OpMode{
     public void buildPaths() {
 
         preload = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
-                .setConstantHeadingInterpolation(ready2Score.getHeading())
-                .setPathEndTimeoutConstraint(150)
+                .addPath(new BezierLine(new Point(startPose),new Point(wallScore.getX()+1,wallScore.getY())))
+                .setConstantHeadingInterpolation(startPose.getHeading())
+                .setPathEndTimeoutConstraint(100)
                 .build();
 
 
@@ -89,12 +90,20 @@ public class autoBucketNT extends OpMode{
         goSafe = new Path(new BezierLine(new Point(ready2Score), new Point(beforeBucket)));
         goSafe.setConstantHeadingInterpolation(Math.PI);
 
+        goBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket)));
+        goBack.setConstantHeadingInterpolation(Math.PI);
+
         secondBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket2)));
         secondBack.setConstantHeadingInterpolation(Math.PI);
+
+        thirdBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket3)));
+        thirdBack.setConstantHeadingInterpolation(Math.toRadians(180));
 
         floorCycle = new Path(new BezierLine(new Point(beforeBucket), new Point(wallScore)));
         floorCycle.setConstantHeadingInterpolation(Math.PI);
     }
+
+
 
 
     // TODO: HERE IS WHERE THE MAIN PATH IS
@@ -105,39 +114,36 @@ public class autoBucketNT extends OpMode{
             //
             case 10: // scores initial specimen
                 totalTime = pathTimer.getElapsedTime();
-                robot.intakeTilt.setFlat();
-                robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
                 pathTimer.resetTimer();
                 follower.followPath(preload, true);
-                follower.setMaxPower(0.7);
                 setPathState(12);
                 break;
             case 12:
-                if(pathTimer.getElapsedTime()>600){
+                robot.intakeTilt.setFlat();
+                if(pathTimer.getElapsedTime()>2000){
                     pathTimer.resetTimer();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
                     robot.clawSmallTilt.setOut();
-                    waitFor(300);
+                    waitFor(600);
                     robot.depoWrist.setOut();
-                    waitFor(200);
+                    waitFor(500);
                     setPathState(13);
                 }
                 break;
             case 13:
-                waitFor(400);
+                //follower.holdPoint(new BezierPoint(new Point(ready2Score)),Math.toRadians(90));
                 robot.clawBigTilt.setBucket();
-                robot.clawSmallTilt.setLeft();
+                robot.clawSmallTilt.setRight();
                 robot.depoHslide.setInit();
-                if(Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-robot.vSlides.high1) < 20 && follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1)){
-                    waitFor(90);
-                    robot.claw.setBig();
-                    scored = true;
-                    setPathState(14);
-                }
+                waitFor(700);
+                robot.claw.setBig();
+                scored = true;
+                setPathState(14);
                 break;
             case 14:
-                waitFor(350);
-                robot.depoWrist.setIn();
                 waitFor(450);
+                robot.depoWrist.setIn();
+                waitFor(550);
                 robot.claw.setOpen();
                 robot.clawBigTilt.setTransfer();
                 robot.clawSmallTilt.setTransfer();
@@ -146,23 +152,28 @@ public class autoBucketNT extends OpMode{
                     pathTimer.resetTimer();
                     if(floorRep == 3) {
                         follower.followPath(goSafe, true);
-                        follower.setMaxPower(0.9);
-                        goSafe.setLinearHeadingInterpolation(ready2Score.getHeading(), Math.toRadians(180));
+                        goSafe.setConstantHeadingInterpolation(Math.toRadians(180));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
                     else if(floorRep==2){
-                        follower.followPath(secondBack, true);
-                        secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(180));
+                        follower.followPath(secondBack);
+                        secondBack.setConstantHeadingInterpolation(Math.toRadians(180));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
                     else if(floorRep==1){
-                        follower.followPath(secondBack, true);
-                        secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(190));
+                        follower.followPath(thirdBack, true);
+                        thirdBack.setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(190));
                         vslideGoBottom = true;
                         setPathState(16);
                     }
+                }
+                break;
+            case 141:
+                if (follower.getCurrentTValue()>0.2){
+                    goSafe.setLinearHeadingInterpolation(ready2Score.getHeading() - 0.2 * MathFunctions.getTurnDirection(ready2Score.getHeading(), goSafe.getEndTangent().getTheta()) * MathFunctions.getSmallestAngleDifference(startPose.getHeading(), goSafe.getEndTangent().getTheta()), Math.toRadians(180));
+                    setPathState(16);
                 }
                 break;
             case 16:
@@ -170,15 +181,19 @@ public class autoBucketNT extends OpMode{
                     robot.latch.setOut();
                     robot.intakeTilt.setOut();
                     in = false;
-                    if(floorRep>1) {
+                    if(floorRep==3) {
                         robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.8f);
                     }
+                    else if(floorRep==2) {
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 0.80f);
+                    }
                     else if(floorRep==1) {
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET3, 0.85f);
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET3, 0.65f);
                     }
                     robot.intake.in();
                     waitFor(300);
                     setPathState(161);
+                    pathTimer.resetTimer();
                 }
                 break;
             case 161:
@@ -190,7 +205,7 @@ public class autoBucketNT extends OpMode{
                     robot.intake.out();
                     setPathState(17);
                 }
-                else if (pathTimer.getElapsedTime()>1900){
+                else if (pathTimer.getElapsedTime()>2000){
                     robot.intake.off();
                     robot.intakeTilt.setTransfer();
                     hSlideGoBottom = true;
@@ -205,17 +220,15 @@ public class autoBucketNT extends OpMode{
                 if(in) {
                     robot.intakeTilt.setTransfer();
                     follower.followPath(floorCycle, true);
-                    follower.setMaxPower(0.7);
                     if(floorRep>1) {
                         floorCycle.setConstantHeadingInterpolation(Math.toRadians(180));
                     }
                     else if(floorRep==1) {
-                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(190), Math.PI);
+                        floorCycle.setLinearHeadingInterpolation(Math.toRadians(190), Math.toRadians(180));
                     }
                     waitFor(200);
                     robot.claw.setClose();
                     waitFor(250);
-                    robot.intakeTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
                     waitFor(200);
                     robot.intakeTilt.setFlat();
@@ -225,7 +238,7 @@ public class autoBucketNT extends OpMode{
                 }
                 break;
             case 171:
-                if(pathTimer.getElapsedTime()>800){
+                if(pathTimer.getElapsedTime()>900){
                     robot.clawBigTilt.setBucket();
                     robot.depoHslide.setInit();
                     robot.clawSmallTilt.setRight();
@@ -233,23 +246,17 @@ public class autoBucketNT extends OpMode{
                     setPathState(172);
                 }
                 break;
-            case 1710:
-                if(Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-robot.vSlides.high1) < 20 && follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1)){
-                    waitFor(50);
-                    robot.claw.setBig();
-                    scored = true;
-                    setPathState(172);
-                }
-                break;
             case 172:
                 if(!follower.isBusy()){
                     if (floorRep>0) {
+                        waitFor(700);
+                        robot.claw.setBig();
+                        scored = true;
                         floorRep-=1;
                         waitFor(300);
                         setPathState(14);
                     }
                     else{
-                        vslideGoBottom = true;
                         setPathState(18);
                     }
                 }
@@ -257,9 +264,10 @@ public class autoBucketNT extends OpMode{
             case 18:
                 waitFor(450);
                 robot.depoWrist.setIn();
-                waitFor(550);
+                waitFor(450);
                 robot.claw.setOpen();
                 robot.clawBigTilt.setTransfer();
+                robot.vSlides.moveEncoderTo(1500,1f);
                 vslideGoBottom = true;
                 robot.clawSmallTilt.setTransfer();
                 setPathState(100);
@@ -295,11 +303,11 @@ public class autoBucketNT extends OpMode{
         telemetry.addLine("TValue: "+follower.getCurrentTValue());
         telemetry.addLine("Path: " + pathState);
         telemetry.addLine("Position: " + follower.getPose());
-        telemetry.addLine("heading: " + follower.getTotalHeading());
-        //telemetry.addLine("color: "+robot.sensorF.getColor());
+        telemetry.addLine("Follow: " + follower.getCurrentPath());
+        telemetry.addLine("color: "+robot.sensorF.getColor());
         //telemetry.addLine("vLimit" + vlimitswitch.getState());
         //telemetry.addLine("hLimit" + hlimitswitch.getState());
-        telemetry.addLine("Rep Count"+ floorRep);
+        telemetry.addLine("Rep Count: "+ floorRep);
 
         //functions
         if (!hlimitswitch.getState() && hSlideGoBottom) {
@@ -316,6 +324,7 @@ public class autoBucketNT extends OpMode{
             hSlideGoBottom = false;
             RobotLog.ii(TAG_SL, "Force stopped");
         }
+
         if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -10,7 +10,7 @@ public class intakeTilt {
     public static final float INIT = 51f;//36f;//230f;
     public static final float TRANSFER = 51f;//84f;//36f;//175f;
     public static final float HIGH = 16f;
-    public static final float FLAT = 103f;//158f;
+    public static final float FLAT = 93f;//158f;
     public static final float INOUT = 122f;
     public static final float OUT = 112f;//112f;//120f;//255f;//52f;
     public static final float MOVE_TO_WALL = 124f;//136f;

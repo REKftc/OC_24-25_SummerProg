@@ -272,6 +272,8 @@ public class teleop4 extends OpMode {
             robot.hslides.hslides.setPower(-1f);
             RobotLog.ii(TAG_SL, "Going down");
         } else if (hlimitswitch.getState() && hSlideGoBottom) {
+            robot.intake.off();
+            intakeMode = IntakeMode.OFF;
             robot.hslides.hslides.setPower(0);
             robot.latch.setInit();
             latched = true;
@@ -361,17 +363,17 @@ public class teleop4 extends OpMode {
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
+            //HSLIDE BOTTOM
+            hSlideGoBottom = true;
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>200){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>230){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-            //HSLIDE BOTTOM
-            hSlideGoBottom = true;
         }
         if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
-            robot.intake.off();
+            robot.intake.in();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;

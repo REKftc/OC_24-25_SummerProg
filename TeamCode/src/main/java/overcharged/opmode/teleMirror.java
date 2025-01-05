@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import overcharged.components.Button;
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
+import overcharged.components.hslides;
 import overcharged.components.vSlides;
 import overcharged.pedroPathing.follower.Follower;
 import overcharged.pedroPathing.pathGeneration.Vector;
@@ -79,6 +80,9 @@ public class teleMirror extends OpMode {
     int intakeStep = 0;
     int modeCount = 1;
     int tempLocation;
+
+    float turnConstant = 1f;
+
     boolean intakeDelay = false;
     boolean intakeOn = false;
     boolean intTiltDelay = false;
@@ -96,13 +100,14 @@ public class teleMirror extends OpMode {
     boolean moveCount = false;
     boolean sense = false;
     boolean highTransfer = false;
+    boolean outH = false;
 
     boolean redSpec = false;
     boolean red = false;
     boolean yellow = false;
     boolean blueSpec = false;
     boolean blue = true;
-    ModeNow mode = ModeNow.BLUE_YELLOW;
+    ModeNow mode = ModeNow.RED_YELLOW;
 
     boolean bucketSeq = false;
     private DigitalChannel hlimitswitch;
@@ -180,18 +185,21 @@ public class teleMirror extends OpMode {
         // Joystick and bumper handling
         double y = gamepad1.left_stick_y;
         double x = -gamepad1.left_stick_x * 1.1;
-        double rx = -gamepad1.right_stick_x;
+        double rx = -gamepad1.right_stick_x*turnConstant;
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
         // Slowmode Settings for Heights
         if (slideHeight == SlideHeight.HIGH1){
-            slowPower = 0.9;
+            slowPower = 0.85f;
         } else if (slideHeight == SlideHeight.WALL){
-            slowPower = 1;
+            slowPower = 1f;
         } else if (slideHeight == SlideHeight.MID){
-            slowPower = 1.15;
-        } else{
-            slowPower = 1.25;
+            slowPower = 1;//1.15f;
+        } else if(hSlideGoBottom){
+            slowPower = 1;//1.15f;
+        }
+        else{
+            slowPower = 1;//1.25f;
         }
 
 
@@ -232,9 +240,22 @@ public class teleMirror extends OpMode {
         robot.driveRightFront.setPower(frontRightPower);
         robot.driveRightBack.setPower(backRightPower);
 
-        if (gamepad1.right_bumper && Button.TRANSFER.canPress(timestamp)) { // hSlide mode
+        if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
+            outH = true;
+            robot.clawBigTilt.setSlides();
+            robot.latch.setOut();
+            turnConstant = 0.44f;
+            robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
+            if (robot.hslides.getPower() == 0){
+                hSlideisOut = true;
+            }
+        }
+
+        if (gamepad1.a && Button.TRANSFER.canPress(timestamp)) { // hSlide mode
+            outH = true;
             hSlideisOut = !hSlideisOut;
             robot.latch.setOut();
+            turnConstant = 0.5f;
             latched = !latched;
             if(!intakeTransfer) {
                 robot.intakeTilt.setTransfer();
@@ -244,15 +265,17 @@ public class teleMirror extends OpMode {
 
         // Logic for bringing hslides back in
         if (!hlimitswitch.getState() && hSlideGoBottom) {
+            outH = false;
+            turnConstant = 1f;
             robot.latch.setInit();
             robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.hslides.hslides.setPower(-1);
+            robot.hslides.hslides.setPower(-1f);
             RobotLog.ii(TAG_SL, "Going down");
         } else if (hlimitswitch.getState() && hSlideGoBottom) {
+            robot.hslides.hslides.setPower(0);
             robot.latch.setInit();
             latched = true;
             robot.intakeTilt.setTransfer();
-            robot.hslides.hslides.setPower(0);
             robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             hSlideisOut = false;
             clawDelay = System.currentTimeMillis();
@@ -261,10 +284,9 @@ public class teleMirror extends OpMode {
             hSlideGoBottom = false;
             sense = false;
             if(robot.sensorF.getColor() == colorSensor.Color.NONE){
-                gamepad1.rumble(600);
+                gamepad1.rumble(400);
             }
             RobotLog.ii(TAG_SL, "Force stopped");
-            gamepad2.rumble(400);
         }
         if (hlimitswitch.getState() && highTransfer){
             robot.intakeTilt.setTransfer();
@@ -278,28 +300,28 @@ public class teleMirror extends OpMode {
             if (modeCount % 2 == 0){
                 blueSpec = true;
                 blue = false;
-                mode = ModeNow.BLUE_ONLY;
-                gamepad1.rumble(50,0,300);
+                mode = ModeNow.RED_ONLY;
+                gamepad1.rumble(50,0,500);
             }
             else if (modeCount % 3 == 0){
                 yellow = true;
                 blueSpec = false;
                 mode = ModeNow.YELLOW_ONLY;
-                gamepad1.rumble(50,50,300);
+                gamepad1.rumble(50,20,500);
                 modeCount = 0;
             }
             else{
                 blue = true;
                 yellow = false;
-                mode = ModeNow.BLUE_YELLOW;
-                gamepad1.rumble(0,50,300);
+                mode = ModeNow.RED_YELLOW;
+                gamepad1.rumble(0,50,500);
             }
         }
         if(blueSpec){
-            gamepad1.setLedColor(0,0,255,250);
+            gamepad1.setLedColor(0,100,255,250);
         }
         else if (blue){
-            gamepad1.setLedColor(195,0,255,250);
+            gamepad1.setLedColor(0,0,255,250);
         }
         else if (yellow){
             gamepad1.setLedColor(255,255,0,250);
@@ -323,7 +345,7 @@ public class teleMirror extends OpMode {
                     intTiltDelay = true;
                 }
                 else{
-                    robot.intakeTilt.setOut();
+                    robot.intakeTilt.setInOut();
                 }
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
@@ -340,16 +362,17 @@ public class teleMirror extends OpMode {
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>210){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>200){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>130){
-            robot.intake.in();
-            intakeMode = IntakeMode.IN;
+            //HSLIDE BOTTOM
             hSlideGoBottom = true;
+        }
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
+            robot.intake.off();
+            intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
         }
@@ -376,24 +399,10 @@ public class teleMirror extends OpMode {
         }
         //H Slides go back
         if(gamepad1.y && Button.TRANSFER.canPress(timestamp)){
-            robot.intakeTilt.setHigh();
-            robot.latch.setInit();
-            robot.depoWrist.setIn();
-            outakeTime = System.currentTimeMillis();
-            intakeOutDelay = true;
-            hSlideisOut = false;
-            robot.intake.in();
-            intakeMode = IntakeMode.IN;
-            highTransfer = true;
-            intakeTransfer = true;
-            robot.claw.setOpen();
-            clawOpen = true;
-            vslideOut = false;
-            slideLength = SlideLength.IN;
-            intakeTransfer = true;
+            transferNow();
         }
 
-        if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>150){ // Transfer System
+        if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>120){ // Transfer System
             cDelay = false;
             robot.depoWrist.setIn();
             robot.clawBigTilt.setTransfer();
@@ -407,7 +416,7 @@ public class teleMirror extends OpMode {
             transferStep++;
             clawDelay = System.currentTimeMillis();
         }
-        if (transferStep ==2 & System.currentTimeMillis()-clawDelay>100){
+        if (transferStep ==2 & System.currentTimeMillis()-clawDelay>90){
             robot.claw.setClose();
             clawOpen = false;
             gamepad2.rumble(400);
@@ -416,7 +425,7 @@ public class teleMirror extends OpMode {
             clawDelay = 0;
         }
 
-        if(!intakeTransfer && intTiltDelay && System.currentTimeMillis()- intakeTiltDelay>400){ //delay in submersible
+        if(!intakeTransfer && intTiltDelay && System.currentTimeMillis()- intakeTiltDelay>390){ //delay in submersible
             robot.intakeTilt.setOut();
             intTiltDelay = false;
         }
@@ -433,7 +442,7 @@ public class teleMirror extends OpMode {
         }
 
         // Bucket(High & Low) sequence
-        if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>300 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>300 &dDelay) { // Depo to Bucket
+        if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>290 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>290 &dDelay) { // Depo to Bucket
             vslideOut = true;
             robot.depoWrist.setOut();
             robot.clawSmallTilt.setOut();
@@ -443,7 +452,7 @@ public class teleMirror extends OpMode {
             depoDelay = System.currentTimeMillis();
             dDelay = false;
         }
-        if (bucketSeq && slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>140 || bucketSeq && slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>110){
+        if (bucketSeq && slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>130 || bucketSeq && slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>100){
             bucketSeq = false;
             depoDelay = 0;
             robot.clawBigTilt.setBucket();
@@ -451,7 +460,7 @@ public class teleMirror extends OpMode {
         }
 
 
-        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>630 && dDelay) { // Depo to Specimen
+        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>620 && dDelay) { // Depo to Specimen
             robot.claw.setSpec();
             robot.clawBigTilt.setOut();
             robot.depoHslide.setOut();
@@ -485,7 +494,7 @@ public class teleMirror extends OpMode {
 
             slideHeight = SlideHeight.LOWER;
 
-            robot.vSlides.moveEncoderTo(robot.vSlides.lower, 1f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.lower, 1.2f);
             vslideOut = true;
             dDelay = true;
             depoDelay = System.currentTimeMillis();
@@ -527,7 +536,7 @@ public class teleMirror extends OpMode {
             clawOpen = false;
 
             slideHeight = SlideHeight.HIGH1;
-            robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1.5f);
 
             dDelay = true;
             depoDelay = System.currentTimeMillis();
@@ -539,7 +548,7 @@ public class teleMirror extends OpMode {
             slideHeight = SlideHeight.MID;
             vslideOut = true;
             dDelay = true;
-            robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.mid+50, 1.2f);
             depoDelay = System.currentTimeMillis();
         }
 
@@ -567,7 +576,7 @@ public class teleMirror extends OpMode {
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 330){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 310){
             robot.claw.setClose();
             clawOpen = false;
             robot.clawSmallTilt.setWall();
@@ -607,12 +616,12 @@ public class teleMirror extends OpMode {
                 dDelay=true;
             }
         }
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-depoDelay>230 &&dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-depoDelay>200 &&dDelay){
             vslideGoBottom = true;
             depoDelay =0;
             dDelay =false;
         }
-        if(resetStep==1 && System.currentTimeMillis() - depoDelay > 370){
+        if(resetStep==1 && System.currentTimeMillis() - depoDelay > 350){
             robot.clawSmallTilt.setTransfer();
             robot.clawBigTilt.setTransfer();
             robot.claw.setOpen();
@@ -620,7 +629,7 @@ public class teleMirror extends OpMode {
             depoDelay = System.currentTimeMillis();
             resetStep++;
         }
-        if(resetStep==2 && System.currentTimeMillis() - depoDelay > 370){
+        if(resetStep==2 && System.currentTimeMillis() - depoDelay > 350){
             robot.intakeTilt.setTransfer();
             slideHeight = SlideHeight.DOWN;
             gamepad2.rumble(500);
@@ -637,14 +646,14 @@ public class teleMirror extends OpMode {
 
         if(gamepad2.x && Button.SLIGHT_UP.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() < robot.vSlides.high1){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.9f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.7f);
             }
         }
 
 
         if(gamepad2.b && Button.SLIGHT_DOWN.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() > 100){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.9f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.7f);
             }
         }
 
@@ -684,6 +693,10 @@ public class teleMirror extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
+                    if (outH){
+                        outH = false;
+                        transferNow();
+                    }
                 }
                 else{
                     gamepad1.rumble(400);
@@ -699,6 +712,10 @@ public class teleMirror extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
+                    if (outH){
+                        outH = false;
+                        transferNow();
+                    }
                 }
                 else{
                     gamepad1.rumble(400);
@@ -715,6 +732,10 @@ public class teleMirror extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
+                    if (outH){
+                        outH = false;
+                        transferNow();
+                    }
                 }
                 else{
                     gamepad1.rumble(400);
@@ -765,6 +786,7 @@ public class teleMirror extends OpMode {
         telemetry.addData("Current Mode:",mode);
         //telemetry.addData("intake mode", intakeMode);
         //telemetry.addData("h limit switch: ",   hlimitswitch.getState());
+        //telemetry.addData("h slide motor power", robot.hslides.getPower());
         //telemetry.addData("v limit switch: ",   vlimitswitch.getState());
         //telemetry.addData("vslideRPower:", robot.vSlides.vSlidesL.getPower());
         //telemetry.addData("vslideLPower:", robot.vSlides.vSlidesR.getPower());
@@ -806,6 +828,24 @@ public class teleMirror extends OpMode {
             vslideManual = false;
             RobotLog.ii(TAG_SL, "Force stopped");
         }
+    }
+
+    public void transferNow(){
+        intakeOutDelay = true;
+        robot.clawBigTilt.setTransfer();
+        robot.intakeTilt.setHigh();
+        robot.latch.setInit();
+        robot.depoWrist.setIn();
+        outakeTime = System.currentTimeMillis();
+        robot.intake.in();
+        intakeMode = IntakeMode.IN;
+        highTransfer = true;
+        intakeTransfer = true;
+        robot.claw.setOpen();
+        clawOpen = true;
+        vslideOut = false;
+        slideLength = SlideLength.IN;
+        intakeTransfer = true;
     }
     //TODO: Better delay function
     public static void waitFor(int milliseconds) { //Waitor Function

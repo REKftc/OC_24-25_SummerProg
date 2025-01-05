@@ -27,7 +27,7 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "BACKUP bucket", group = "Autonomous")
+@Autonomous(name = "BACKUP bucket", group = "1Autonomous")
 public class backupAuto extends OpMode{
 
     //stuff
@@ -126,7 +126,7 @@ public class backupAuto extends OpMode{
                 }
                 break;
             case 13:
-                follower.holdPoint(new BezierPoint(new Point(ready2Score)),Math.toRadians(135));
+                //follower.holdPoint(new BezierPoint(new Point(ready2Score)),Math.toRadians(135));
                 robot.clawBigTilt.setBucket();
                 robot.depoHslide.setInit();
                 waitFor(900);
