@@ -29,21 +29,20 @@ import org.opencv.core.Mat;
  *
  * forward on robot is the x positive direction
  *
- *                    forward (x positive)
- *                                △
- *                                |
- *                                |
- *                         /--------------\
- *                         |              |
- *                         |              |
- *                         |           || |
- *  left (y positive) <--- |           || |
- *                         |     ____     |
- *                         |     ----     |
- *                         \--------------/
+ *    /--------------\
+ *    |     ____     |
+ *    |     ----     |
+ *    | ||           |
+ *    | ||           |  ----> left (y positive)
+ *    |              |
+ *    |              |
+ *    \--------------/
+ *           |
+ *           |
+ *           V
+ *    forward (x positive)
  * With the pinpoint your readings will be used in mm
  * to use inches ensure to divide your mm value by 25.4
- *
  * @author Logan Nash
  * @author Havish Sripada 12808 - RevAmped Robotics
  * @author Ethan Doak - Gobilda
@@ -51,15 +50,14 @@ import org.opencv.core.Mat;
  */
 public class PinpointLocalizer extends Localizer {
     private HardwareMap hardwareMap;
-    private Pose startPose;
     private GoBildaPinpointDriver odo;
     private double previousHeading;
     private double totalHeading;
+    private Pose startPose;
     private long deltaTimeNano;
     private NanoTimer timer;
     private Pose currentVelocity;
     private Pose previousPinpointPose;
-
 
     /**
      * This creates a new PinpointLocalizer from a HardwareMap, with a starting Pose at (0,0)
@@ -78,21 +76,20 @@ public class PinpointLocalizer extends Localizer {
      */
     public PinpointLocalizer(HardwareMap map, Pose setStartPose){
         hardwareMap = map;
-        // TODO: replace this with your Pinpoint port
+
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         //This uses mm, to use inches divide these numbers by 25.4
         setOffsets(5.8,0.8 , DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
         //TODO: If you find that the gobilda Yaw Scaling is incorrect you can edit this here
         odo.setYawScalar(0.98);
-        //TODO: Set your encoder resolution here, I have the Gobilda Odometry products already included.
-        //TODO: If you would like to use your own odometry pods input the ticks per mm in the commented part below
+
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         //odo.setEncoderResolution(13.26291192);
-        //TODO: Set encoder directions
+
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-        odo.resetPosAndIMU();
+        resetPinpoint();
 
         setStartPose(setStartPose);
         totalHeading = 0;
@@ -102,6 +99,7 @@ public class PinpointLocalizer extends Localizer {
         deltaTimeNano = 1;
         previousHeading = setStartPose.getHeading();
     }
+
     /**
      * This returns the current pose estimate.
      *
@@ -221,10 +219,10 @@ public class PinpointLocalizer extends Localizer {
     }
 
     /**
-     * This resets the IMU.
+     * This resets the IMU. Does not change heading estimation.
      */
     @Override
-    public void resetIMU()  {
+    public void resetIMU() {
         odo.recalibrateIMU();
 
         try {
@@ -235,7 +233,7 @@ public class PinpointLocalizer extends Localizer {
     }
 
     /**
-     * This resets the OTOS.
+     * This resets the pinpoint.
      */
     private void resetPinpoint() {
         odo.resetPosAndIMU();

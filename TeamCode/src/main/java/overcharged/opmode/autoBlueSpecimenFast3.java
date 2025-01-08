@@ -22,7 +22,7 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "blue specimen +3 faster", group = "Autonomous")
+@Autonomous(name = "blue specimen +3 faster", group = "1Autonomous")
 public class autoBlueSpecimenFast3 extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;

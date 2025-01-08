@@ -272,6 +272,8 @@ public class teleMirror extends OpMode {
             robot.hslides.hslides.setPower(-1f);
             RobotLog.ii(TAG_SL, "Going down");
         } else if (hlimitswitch.getState() && hSlideGoBottom) {
+            robot.intake.off();
+            intakeMode = IntakeMode.OFF;
             robot.hslides.hslides.setPower(0);
             robot.latch.setInit();
             latched = true;
@@ -314,14 +316,14 @@ public class teleMirror extends OpMode {
                 blue = true;
                 yellow = false;
                 mode = ModeNow.RED_YELLOW;
-                gamepad1.rumble(0,50,500);
+                gamepad1.rumble(50,50,500);
             }
         }
         if(blueSpec){
-            gamepad1.setLedColor(0,100,255,250);
+            gamepad1.setLedColor(0,0,255,250);
         }
         else if (blue){
-            gamepad1.setLedColor(0,0,255,250);
+            gamepad1.setLedColor(0,105,255,250);
         }
         else if (yellow){
             gamepad1.setLedColor(255,255,0,250);
@@ -361,17 +363,17 @@ public class teleMirror extends OpMode {
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
+            //HSLIDE BOTTOM
+            hSlideGoBottom = true;
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>200){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>230){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-            //HSLIDE BOTTOM
-            hSlideGoBottom = true;
         }
         if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
-            robot.intake.off();
+            robot.intake.in();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
@@ -732,10 +734,7 @@ public class teleMirror extends OpMode {
                     intakeOn = false;
                     intakeMode = IntakeMode.OFF;
                     robot.intake.off();
-                    if (outH){
-                        outH = false;
-                        transferNow();
-                    }
+                    transferNow();
                 }
                 else{
                     gamepad1.rumble(400);

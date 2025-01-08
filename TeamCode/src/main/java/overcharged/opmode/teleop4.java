@@ -339,6 +339,7 @@ public class teleop4 extends OpMode {
                 if(hlimitswitch.getState() && latched) {
                     clawDelay = System.currentTimeMillis();
                     cDelay = true;
+                    sense = true;
                 }
             } else {
                 robot.intakeTilt.setFlat();
@@ -406,6 +407,7 @@ public class teleop4 extends OpMode {
 
         if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>120){ // Transfer System
             cDelay = false;
+            sense = false;
             robot.depoWrist.setIn();
             robot.clawBigTilt.setTransfer();
             robot.clawSmallTilt.setTransfer();
@@ -566,7 +568,7 @@ public class teleop4 extends OpMode {
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 190){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 180){
             robot.claw.setClose();
             clawOpen = false;
             robot.intakeTilt.setFlat();
@@ -578,7 +580,7 @@ public class teleop4 extends OpMode {
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 310){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 290){
             robot.claw.setClose();
             clawOpen = false;
             robot.clawSmallTilt.setWall();
@@ -587,7 +589,7 @@ public class teleop4 extends OpMode {
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 230){
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 270){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;

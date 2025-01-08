@@ -27,7 +27,7 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "BACKUP bucket", group = "1Autonomous")
+@Autonomous(name = "BACKUP bucket", group = "Autonomous")
 public class backupAuto extends OpMode{
 
     //stuff

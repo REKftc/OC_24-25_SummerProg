@@ -27,7 +27,7 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "less turn bucket", group = "1Autonomous")
+@Autonomous(name = "less turn bucket", group = "Autonomous")
 public class autoBucketNT extends OpMode{
 
     //stuff
