@@ -58,7 +58,7 @@ public class autoBucketSafe extends OpMode{
 
     // OTHER POSES
     private Pose initBucket, beforeBucket, ready2Score, wallScore, beforeBucket2, beforeBucket3;
-    private Pose startPose = new Pose(136, 32, Math.toRadians(180));
+    private Pose startPose = new Pose(136, 32, Math.toRadians(90));
 
     private Path firstScore, inchBucket, goSafe, goBack, floorCycle, secondBack, thirdBack;
 
