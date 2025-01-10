@@ -244,7 +244,7 @@ public class teleop4 extends OpMode {
             outH = true;
             robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.44f;
+            turnConstant = 0.60f;
             robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
             if (robot.hslides.getPower() == 0){
                 hSlideisOut = true;
@@ -297,7 +297,7 @@ public class teleop4 extends OpMode {
 
 
         // mode switcher
-        if (gamepad1.touchpad && Button.CYCLE_MODE.canPress(timestamp)) {
+        if (gamepad1.back && Button.CYCLE_MODE.canPress(timestamp)) {
             modeCount += 1;
             if (modeCount % 2 == 0){
                 redSpec = true;
@@ -367,13 +367,13 @@ public class teleop4 extends OpMode {
             //HSLIDE BOTTOM
             hSlideGoBottom = true;
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>230){ //210
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>220){ //210
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>190){
             robot.intake.in();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
