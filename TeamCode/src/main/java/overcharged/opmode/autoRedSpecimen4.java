@@ -96,7 +96,7 @@ public class autoRedSpecimen4 extends OpMode {
         goRotate = new Pose(114,93, Math.PI/4);
         bitForward = new Pose(118,92, 2*Math.PI/3);
         bitBack = new Pose(114,93, Math.PI/4);
-        toSample = new Pose(115,99, 2*Math.PI/3);
+        toSample = new Pose(115,98, 2*Math.PI/3);
         secondScore = new Pose(114,93, Math.PI/4);
         bitCloser = new Pose(111,61, Math.PI);
         bitBitBack = new Pose(122,59, Math.PI);
@@ -282,7 +282,7 @@ public class autoRedSpecimen4 extends OpMode {
                 break;
             case 24:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(120));
+                    follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(100));
                     if (robot.sensorF.getColor() == colorSensor.Color.RED) {
                         follower.followPath(nextSample);
                         setPathState(25);
