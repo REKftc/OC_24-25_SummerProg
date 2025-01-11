@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import overcharged.components.RobotMecanum;
@@ -34,7 +35,7 @@ public class autoBlueSpecimenFaster4 extends OpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     SampleMecanumDrive drive;
     MultipleTelemetry telems;
-    private Timer pathTimer, opmodeTimer, scanTimer, distanceSensorUpdateTimer, distanceSensorDecimationTimer;
+    private ElapsedTime pathTimer;
 
     // Other init
     private int pathState;
@@ -88,22 +89,22 @@ public class autoBlueSpecimenFaster4 extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(112,68,Math.PI);
+        beforeSpecimen = new Pose(111,68,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,68, Math.PI);
         backUp = new Pose(119,68, Math.PI);
         goPark = new Pose(118,84, 3*Math.PI/4);
         goRotate = new Pose(115,93, Math.PI/4);
-        bitForward = new Pose(117,95, 2*Math.PI/3);
+        bitForward = new Pose(116,95, 2*Math.PI/3);
         bitBack = new Pose(114,93, Math.PI/4);
         toSample = new Pose(115,98, 2*Math.PI/3);
         secondScore = new Pose(114,93, Math.PI/4);
         bitCloser = new Pose(131,96, Math.PI);
         bitBitBack = new Pose(109,63, Math.PI);
-        thirdSample = new Pose(131,96, Math.PI);
+        thirdSample = new Pose(132,96, Math.PI);
         getThirdSample = new Pose(109,60, Math.PI);
         thirdScore = new Pose(131,96, Math.PI);
-        thirdScoreCloser = new Pose(109,68, Math.PI);
+        thirdScoreCloser = new Pose(110,69, Math.PI);
         fourthScore = new Pose(129,98, Math.PI);
         fourthScoreCloser = new Pose(114,64, Math.PI);
 
@@ -177,7 +178,7 @@ public class autoBlueSpecimenFaster4 extends OpMode {
             // Auto Body
             //
             case 10: // scores initial specimen
-                pathTimer.resetTimer();
+                pathTimer.reset();
                 robot.claw.setClose();
                 waitFor(300);
                 robot.vSlides.moveEncoderTo(robot.vSlides.mid+50, 1.2f);
@@ -233,9 +234,16 @@ public class autoBlueSpecimenFaster4 extends OpMode {
                 }
                 break;
             case 18:
-                if(robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                if(robot.sensorF.getColor() == colorSensor.Color.BLUE) {
                     follower.followPath(nextRotate);
                     setPathState(19);
+                }
+                else if (pathTimer.milliseconds()>7000) {
+                    pathTimer.reset();
+                    robot.intake.off();
+                    robot.intakeTilt.setTransfer();
+                    hSlideGoBottom = true;
+                    setPathState(20);
                 }
                 break;
             case 19:
@@ -261,6 +269,13 @@ public class autoBlueSpecimenFaster4 extends OpMode {
                     if (robot.sensorF.getColor() == colorSensor.Color.BLUE) {
                         follower.followPath(toSample2);
                         setPathState(22);
+                    }
+                    else if (pathTimer.milliseconds()>5000) {
+                        pathTimer.reset();
+                        robot.intake.off();
+                        robot.intakeTilt.setTransfer();
+                        hSlideGoBottom = true;
+                        setPathState(23);
                     }
                     break;
                 }
@@ -415,7 +430,7 @@ public class autoBlueSpecimenFaster4 extends OpMode {
     // path setter
     public void setPathState(int state){
         pathState = state;
-        pathTimer.resetTimer();
+        pathTimer.reset();
         autoPath();
     }
 
@@ -430,6 +445,7 @@ public class autoBlueSpecimenFaster4 extends OpMode {
         autoPath();
         telemetry.addLine("TValue: "+follower.getCurrentTValue());
         telemetry.addLine("Path: " + pathState);
+        telemetry.addLine("pathTimer: " + pathTimer);
         telemetry.addLine("vLimit" + vlimitswitch.getState());
         telemetry.addLine("hLimit" + hlimitswitch.getState());
 
@@ -475,7 +491,7 @@ public class autoBlueSpecimenFaster4 extends OpMode {
         telems = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
         robot = new RobotMecanum(this, true, false);
         drive = new SampleMecanumDrive(hardwareMap);
-        pathTimer = new Timer();
+        pathTimer = new ElapsedTime();
 
 
 
@@ -490,7 +506,8 @@ public class autoBlueSpecimenFaster4 extends OpMode {
 
         //robot init
         robot.intakeTilt.setOut();
-        robot.clawBigTilt.setWall();
+        robot.clawBigTilt.setOut();
+        robot.clawSmallTilt.setFlat();
         robot.clawSmallTilt.setWall();
         robot.depoWrist.setIn();
         robot.claw.setClose();

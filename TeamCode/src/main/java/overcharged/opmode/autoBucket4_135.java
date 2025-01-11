@@ -78,7 +78,7 @@ public class autoBucket4_135 extends OpMode{
         beforeBucket = new Pose(120,19.75, Math.PI);
         beforeBucket2 = new Pose(120,13, Math.PI);
         ready2Score = new Pose(129.5,13,Math.toRadians(135));
-        wallScore = new Pose(125.75,9.875, Math.PI);
+        wallScore = new Pose(125.75,9.65, Math.PI);
     }
 
     //TODO: here are where the paths are defined
