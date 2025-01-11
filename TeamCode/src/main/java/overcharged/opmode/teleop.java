@@ -35,6 +35,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 // A - depo claw
 
 @Config
+@Disabled
 @TeleOp(name="teleop", group="Teleop")
 
 public class teleop extends OpMode {

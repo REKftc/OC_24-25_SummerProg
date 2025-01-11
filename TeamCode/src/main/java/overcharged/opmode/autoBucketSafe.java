@@ -5,6 +5,7 @@ import static overcharged.config.RobotConstants.TAG_SL;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -27,7 +28,8 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "less turn safe", group = "1Autonomous")
+//@Disabled
+@Autonomous(name = "less turn safe", group = "2Autonomous")
 public class autoBucketSafe extends OpMode{
 
     //stuff

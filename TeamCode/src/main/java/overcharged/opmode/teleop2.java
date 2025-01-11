@@ -47,6 +47,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
 
 @Config
+@Disabled
 @TeleOp(name="teleop manual", group="Teleop")
 public class teleop2 extends OpMode {
     RobotMecanum robot;
