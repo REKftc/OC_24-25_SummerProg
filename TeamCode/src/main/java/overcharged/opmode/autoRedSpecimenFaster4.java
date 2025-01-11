@@ -89,7 +89,7 @@ public class autoRedSpecimenFaster4 extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(112,68,Math.PI);
+        beforeSpecimen = new Pose(111,68,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,68, Math.PI);
         backUp = new Pose(119,68, Math.PI);
@@ -102,9 +102,9 @@ public class autoRedSpecimenFaster4 extends OpMode {
         bitCloser = new Pose(131,96, Math.PI);
         bitBitBack = new Pose(109,63, Math.PI);
         thirdSample = new Pose(131,96, Math.PI);
-        getThirdSample = new Pose(109,60, Math.PI);
+        getThirdSample = new Pose(109,65, Math.PI);
         thirdScore = new Pose(131,96, Math.PI);
-        thirdScoreCloser = new Pose(109,68, Math.PI);
+        thirdScoreCloser = new Pose(109,67, Math.PI);
         fourthScore = new Pose(129,98, Math.PI);
         fourthScoreCloser = new Pose(114,64, Math.PI);
 
@@ -234,7 +234,7 @@ public class autoRedSpecimenFaster4 extends OpMode {
                 }
                 break;
             case 18:
-                if(robot.sensorF.getColor() == colorSensor.Color.BLUE) {
+                if(robot.sensorF.getColor() == colorSensor.Color.RED) {
                     follower.followPath(nextRotate);
                     setPathState(19);
                 }
@@ -386,6 +386,7 @@ public class autoRedSpecimenFaster4 extends OpMode {
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid+90, 1.2f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
+                    waitFor(200);
                     robot.depoHslide.setOut();
                     robot.clawSmallTilt.setFlat();
                     setPathState(33);
