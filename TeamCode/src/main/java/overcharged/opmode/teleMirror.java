@@ -107,7 +107,7 @@ public class teleMirror extends OpMode {
     boolean yellow = false;
     boolean blueSpec = false;
     boolean blue = true;
-    ModeNow mode = ModeNow.RED_YELLOW;
+    ModeNow mode = ModeNow.BLUE_YELLOW;
 
     boolean bucketSeq = false;
     private DigitalChannel hlimitswitch;
@@ -192,7 +192,7 @@ public class teleMirror extends OpMode {
         if (slideHeight == SlideHeight.HIGH1){
             slowPower = 0.85f;
         } else if (slideHeight == SlideHeight.WALL){
-            slowPower = 1f;
+            slowPower = 0.9f;
         } else if (slideHeight == SlideHeight.MID){
             slowPower = 1;//1.15f;
         } else if(hSlideGoBottom){
@@ -244,7 +244,7 @@ public class teleMirror extends OpMode {
             outH = true;
             robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.44f;
+            turnConstant = 0.60f;
             robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
             if (robot.hslides.getPower() == 0){
                 hSlideisOut = true;
@@ -297,12 +297,12 @@ public class teleMirror extends OpMode {
 
 
         // mode switcher
-        if (gamepad1.touchpad && Button.CYCLE_MODE.canPress(timestamp)) {
+        if (gamepad1.back && Button.CYCLE_MODE.canPress(timestamp)) {
             modeCount += 1;
             if (modeCount % 2 == 0){
                 blueSpec = true;
                 blue = false;
-                mode = ModeNow.RED_ONLY;
+                mode = ModeNow.BLUE_ONLY;
                 gamepad1.rumble(50,0,500);
             }
             else if (modeCount % 3 == 0){
@@ -315,7 +315,7 @@ public class teleMirror extends OpMode {
             else{
                 blue = true;
                 yellow = false;
-                mode = ModeNow.RED_YELLOW;
+                mode = ModeNow.BLUE_YELLOW;
                 gamepad1.rumble(50,50,500);
             }
         }
@@ -339,6 +339,7 @@ public class teleMirror extends OpMode {
                 if(hlimitswitch.getState() && latched) {
                     clawDelay = System.currentTimeMillis();
                     cDelay = true;
+                    sense = true;
                 }
             } else {
                 robot.intakeTilt.setFlat();
@@ -363,16 +364,17 @@ public class teleMirror extends OpMode {
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
+
+        }
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>250){ //210
+            robot.intake.out();
             //HSLIDE BOTTOM
             hSlideGoBottom = true;
-        }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>230){ //210
-            robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>180){
             robot.intake.in();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
@@ -406,6 +408,7 @@ public class teleMirror extends OpMode {
 
         if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>120){ // Transfer System
             cDelay = false;
+            sense = false;
             robot.depoWrist.setIn();
             robot.clawBigTilt.setTransfer();
             robot.clawSmallTilt.setTransfer();
@@ -566,7 +569,7 @@ public class teleMirror extends OpMode {
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 190){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 180){
             robot.claw.setClose();
             clawOpen = false;
             robot.intakeTilt.setFlat();
@@ -578,7 +581,7 @@ public class teleMirror extends OpMode {
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 310){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 290){
             robot.claw.setClose();
             clawOpen = false;
             robot.clawSmallTilt.setWall();
@@ -587,7 +590,7 @@ public class teleMirror extends OpMode {
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 230){
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 270){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -752,7 +755,7 @@ public class teleMirror extends OpMode {
         }
 
         // Intake Delay
-        if(intakeDelay && System.currentTimeMillis()-outDelay>300){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>450){
             intakeDelay = false;
             outDelay =0;
             intakeMode = IntakeMode.IN;
