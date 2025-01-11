@@ -92,12 +92,12 @@ public class autoRedSpecimen4 extends OpMode {
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,68, Math.PI);
         backUp = new Pose(119,68, Math.PI);
-        goPark = new Pose(120,82, 3*Math.PI/4);
-        goRotate = new Pose(117,82, Math.PI/4);
-        bitForward = new Pose(116,86, 3*Math.PI/4);
-        bitBack = new Pose(117,82, Math.PI/4);
-        toSample = new Pose(132,116, Math.PI);
-        secondScore = new Pose(131,67, Math.PI);
+        goPark = new Pose(118,84, 3*Math.PI/4);
+        goRotate = new Pose(114,93, Math.PI/4);
+        bitForward = new Pose(118,92, 2*Math.PI/3);
+        bitBack = new Pose(114,93, Math.PI/4);
+        toSample = new Pose(115,98, 2*Math.PI/3);
+        secondScore = new Pose(114,93, Math.PI/4);
         bitCloser = new Pose(111,61, Math.PI);
         bitBitBack = new Pose(122,59, Math.PI);
         thirdSample = new Pose(122,105, Math.PI);
@@ -141,13 +141,13 @@ public class autoRedSpecimen4 extends OpMode {
         nextRotate = new Path(new BezierLine(new Point(goPark), new Point(goRotate)));
         nextRotate.setConstantHeadingInterpolation(Math.PI/4);
         bitRotate = new Path(new BezierLine(new Point(goRotate), new Point(bitForward)));
-        bitRotate.setConstantHeadingInterpolation(3*Math.PI/4);
+        bitRotate.setConstantHeadingInterpolation(2*Math.PI/3);
         toSample2 = new Path(new BezierLine(new Point(bitForward), new Point(bitBack)));
         toSample2.setConstantHeadingInterpolation(Math.PI/4);
         grabSample = new Path(new BezierLine(new Point(bitBack), new Point(toSample)));
-        grabSample.setConstantHeadingInterpolation(Math.PI);
+        grabSample.setConstantHeadingInterpolation(2*Math.PI/3);
         nextSample = new Path(new BezierLine(new Point(toSample), new Point(secondScore)));
-        nextSample.setConstantHeadingInterpolation(Math.PI);
+        nextSample.setConstantHeadingInterpolation(Math.PI/4);
         getCloser = new Path(new BezierLine(new Point(secondScore), new Point(bitCloser)));
         getCloser.setConstantHeadingInterpolation(Math.PI);
         getGetBack = new Path(new BezierLine(new Point(bitCloser), new Point(bitBitBack)));
@@ -189,7 +189,7 @@ public class autoRedSpecimen4 extends OpMode {
                 break;
             case 13: // scores initial specimen
                 if(!follower.isBusy()) {
-                    waitFor(700);
+                    waitFor(200);
                     robot.claw.setOpen();
                     setPathState(14);
                 }
@@ -240,9 +240,11 @@ public class autoRedSpecimen4 extends OpMode {
                 break;
             case 19:
                 if(!follower.isBusy()){
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(45));
                     robot.intake.in();
-                    waitFor(50);
+                    waitFor(10);
                     robot.intake.out();
+                    waitFor(40);
                     setPathState(20);
                 }
                 break;
@@ -254,16 +256,45 @@ public class autoRedSpecimen4 extends OpMode {
                 }
                 break;
             case 21:
-                if(robot.sensorF.getColor() == colorSensor.Color.RED){
-                    follower.followPath(toSample2);
-                    setPathState(22);
+                if(!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(new Point(bitForward)), Math.toRadians(132));
+                    if (robot.sensorF.getColor() == colorSensor.Color.RED) {
+                        follower.followPath(toSample2);
+                        setPathState(22);
+                    }
+                    break;
                 }
-                break;
             case 22:
                 if(!follower.isBusy()){
                     robot.intake.in();
-                    waitFor(50);
+                    waitFor(10);
                     robot.intake.out();
+                    waitFor(40);
+                    setPathState(23);
+                }
+                break;
+            case 23:
+                if(robot.sensorF.getColor() == colorSensor.Color.NONE){
+                    robot.intake.in();
+                    follower.followPath(grabSample);
+                    setPathState(24);
+                }
+                break;
+            case 24:
+                if(!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(100));
+                    if (robot.sensorF.getColor() == colorSensor.Color.RED) {
+                        follower.followPath(nextSample);
+                        setPathState(25);
+                    }
+                    break;
+                }
+            case 25:
+                if(!follower.isBusy()){
+                    robot.intake.in();
+                    waitFor(10);
+                    robot.intake.out();
+                    waitFor(40);
                     setPathState(100);
                 }
                 break;
