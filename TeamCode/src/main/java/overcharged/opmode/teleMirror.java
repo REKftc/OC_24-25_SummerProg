@@ -302,7 +302,7 @@ public class teleMirror extends OpMode {
             if (modeCount % 2 == 0){
                 blueSpec = true;
                 blue = false;
-                mode = ModeNow.BLUE_ONLY;
+                mode = ModeNow.RED_ONLY;
                 gamepad1.rumble(50,0,500);
             }
             else if (modeCount % 3 == 0){
@@ -315,18 +315,9 @@ public class teleMirror extends OpMode {
             else{
                 blue = true;
                 yellow = false;
-                mode = ModeNow.BLUE_YELLOW;
+                mode = ModeNow.RED_YELLOW;
                 gamepad1.rumble(50,50,500);
             }
-        }
-        if(blueSpec){
-            gamepad1.setLedColor(0,0,255,250);
-        }
-        else if (blue){
-            gamepad1.setLedColor(0,105,255,250);
-        }
-        else if (yellow){
-            gamepad1.setLedColor(255,255,0,250);
         }
 
 
@@ -403,6 +394,7 @@ public class teleMirror extends OpMode {
         }
         //H Slides go back
         if(gamepad1.y && Button.TRANSFER.canPress(timestamp)){
+            sense = true;
             transferNow();
         }
 
@@ -733,10 +725,11 @@ public class teleMirror extends OpMode {
             }
 
             if (robot.sensorF.getColor() == colorSensor.Color.BLUE && sense){
-                if(blue || blueSpec){
-                    intakeOn = false;
-                    intakeMode = IntakeMode.OFF;
-                    robot.intake.off();
+                intakeOn = false;
+                intakeMode = IntakeMode.OFF;
+                robot.intake.off();
+                if (outH){
+                    outH = false;
                     transferNow();
                 }
                 else{
@@ -762,27 +755,6 @@ public class teleMirror extends OpMode {
             robot.intake.in();
         }
 
-        // LED code
-        robot.drawLed();
-        if(robot.sensorF.getColor() == colorSensor.Color.RED){
-            robot.ledRedOn(true);
-        }
-        else{
-            robot.ledRedOn(false);
-        }
-        if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
-            robot.ledYellowOn(true);
-        }
-        else{
-            robot.ledYellowOn(false);
-        }
-
-        if(robot.sensorF.getColor() == colorSensor.Color.BLUE){
-            robot.ledBlueOn(true);
-        }
-        else{
-            robot.ledBlueOn(false);
-        }
 
         /// Telems TODO: DO NOT DELETE ANYTHING
         telemetry.addData("Current Mode:",mode);
@@ -847,7 +819,6 @@ public class teleMirror extends OpMode {
         clawOpen = true;
         vslideOut = false;
         slideLength = SlideLength.IN;
-        intakeTransfer = true;
     }
     //TODO: Better delay function
     public static void waitFor(int milliseconds) { //Waitor Function
