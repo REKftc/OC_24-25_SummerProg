@@ -192,7 +192,7 @@ public class teleop4 extends OpMode {
         if (slideHeight == SlideHeight.HIGH1){
             slowPower = 0.85f;
         } else if (slideHeight == SlideHeight.WALL){
-            slowPower = 1f;
+            slowPower = 0.9f;
         } else if (slideHeight == SlideHeight.MID){
             slowPower = 1;//1.15f;
         } else if(hSlideGoBottom){
@@ -364,16 +364,17 @@ public class teleop4 extends OpMode {
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
+
+        }
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>250){ //210
+            robot.intake.out();
             //HSLIDE BOTTOM
             hSlideGoBottom = true;
-        }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>220){ //210
-            robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>190){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>180){
             robot.intake.in();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
@@ -754,7 +755,7 @@ public class teleop4 extends OpMode {
         }
 
         // Intake Delay
-        if(intakeDelay && System.currentTimeMillis()-outDelay>300){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>450){
             intakeDelay = false;
             outDelay =0;
             intakeMode = IntakeMode.IN;

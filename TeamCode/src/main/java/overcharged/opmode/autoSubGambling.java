@@ -84,31 +84,27 @@ public class autoSubGambling extends OpMode{
                 robot.intakeTilt.setFlat();
                 waitFor(400);
                 robot.intakeTilt.setOut();
-                shaker();
                 pathTimer.resetTimer();
                 setPathState(12);
                 break;
             case 12:
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.intakeTilt.setHigh();
-                    shaker();
                     setPathState(13);
                 }
                 else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intake.out();
-                    shaker();
                     setPathState(121);
                 }
-                else if (pathTimer.getElapsedTime()>1500){
+                else if (pathTimer.getElapsedTime()>1300){
                     robot.intake.out();
-                    shaker();
                     setPathState(121);
                 }
                 break;
             case 121:
                 robot.intakeTilt.setTransfer();
                 waitFor(300);
-                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 100, 0.8f);
+                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 0.8f);
                 waitFor(300);
                 robot.intake.in();
                 setPathState(11);

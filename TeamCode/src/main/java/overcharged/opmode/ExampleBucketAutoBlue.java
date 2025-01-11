@@ -1,6 +1,7 @@
 package overcharged.opmode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
@@ -24,7 +25,7 @@ import overcharged.pedroPathing.util.Timer;
  * @author Baron Henderson - 20077 The Indubitables
  * @version 2.0, 11/28/2024
  */
-
+@Disabled
 @Autonomous(name = "Example Auto Blue", group = "Examples")
 public class ExampleBucketAutoBlue extends OpMode {
 
