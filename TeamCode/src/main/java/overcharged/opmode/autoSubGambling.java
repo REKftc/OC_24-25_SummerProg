@@ -88,6 +88,7 @@ public class autoSubGambling extends OpMode{
                 setPathState(12);
                 break;
             case 12:
+                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 0.8f);
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.intakeTilt.setHigh();
                     setPathState(13);
@@ -103,8 +104,6 @@ public class autoSubGambling extends OpMode{
                 break;
             case 121:
                 robot.intakeTilt.setTransfer();
-                waitFor(300);
-                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 0.8f);
                 waitFor(300);
                 robot.intake.in();
                 setPathState(11);
