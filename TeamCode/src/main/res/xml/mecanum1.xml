@@ -2,13 +2,13 @@
 <Robot type="FirstInspires-FTC">
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
-            <goBILDA5202SeriesMotor name="hslides" port="1" />
             <goBILDA5203SeriesMotor name="intake" port="0" />
+            <goBILDA5202SeriesMotor name="hslides" port="1" />
             <goBILDA5202SeriesMotor name="vslidesL" port="2" />
             <goBILDA5202SeriesMotor name="vslidesR" port="3" />
 
-            <DigitalDevice name="hlimitswitch" port="1" />
-            <DigitalDevice name="vlimitswitch" port="0" />
+            <DigitalDevice name="hlimitswitch" port="0" bus="1" />
+            <DigitalDevice name="vlimitswitch" port="0" bus="0" />
             <RevColorSensorV3 name="colorSensorF" port="3" bus="1" />
 
             <Servo name="intakeTilt" port="5" />
@@ -22,13 +22,14 @@
             <goBILDA5203SeriesMotor name="driveRB" port="2" />
             <goBILDA5202SeriesMotor name="driveRF" port="3" />
 
-            <SparkFunOTOS name="sensor_otos" port="0" bus="0"/>
-            <Servo name="claw" port="4" />
-            <Servo name="clawSmallTilit" port="3" />
+
+            <Servo name="depoWrist" port="0" />
             <Servo name="depoHslide" port="1" />
             <Servo name="clawBigTilt" port="2" />
-            <Servo name="depoWrist" port="0" />
-            <goBILDAPinpoint name="pinpoint" port="0" bus="1"/>
+            <Servo name="clawSmallTilt" port="4" />
+            <Servo name="claw" port="5" />
+
+            <goBILDAPinpoint name="pinpoint" port="1" bus="1"/>
 
 
         </LynxModule>
