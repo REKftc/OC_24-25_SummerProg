@@ -7,8 +7,8 @@ public class intakeTilt {
     //public OcServo intakeTilt;
     public OcServo intakeTilt;
     public VoltageSensor intakeVolt;
-    public static final float INIT = 51f;//36f;//230f;
-    public static final float TRANSFER = 51f;//84f;//36f;//175f;
+    public static final float INIT = 224f; //36f;//230f;
+    public static final float TRANSFER = 224f;//84f;//36f;//175f;
     public static final float HIGH = 16f;
     public static final float FLAT = 93f;//158f;
     public static final float INOUT = 122f;
