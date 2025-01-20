@@ -367,6 +367,7 @@ public class teleop4 extends OpMode {
 
         }
         if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>250){ //210
+            robot.intakeTilt.setMid();
             robot.intake.out();
             //HSLIDE BOTTOM
             hSlideGoBottom = true;
@@ -375,8 +376,9 @@ public class teleop4 extends OpMode {
             outakeTime = System.currentTimeMillis();
         }
         if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>180){
+            robot.intakeTilt.setTransfer();
             robot.intake.in();
-            intakeMode = IntakeMode.OFF;
+            intakeMode = IntakeMode.IN;
             intakeStep = 0;
             outakeTime = 0;
         }

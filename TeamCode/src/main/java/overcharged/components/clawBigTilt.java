@@ -9,11 +9,11 @@ public class clawBigTilt {
     public VoltageSensor intakeVolt;
     public static final float INIT = 124f;//230f;//90f;//70f;//230f;
     public static final float TRANSFER = 222f;//225f;//233f;//226f;//223f;//201f;//175f;
-    public static final float TEMP = 188f;
-    public static final float FLAT = 161f;//107f;//158f;
-    public static final float OUT = 20;//139f DONE
-    public static final float WALL = 0f;//52f;
-    public static final float BUCKET = 27f;
+    public static final float TEMP = 222f;//188f;
+    public static final float FLAT = 182f;//161f;//107f;//158f;
+    public static final float OUT = 180f;//139f DONE
+    public static final float WALL = 17f;//52f;
+    public static final float BUCKET = 41f;
 
 
     public clawBigTilt(HardwareMap hardwareMap) {
@@ -36,6 +36,7 @@ public class clawBigTilt {
     public void setOut() { clawBigTilt.setPosition(OUT); }
 
     public void setWall() { clawBigTilt.setPosition(WALL); }
+
 
     public void setBucket() { clawBigTilt.setPosition(BUCKET); }
 

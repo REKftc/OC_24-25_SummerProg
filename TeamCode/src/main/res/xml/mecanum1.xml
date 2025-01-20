@@ -19,8 +19,8 @@
         <LynxModule name="Control Hub" port="173">
             <goBILDA5203SeriesMotor name="driveLF" port="0" />
             <goBILDA5203SeriesMotor name="driveLB" port="1" />
-            <goBILDA5203SeriesMotor name="driveRB" port="2" />
-            <goBILDA5202SeriesMotor name="driveRF" port="3" />
+            <goBILDA5203SeriesMotor name="driveRB" port="3" />
+            <goBILDA5202SeriesMotor name="driveRF" port="2" />
 
 
             <Servo name="depoWrist" port="0" />

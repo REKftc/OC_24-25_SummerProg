@@ -10,7 +10,7 @@ public class depoHslide {
     //public static final float TRANSFER  = 20f;
     // public static final float TRANSFER = 70f;//175f;
     // public static final float SPEC = 171f;//158f;
-    public static final float OUT = 177f;
+    public static final float OUT = 176f;
 
 
     public depoHslide(HardwareMap hardwareMap) {
