@@ -11,9 +11,9 @@ public class clawBigTilt {
     public static final float TRANSFER = 222f;//225f;//233f;//226f;//223f;//201f;//175f;
     public static final float TEMP = 222f;//188f;
     public static final float FLAT = 182f;//161f;//107f;//158f;
-    public static final float OUT = 180f;//139f DONE
+    public static final float OUT = 159f;//139f DONE
     public static final float WALL = 17f;//52f;
-    public static final float BUCKET = 41f;
+    public static final float BUCKET = 46f;
 
 
     public clawBigTilt(HardwareMap hardwareMap) {

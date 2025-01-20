@@ -7,8 +7,8 @@
             <goBILDA5202SeriesMotor name="vslidesL" port="1" />
             <goBILDA5202SeriesMotor name="vslidesR" port="0" />
 
-            <DigitalDevice name="hlimitswitch" port="0" bus="1" />
             <DigitalDevice name="vlimitswitch" port="0" bus="0" />
+            <DigitalDevice name="hlimitswitch" port="0" bus="1" />
             <RevColorSensorV3 name="colorSensorF" port="3" bus="1" />
 
             <Servo name="intakeTilt" port="5" />

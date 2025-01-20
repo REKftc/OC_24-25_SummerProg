@@ -403,6 +403,7 @@ public class teleop4 extends OpMode {
                 intakeMode = IntakeMode.OFF;
             }
         }
+
         //H Slides go back
         if(gamepad1.y && Button.TRANSFER.canPress(timestamp)){
             transferNow();

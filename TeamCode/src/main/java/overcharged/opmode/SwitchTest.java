@@ -30,7 +30,7 @@ public class SwitchTest extends LinearOpMode {
 //        }
 
 
-        digital = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
+        digital = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
         robot = new RobotMecanum(this, false, false);
       //  intakeTilt = new OcServo(hardwareMap, "intakeTilt", 100f);
         telemetry.addData(">>", "Press start to continue");

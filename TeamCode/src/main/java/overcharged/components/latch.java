@@ -6,10 +6,10 @@ public class latch {
     //public OcServo intakeTilt;
     public OcServo latch;
     //public VoltageSensor intakeVolt;
-    public static final float INIT = 170f;//206f;
+    public static final float INIT = 137f;//206f;
     // public static final float TRANSFER = 70f;//175f;
     // public static final float SPEC = 171f;//158f;
-    public static final float OUT = 62f;//237f;
+    public static final float OUT = 204f;//237f;
 
 
     public latch(HardwareMap hardwareMap) {

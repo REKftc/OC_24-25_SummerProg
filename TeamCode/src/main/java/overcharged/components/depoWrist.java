@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class depoWrist {
     public OcServo depoWrist;
-    public static final float IN = 125f;//124f;//125f;
-    public static final float OUT = 155f;//198f;
+    public static final float IN = 127f;//124f;//125f;
+    public static final float OUT = 57f;//198f;
 
     public depoWrist(HardwareMap hardwareMap) {
         depoWrist = new OcServo(hardwareMap, "depoWrist", IN);
