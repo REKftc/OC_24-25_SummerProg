@@ -33,6 +33,8 @@ public class teleop5 extends OpMode{
 
     long depoDelay;
     long clawDelay;
+    long outakeTime;
+    long manualDelay;
 
     double slowPower = 1;
     float turnConstant = 1f;
@@ -40,12 +42,17 @@ public class teleop5 extends OpMode{
     int wallStep = 0;
     int resetStep = 0;
     int transferStep = 0;
+    int intakeStep = 0;
 
     boolean intakeTransfer = true;
     boolean clawOpen = true;
+    boolean hslideOut = false;
+    boolean manualOut = false;
+
     boolean dDelay = false;
     boolean cDelay = false;
     boolean bucketSeq = false;
+    boolean intakeOutDelay = false;
 
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
@@ -103,9 +110,21 @@ public class teleop5 extends OpMode{
 
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
+            hslideOut = true;
+            manualDelay = System.currentTimeMillis();
             robot.latch.setOut();
             turnConstant = 0.70f;
             robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
+        }
+
+        if (manualOut) {
+            float slidePower = -gamepad1.right_stick_y;
+            if (Math.abs(slidePower) > 0.6) {
+                robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                robot.hslides.hslides.setPower(slidePower*0.6f);
+            } else {
+                robot.hslides.hslides.setPower(0);
+            }
         }
 
         if (gamepad1.left_bumper && Button.TRANSFER.canPress(timestamp)) {
@@ -216,6 +235,10 @@ public class teleop5 extends OpMode{
             slideBottom();
         }
 
+        if(hslideOut && System.currentTimeMillis()-manualDelay>400){
+            manualOut = true;
+        }
+
         if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>100){ // Transfer System
             cDelay = false;
             robot.depoWrist.setIn();
@@ -234,6 +257,39 @@ public class teleop5 extends OpMode{
             transferStep = 0;
             clawDelay = 0;
         }
+
+        if(intakeOutDelay){
+            intakeOutDelay = false;
+
+            robot.intake.in();
+            intakeMode = IntakeMode.IN;
+
+            intakeStep = 0;
+            intakeStep++;
+            outakeTime = System.currentTimeMillis();
+        }
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>240){ //210
+            robot.intakeTilt.setMid();
+            robot.intake.out();
+            intakeMode = IntakeMode.OUT;
+
+            if(hslideOut){
+                hSlideGoBottom = true;
+            }
+
+            intakeStep++;
+            outakeTime = System.currentTimeMillis();
+        }
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>160){
+            robot.intakeTilt.setTransfer();
+            robot.intake.in();
+            intakeMode = IntakeMode.IN;
+
+            intakeStep = 0;
+            outakeTime = 0;
+        }
+
+
         // Bucket(High & Low) sequence
         if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>200 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>200 &dDelay) { // Depo to Bucket
             robot.clawSmallTilt.setOut();
@@ -359,6 +415,7 @@ public class teleop5 extends OpMode{
         intakeMode = IntakeMode.IN;
         intakeTransfer = true;
         robot.claw.setOpen();
+        intakeOutDelay = true;
     }
 
 }
