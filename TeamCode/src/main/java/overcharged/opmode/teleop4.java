@@ -556,7 +556,7 @@ public class teleop4 extends OpMode {
             slideHeight = SlideHeight.MID;
             vslideOut = true;
             dDelay = true;
-            robot.vSlides.moveEncoderTo(robot.vSlides.mid+50, 1.2f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1.2f);
             depoDelay = System.currentTimeMillis();
         }
 
@@ -817,21 +817,17 @@ public class teleop4 extends OpMode {
     }
 
     public void slideBottom() { //Slide bottom
-        if (vlimitswitch.getState() && vslideGoBottom) {
+        if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-1);
-            robot.vSlides.vSlidesL.setPower(-1);
-            RobotLog.ii(TAG_SL, "Going down");
-        } else if (!vlimitswitch.getState() && vslideGoBottom) {
-            //robot.hslides.forceStop();
+            robot.vSlides.vSlidesR.setPower(-0.8f);
+            robot.vSlides.vSlidesL.setPower(-0.8f);
+        } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             vslideGoBottom = false;
-            vslideManual = false;
-            RobotLog.ii(TAG_SL, "Force stopped");
         }
     }
 

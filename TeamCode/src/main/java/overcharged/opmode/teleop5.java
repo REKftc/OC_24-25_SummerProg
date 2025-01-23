@@ -212,6 +212,7 @@ public class teleop5 extends OpMode{
             robot.depoHslide.setInit();
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 robot.depoWrist.setIn();
+                robot.claw.setOpen();
                 robot.intakeTilt.setFlat();
                 robot.clawBigTilt.setFlat();
                 robot.clawSmallTilt.setTranSeq();
@@ -307,7 +308,7 @@ public class teleop5 extends OpMode{
 
             depoDelay = 0;
         }
-        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>500 && dDelay) { // Depo to Specimen
+        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>200 && dDelay) { // Depo to Specimen
             robot.claw.setSpec();
             robot.clawBigTilt.setOut();
             robot.depoHslide.setOut();
@@ -362,7 +363,7 @@ public class teleop5 extends OpMode{
             depoDelay = System.currentTimeMillis();
             resetStep++;
         }
-        if(resetStep==2 && System.currentTimeMillis() - depoDelay > 300){
+        if(resetStep==2 && System.currentTimeMillis() - depoDelay > 600){
             robot.intakeTilt.setTransfer();
             slideHeight = SlideHeight.DOWN;
             robot.claw.setOpen();
@@ -395,8 +396,8 @@ public class teleop5 extends OpMode{
         if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-1);
-            robot.vSlides.vSlidesL.setPower(-1);
+            robot.vSlides.vSlidesR.setPower(-0.8f);
+            robot.vSlides.vSlidesL.setPower(-0.8f);
         } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);
@@ -416,6 +417,7 @@ public class teleop5 extends OpMode{
         intakeTransfer = true;
         robot.claw.setOpen();
         intakeOutDelay = true;
+        //hSlideGoBottom = true;
     }
 
 }
