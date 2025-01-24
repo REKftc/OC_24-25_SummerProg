@@ -77,10 +77,10 @@ public class autoRedSpecimenNEW extends OpMode {
     private Pose redRightBasket = new Pose();
 
     // OTHER POSES
-    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample, secondScore, bitCloser, bitBitBack, thirdSample, getThirdSample, thirdScore, thirdScoreCloser, fourthScore, fourthScoreCloser;
+    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample, secondScore, bitCloser, bitBitBack, thirdSample, getThirdSample, thirdScore, thirdScoreCloser, fourthScore, fourthScoreCloser, finalPark, grabFourthSample;
     private Pose startPose = new Pose(135, 66, Math.PI);
 
-    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample, nextSample, getCloser, getGetBack, toSample3, grabSample3, scoreSample3, scoredSample3, scoreSample4, scoredSample4;
+    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample, nextSample, getCloser, getGetBack, toSample3, grabSample3, scoreSample3, scoredSample3, scoreSample4, scoredSample4, endPark, grabSample4;
 
     private PathChain preload;
 
@@ -89,24 +89,26 @@ public class autoRedSpecimenNEW extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(111,68,Math.PI);
+        beforeSpecimen = new Pose(111,66,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,68, Math.PI);
-        backUp = new Pose(119,68, Math.PI);
-        goPark = new Pose(119,84, Math.PI);
-        goRotate = new Pose(115,93, Math.PI/4);
-        bitForward = new Pose(117,95, 2*Math.PI/3);
-        bitBack = new Pose(114,93, Math.PI/4);
-        toSample = new Pose(115,98, 2*Math.PI/3);
-        secondScore = new Pose(114,93, Math.PI/4);
-        bitCloser = new Pose(131,96, Math.PI);
-        bitBitBack = new Pose(109,63, Math.PI);
-        thirdSample = new Pose(131,96, Math.PI);
-        getThirdSample = new Pose(109,65, Math.PI);
-        thirdScore = new Pose(131,96, Math.PI);
-        thirdScoreCloser = new Pose(109,67, Math.PI);
-        fourthScore = new Pose(129,98, Math.PI);
-        fourthScoreCloser = new Pose(114,64, Math.PI);
+        backUp = new Pose(120,98, Math.PI);
+        goPark = new Pose(85,98, Math.PI);
+        goRotate = new Pose(85,104, Math.PI);
+        bitForward = new Pose(119,109, Math.PI);
+        bitBack = new Pose(85,109, Math.PI);
+        toSample = new Pose(85,116, Math.PI);
+        secondScore = new Pose(119,116, Math.PI);
+        bitCloser = new Pose(85,116, Math.PI);
+        bitBitBack = new Pose(85,121, Math.PI);
+        thirdSample = new Pose(119,121, Math.PI);
+        getThirdSample = new Pose(131,110, Math.PI);
+        thirdScore = new Pose(107,61, Math.PI);
+        thirdScoreCloser = new Pose(131,104, Math.PI);
+        fourthScore = new Pose(108,63, Math.PI);
+        fourthScoreCloser = new Pose(108,64, Math.PI);
+        grabFourthSample = new Pose(131,104, Math.PI);
+        finalPark = new Pose(130,100, Math.PI);
 
 
     }
@@ -140,15 +142,15 @@ public class autoRedSpecimenNEW extends OpMode {
         redPark2 = new Path(new BezierLine(new Point(backUp), new Point(goPark)));
         redPark2.setConstantHeadingInterpolation(Math.PI);
         nextRotate = new Path(new BezierLine(new Point(goPark), new Point(goRotate)));
-        nextRotate.setConstantHeadingInterpolation(Math.PI/4);
+        nextRotate.setConstantHeadingInterpolation(Math.PI);
         bitRotate = new Path(new BezierLine(new Point(goRotate), new Point(bitForward)));
-        bitRotate.setConstantHeadingInterpolation(2*Math.PI/3);
+        bitRotate.setConstantHeadingInterpolation(Math.PI);
         toSample2 = new Path(new BezierLine(new Point(bitForward), new Point(bitBack)));
-        toSample2.setConstantHeadingInterpolation(Math.PI/4);
+        toSample2.setConstantHeadingInterpolation(Math.PI);
         grabSample = new Path(new BezierLine(new Point(bitBack), new Point(toSample)));
-        grabSample.setConstantHeadingInterpolation(2*Math.PI/3);
+        grabSample.setConstantHeadingInterpolation(Math.PI);
         nextSample = new Path(new BezierLine(new Point(toSample), new Point(secondScore)));
-        nextSample.setConstantHeadingInterpolation(Math.PI/4);
+        nextSample.setConstantHeadingInterpolation(Math.PI);
         getCloser = new Path(new BezierLine(new Point(secondScore), new Point(bitCloser)));
         getCloser.setConstantHeadingInterpolation(Math.PI);
         getGetBack = new Path(new BezierLine(new Point(bitCloser), new Point(bitBitBack)));
@@ -163,8 +165,12 @@ public class autoRedSpecimenNEW extends OpMode {
         scoredSample3.setConstantHeadingInterpolation(Math.PI);
         scoreSample4 = new Path(new BezierLine(new Point(thirdScoreCloser), new Point(fourthScore)));
         scoreSample4.setConstantHeadingInterpolation(Math.PI);
-        scoredSample4 = new Path(new BezierLine(new Point(fourthScore), new Point(fourthScoreCloser)));
+        grabSample4 = new Path(new BezierLine(new Point(fourthScore), new Point(grabFourthSample)));
+        grabSample4.setConstantHeadingInterpolation(Math.PI);
+        scoredSample4 = new Path(new BezierLine(new Point(grabFourthSample), new Point(fourthScoreCloser)));
         scoredSample4.setConstantHeadingInterpolation(Math.PI);
+        endPark = new Path(new BezierLine(new Point(fourthScoreCloser), new Point(finalPark)));
+        endPark.setConstantHeadingInterpolation(Math.PI);
 
     }
 
@@ -179,249 +185,218 @@ public class autoRedSpecimenNEW extends OpMode {
             //
             case 10: // scores initial specimen
                 pathTimer.reset();
-               // robot.claw.setClose();
-               // waitFor(300);
-               // robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1);
+                robot.claw.setClose();
+                waitFor(300);
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1);
                 follower.followPath(preload);
-               // robot.clawBigTilt.setOut();
-              //  robot.depoHslide.setOut();
-              //  robot.clawSmallTilt.setFlat();
-                setPathState(14);
+                robot.clawBigTilt.setOut();
+                robot.depoHslide.setOut();
+                robot.clawSmallTilt.setFlat();
+                setPathState(13);
                 break;
             case 13: // scores initial specimen
                 if(!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(new Point(beforeSpecimen)), Math.toRadians(180));
                     waitFor(200);
                     robot.claw.setOpen();
-                    setPathState(14);
-                }
-                break;
-            case 14:
-                if(!follower.isBusy()) {
-                    waitFor(2000);
-                    follower.followPath(redPark);
-                    redPark.setLinearHeadingInterpolation(backUp.getHeading(), Math.toRadians(180));
-                   /* robot.depoHslide.setInit();
-                    waitFor(200);
-                    robot.intakeTilt.setOut();
-                    robot.depoWrist.setIn();
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
-                    vslideGoBottom = true;*/
-                    setPathState(16);
-                }
-                break;
-            /*case 15:
-                if(!follower.isBusy()) {
                     robot.depoHslide.setInit();
+                    waitFor(400);
+                    setPathState(15);
+                }
+                break;
+            case 15:
+                if(!follower.isBusy()) {
+                    follower.followPath(redPark);
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
+                    robot.clawSmallTilt.setWall();
+                    robot.clawBigTilt.setWall();
+                    robot.intake.off();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
                     vslideGoBottom = true;
                     setPathState(16);
                 }
-                break;*/
+                break;
             case 16:
                 if(!follower.isBusy()) {
-                    waitFor(100);
+                    follower.holdPoint(new BezierPoint(new Point(backUp)), Math.toRadians(180));
                     follower.followPath(redPark2);
-                    setPathState(100);
+                    setPathState(17);
                 }
                 break;
             case 17:
                 if(!follower.isBusy()) {
-                    robot.intakeTilt.setOut();
-                    robot.intake.in();
-                    robot.latch.setOut();
-                    in = false;
-                    robot.hslides.moveEncoderTo(500, 0.8f);
+                    follower.followPath(nextRotate);
                     setPathState(18);
                 }
                 break;
             case 18:
-                if(robot.sensorF.getColor() == colorSensor.Color.RED) {
-                    follower.followPath(nextRotate);
+                if(!follower.isBusy()) {
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
+                    follower.followPath(bitRotate);
                     setPathState(19);
-                }
-                else if (pathTimer.milliseconds()>5000) {
-                    pathTimer.reset();
-                    robot.intake.off();
-                    robot.intakeTilt.setTransfer();
-                    hSlideGoBottom = true;
-                    setPathState(20);
                 }
                 break;
             case 19:
-                if(!follower.isBusy()){
-                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(45));
-                    robot.intake.in();
-                    waitFor(10);
-                    robot.intake.out();
-                    waitFor(40);
+                if(!follower.isBusy()) {
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
+                    follower.followPath(toSample2);
                     setPathState(20);
                 }
                 break;
             case 20:
-                if(robot.sensorF.getColor() == colorSensor.Color.NONE){
-                    robot.intake.in();
-                    follower.followPath(bitRotate);
+                if(!follower.isBusy()) {
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
+                    follower.followPath(grabSample);
                     setPathState(21);
                 }
                 break;
             case 21:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(bitForward)), Math.toRadians(132));
-                    if (robot.sensorF.getColor() == colorSensor.Color.RED) {
-                        follower.followPath(toSample2);
-                        setPathState(22);
-                    }
-                    else if (pathTimer.milliseconds()>5000) {
-                        pathTimer.reset();
-                        robot.intake.off();
-                        robot.intakeTilt.setTransfer();
-                        hSlideGoBottom = true;
-                        setPathState(23);
-                    }
-                    break;
+                    follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(180));
+                    follower.followPath(nextSample);
+                    setPathState(25);
                 }
-            case 22:
-                if(!follower.isBusy()){
-                    robot.intake.in();
-                    waitFor(10);
-                    robot.intake.out();
-                    waitFor(40);
+                break;
+           /* case 22:
+                if(!follower.isBusy()) {
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
+                    follower.followPath(getCloser);
                     setPathState(23);
                 }
                 break;
             case 23:
-                if(robot.sensorF.getColor() == colorSensor.Color.NONE){
-                    robot.intakeTilt.setTransfer();
-                    hSlideGoBottom = true;
-                    robot.claw.setOpen();
-                    robot.clawSmallTilt.setWall();
-                    robot.clawBigTilt.setWall();
-                    robot.intake.off();
+                if(!follower.isBusy()) {
+                    //follower.holdPoint(new BezierPoint(new Point(goRotate)), Math.toRadians(180));
+                    follower.followPath(getGetBack);
                     setPathState(24);
                 }
                 break;
             case 24:
                 if(!follower.isBusy()) {
-                    follower.followPath(getCloser);
+                    follower.holdPoint(new BezierPoint(new Point(thirdSample)), Math.toRadians(180));
+                    follower.followPath(toSample3);
                     setPathState(25);
                 }
-                break;
+                break;*/
             case 25:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(bitCloser)), Math.toRadians(180));
-                    robot.claw.setClose();
+                    follower.holdPoint(new BezierPoint(new Point(secondScore)), Math.toRadians(180));
+                    follower.followPath(grabSample3);
                     setPathState(26);
                 }
                 break;
-            case 26: // scores initial specimen
+            case 26:
                 if(!follower.isBusy()) {
-                    follower.followPath(getGetBack);
-                    robot.vSlides.moveEncoderTo(80, 1.2f);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+90, 1.2f);
+                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(178));
+                    robot.claw.setClose();
+                    robot.vSlides.moveEncoderTo(80, 1f);
+                    setPathState(27);
+                }
+                break;
+            case 27:
+                if(!follower.isBusy()) {
+                    follower.followPath(scoreSample3);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
                     robot.clawSmallTilt.setFlat();
-                    setPathState(27);
-                }
-                break;
-            case 27: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(bitBitBack)), Math.toRadians(180));
-                    robot.claw.setOpen();
-                    waitFor(150);
-                    follower.followPath(toSample3);
-                    robot.depoHslide.setInit();
-                    waitFor(200);
-                    robot.intakeTilt.setOut();
-                    robot.depoWrist.setIn();
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
-                    vslideGoBottom = true;
                     setPathState(28);
                 }
                 break;
             case 28:
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdSample)), Math.toRadians(180));
-                    robot.claw.setClose();
-                    setPathState(29);
-                }
-                break;
-            case 29: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.followPath(grabSample3);
-                    robot.vSlides.moveEncoderTo(80, 1.2f);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+90, 1.2f);
-                    robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoHslide.setOut();
-                    robot.clawSmallTilt.setFlat();
-                    setPathState(30);
-                }
-                break;
-            case 30: // scores initial specimen
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
+                if(!follower.isBusy()){
+                    follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(178));
                     robot.claw.setOpen();
-                    waitFor(150);
-                    follower.followPath(scoreSample3);
+                    //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.depoHslide.setInit();
+                    waitFor(200);
+                    follower.followPath(scoredSample3);
                     waitFor(200);
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
                     robot.claw.setOpen();
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
                     vslideGoBottom = true;
+                    setPathState(29);
+                }
+                break;
+            case 29:
+                if(!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(178));
+                    robot.claw.setClose();
+                    robot.vSlides.moveEncoderTo(80, 1f);
+                    setPathState(30);
+                }
+                break;
+            case 30:
+                if(!follower.isBusy()) {
+                    follower.followPath(scoreSample4);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
+                    robot.claw.setClose();
+                    robot.clawBigTilt.setOut();
+                    robot.depoHslide.setOut();
+                    robot.clawSmallTilt.setFlat();
                     setPathState(31);
                 }
                 break;
             case 31:
-                if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(180));
-                    robot.claw.setClose();
+                if(!follower.isBusy()){
+                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(178));
+                    robot.claw.setOpen();
+                    //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
+                    waitFor(200);
+                    robot.depoHslide.setInit();
+                    follower.followPath(grabSample4);
+                    waitFor(200);
+                    robot.intakeTilt.setOut();
+                    robot.depoWrist.setIn();
+                    robot.claw.setOpen();
+                    robot.clawBigTilt.setWall();
+                    robot.clawSmallTilt.setWall();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
+                    vslideGoBottom = true;
                     setPathState(32);
                 }
                 break;
-            case 32: // scores initial specimen
+            case 32:
                 if(!follower.isBusy()) {
-                    follower.followPath(scoredSample3);
-                    robot.vSlides.moveEncoderTo(80, 1.2f);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+90, 1.2f);
+                    follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(178));
                     robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    waitFor(200);
-                    robot.depoHslide.setOut();
-                    robot.clawSmallTilt.setFlat();
+                    robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(33);
                 }
                 break;
-            case 33: // scores initial specimen
+            case 33:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
+                    follower.followPath(scoredSample4);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
+                    robot.claw.setClose();
+                    robot.clawBigTilt.setOut();
+                    robot.depoHslide.setOut();
+                    robot.clawSmallTilt.setFlat();
+                    setPathState(34);
+                }
+                break;
+            case 34:
+                if(!follower.isBusy()){
+                    follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(178));
                     robot.claw.setOpen();
-                    waitFor(150);
-                    follower.followPath(scoreSample4);
+                    //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
+                    waitFor(200);
                     robot.depoHslide.setInit();
+                    follower.followPath(endPark);
                     waitFor(200);
                     robot.intakeTilt.setOut();
                     robot.depoWrist.setIn();
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-50, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
                     vslideGoBottom = true;
                     setPathState(100);
                 }
@@ -475,24 +450,23 @@ public class autoRedSpecimenNEW extends OpMode {
             RobotLog.ii(TAG_SL, "Force stopped");
         }
 
-        if (vlimitswitch.getState() && vslideGoBottom) {
+        if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-1);
-            robot.vSlides.vSlidesL.setPower(-1);
-            RobotLog.ii(TAG_SL, "Going down");
-        } else if (!vlimitswitch.getState() && vslideGoBottom) {
-            //robot.hslides.forceStop();
+            robot.vSlides.vSlidesR.setPower(-0.8f);
+            robot.vSlides.vSlidesL.setPower(-0.8f);
+        } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             vslideGoBottom = false;
-            RobotLog.ii(TAG_SL, "Force stopped");
-        }
-    }
+         }
 
-    // initialize robot
+        }
+
+
+        // initialize robot
     @Override
     public void init() {
 
@@ -514,10 +488,9 @@ public class autoRedSpecimenNEW extends OpMode {
         buildPaths();
 
         //robot init
-        /*robot.intakeTilt.setOut();
+        robot.intakeTilt.setOut();
         robot.clawBigTilt.setOut();
         robot.clawSmallTilt.setFlat();
-        robot.clawSmallTilt.setWall();*/
         robot.depoWrist.setIn();
         robot.claw.setClose();
 

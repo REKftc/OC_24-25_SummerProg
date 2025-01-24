@@ -373,7 +373,6 @@ public class teleop5 extends OpMode{
             depoDelay = 0;
         }
 
-        // Logic for bringing hslides back in
         if (!hlimitswitch.getState() && hSlideGoBottom) {
             turnConstant = 1f;
             robot.latch.setInit();

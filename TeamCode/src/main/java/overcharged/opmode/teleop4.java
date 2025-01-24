@@ -151,42 +151,38 @@ public class teleop4 extends OpMode {
         BLUE_ONLY;
     }
 
-    @Override
     public void init() {
-        gamepad1.setLedColor(255,0,0,500);
-
         try {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             robot = new RobotMecanum(this, false, false);
-            startTime = System.currentTimeMillis();
             hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
             vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
-
             robot.setBulkReadManual();
-
-            //robot.vSlides.vSlidesB.setTargetPositionPIDFCoefficients(21,0,0,0);
         } catch (Exception e) {
             RobotLog.ee(TAG_T, "Teleop init failed: " + e.getMessage());
             telemetry.addData("Init Failed", e.getMessage());
             telemetry.update();
         }
-
     }
 
-    @Override
-    public void loop() {
-        if (firstLoop) {
-            firstLoop = false;
-        }
-        // Clear bulk cache
+    public void loop(){
         robot.clearBulkCache();
         long timestamp = System.currentTimeMillis();
 
-        // Joystick and bumper handling
         double y = gamepad1.left_stick_y;
         double x = -gamepad1.left_stick_x * 1.1;
         double rx = -gamepad1.right_stick_x*turnConstant;
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+        double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
+        double backLeftPower = ((y - x + rx) / denominator) * slowPower;
+        double frontRightPower = ((y - x - rx) / denominator) * slowPower;
+        double backRightPower = ((y + x - rx) / denominator) * slowPower;
+
+        robot.driveLeftFront.setPower(frontLeftPower);
+        robot.driveLeftBack.setPower(backLeftPower);
+        robot.driveRightFront.setPower(frontRightPower);
+        robot.driveRightBack.setPower(backRightPower);
 
         // Slowmode Settings for Heights
         if (slideHeight == SlideHeight.HIGH1){
@@ -230,15 +226,6 @@ public class teleop4 extends OpMode {
         }
          */
         // Regular robot movement control when left bumper is not pressed
-        double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
-        double backLeftPower = ((y - x + rx) / denominator) * slowPower;
-        double frontRightPower = ((y - x - rx) / denominator) * slowPower;
-        double backRightPower = ((y + x - rx) / denominator) * slowPower;
-
-        robot.driveLeftFront.setPower(frontLeftPower);
-        robot.driveLeftBack.setPower(backLeftPower);
-        robot.driveRightFront.setPower(frontRightPower);
-        robot.driveRightBack.setPower(backRightPower);
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
             outH = true;
@@ -849,7 +836,7 @@ public class teleop4 extends OpMode {
         intakeTransfer = true;
     }
     //TODO: Better delay function
-    public static void waitFor(int milliseconds) { //Waitor Function
+   public static void waitFor(int milliseconds) { //Waitor Function
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime < milliseconds) {
             // loop
