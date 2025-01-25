@@ -28,6 +28,7 @@ public class autoRedSpecimenNEW extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
+    boolean stillBusy = false;
     // Init
     private RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -89,10 +90,10 @@ public class autoRedSpecimenNEW extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(111,66,Math.PI);
+        beforeSpecimen = new Pose(109,64,Math.PI);
         // atSpecimen = new Pose(117,70,0);
-        goForward = new Pose(130,68, Math.PI);
-        backUp = new Pose(120,98, Math.PI);
+        goForward = new Pose(130,64, Math.PI);
+        backUp = new Pose(124,98, Math.PI);
         goPark = new Pose(85,98, Math.PI);
         goRotate = new Pose(85,104, Math.PI);
         bitForward = new Pose(119,109, Math.PI);
@@ -104,10 +105,10 @@ public class autoRedSpecimenNEW extends OpMode {
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(131,110, Math.PI);
         thirdScore = new Pose(107,61, Math.PI);
-        thirdScoreCloser = new Pose(131,104, Math.PI);
+        thirdScoreCloser = new Pose(132,104, Math.PI);
         fourthScore = new Pose(108,63, Math.PI);
         fourthScoreCloser = new Pose(108,64, Math.PI);
-        grabFourthSample = new Pose(131,104, Math.PI);
+        grabFourthSample = new Pose(132,106, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -126,9 +127,9 @@ public class autoRedSpecimenNEW extends OpMode {
          */
 
         preload = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(goForward),new Point(beforeSpecimen)))
+                .addPath(new BezierLine(new Point(startPose),new Point(beforeSpecimen)))
                 //.setConstantHeadingInterpolation(startPose.getHeading())
-                .setLinearHeadingInterpolation(goForward.getHeading(), beforeSpecimen.getHeading())
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeSpecimen.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .build();
 
@@ -187,10 +188,10 @@ public class autoRedSpecimenNEW extends OpMode {
                 pathTimer.reset();
                 robot.claw.setClose();
                 waitFor(300);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1);
                 follower.followPath(preload);
-                robot.clawBigTilt.setOut();
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1);
                 robot.depoHslide.setOut();
+                robot.clawBigTilt.setOut();
                 robot.clawSmallTilt.setFlat();
                 setPathState(13);
                 break;
@@ -199,19 +200,23 @@ public class autoRedSpecimenNEW extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(beforeSpecimen)), Math.toRadians(180));
                     waitFor(200);
                     robot.claw.setOpen();
+                    waitFor(200);
                     robot.depoHslide.setInit();
-                    waitFor(400);
+                    waitFor(200);
+                    follower.followPath(redPark);
                     setPathState(15);
+                    stillBusy = true;
                 }
                 break;
             case 15:
-                if(!follower.isBusy()) {
-                    follower.followPath(redPark);
-                    robot.intakeTilt.setOut();
+                if(stillBusy && follower.isBusy()) {
+                    waitFor(300);
+                    stillBusy = false;
                     robot.depoWrist.setIn();
                     robot.claw.setOpen();
                     robot.clawSmallTilt.setWall();
                     robot.clawBigTilt.setWall();
+                    robot.intakeTilt.setOut();
                     robot.intake.off();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
                     vslideGoBottom = true;
@@ -289,7 +294,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 26:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(179));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(27);
@@ -308,7 +313,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 28:
                 if(!follower.isBusy()){
-                    follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(179));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.depoHslide.setInit();
@@ -327,7 +332,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 29:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(179));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(30);
@@ -346,7 +351,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 31:
                 if(!follower.isBusy()){
-                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(179));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     waitFor(200);
@@ -365,7 +370,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 32:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(179));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(33);
@@ -384,7 +389,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 34:
                 if(!follower.isBusy()){
-                    follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(178));
+                    follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(179));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     waitFor(200);
