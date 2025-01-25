@@ -28,7 +28,10 @@ public class autoRedSpecimenNEW extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
-    boolean stillBusy = false;
+    boolean stillBusy1 = false;
+    boolean stillBusy2 = false;
+    boolean stillBusy3 = false;
+    boolean stillBusy4 = false;
     // Init
     private RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -95,7 +98,7 @@ public class autoRedSpecimenNEW extends OpMode {
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(124,98, Math.PI);
         goPark = new Pose(85,98, Math.PI);
-        goRotate = new Pose(85,104, Math.PI);
+        goRotate = new Pose(85,105, Math.PI);
         bitForward = new Pose(119,109, Math.PI);
         bitBack = new Pose(85,109, Math.PI);
         toSample = new Pose(85,116, Math.PI);
@@ -104,11 +107,11 @@ public class autoRedSpecimenNEW extends OpMode {
         bitBitBack = new Pose(85,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(131,110, Math.PI);
-        thirdScore = new Pose(107,61, Math.PI);
-        thirdScoreCloser = new Pose(132,104, Math.PI);
-        fourthScore = new Pose(108,63, Math.PI);
-        fourthScoreCloser = new Pose(108,64, Math.PI);
-        grabFourthSample = new Pose(132,106, Math.PI);
+        thirdScore = new Pose(106,61, Math.PI);
+        thirdScoreCloser = new Pose(133,102, Math.PI);
+        fourthScore = new Pose(107,63, Math.PI);
+        fourthScoreCloser = new Pose(107,64, Math.PI);
+        grabFourthSample = new Pose(133,101, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -205,13 +208,13 @@ public class autoRedSpecimenNEW extends OpMode {
                     waitFor(200);
                     follower.followPath(redPark);
                     setPathState(15);
-                    stillBusy = true;
+                    waitFor(300);
+                    stillBusy1 = true;
                 }
                 break;
             case 15:
-                if(stillBusy && follower.isBusy()) {
-                    waitFor(300);
-                    stillBusy = false;
+                if(stillBusy1 && follower.isBusy()) {
+                    stillBusy1 = false;
                     robot.depoWrist.setIn();
                     robot.claw.setOpen();
                     robot.clawSmallTilt.setWall();
@@ -232,6 +235,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 17:
                 if(!follower.isBusy()) {
+                    follower.holdPoint(new BezierPoint(new Point(goPark)), Math.toRadians(180));
                     follower.followPath(nextRotate);
                     setPathState(18);
                 }
