@@ -146,7 +146,6 @@ public class autoBucket4_135 extends OpMode{
             case 12:
                 if(pathTimer.milliseconds()>550){
                     pathTimer.reset();
-                    robot.clawSmallTilt.setOut();
                     nowDelay = true;
                 if(delayTimer.milliseconds()>300 && nowDelay){
                     nowDelay = false;
@@ -161,6 +160,7 @@ public class autoBucket4_135 extends OpMode{
                 if(pathTimer.milliseconds()>550) {
                     if (runOnce) {
                         runOnce = false;
+                        robot.clawSmallTilt.setOut();
                         robot.clawBigTilt.setBucket();
                         robot.clawSmallTilt.setLeft();
                         robot.depoHslide.setInit();
