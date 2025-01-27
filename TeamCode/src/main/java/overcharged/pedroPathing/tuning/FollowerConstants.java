@@ -62,7 +62,7 @@ public class FollowerConstants {
 
     // Heading error PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            0.8,
+            1.1,
             0,
             0,
             0);
@@ -73,7 +73,7 @@ public class FollowerConstants {
 
     // Drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients drivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.01,
+            0.0070,
             0,
             0.00001,
             0.5,
@@ -92,7 +92,7 @@ public class FollowerConstants {
     public static double mass = 16.85;
 
     // Centripetal force to power scaling
-    public static double centripetalScaling = 0.000425;
+    public static double centripetalScaling = 0.0004125;
 
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
@@ -110,7 +110,7 @@ public class FollowerConstants {
     // Decreasing this will cause the deceleration at the end of the Path to be slower, making the
     // robot slower but reducing risk of end-of-path overshoots or localization slippage.
     // This can be set individually for each Path, but this is the default.
-    public static double zeroPowerAccelerationMultiplier = 3.5;
+    public static double zeroPowerAccelerationMultiplier = 4.5;
 
 
     // When the robot is at the end of its current Path or PathChain and the velocity goes below
@@ -171,9 +171,9 @@ public class FollowerConstants {
 
     // Secondary translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients secondaryTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.165,
+            0.13,
             0,
-            0.01,
+            0.008,
             0);
 
     // Secondary translational Integral value
@@ -192,9 +192,9 @@ public class FollowerConstants {
 
     // Secondary heading error PIDF coefficients
     public static CustomPIDFCoefficients secondaryHeadingPIDFCoefficients = new CustomPIDFCoefficients(
-            2.3,
+            1.5,
             0,
-            0.05,
+            0.04,
             0);
 
     // Feed forward constant added on to the secondary heading PIDF
@@ -206,9 +206,9 @@ public class FollowerConstants {
 
     // Secondary drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients secondaryDrivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.001,
+            0.00025,
             0,
-            0.0000035,
+            0.000003,
             0.5,
             0);
 
