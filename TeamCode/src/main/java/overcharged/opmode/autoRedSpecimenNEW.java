@@ -485,7 +485,8 @@ public class autoRedSpecimenNEW extends OpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         pathTimer = new ElapsedTime();
 
-
+        robot.vSlides.vSlidesR.resetPosition();
+        robot.vSlides.vSlidesL.resetPosition();
 
         //follower init
         follower = new Follower(hardwareMap);

@@ -112,7 +112,8 @@ Tester
         //Initialization
         robot = new RobotMecanum(this, true, false);
         drive = robot.getDrive();
-
+        robot.vSlides.vSlidesR.resetPosition();
+        robot.vSlides.vSlidesL.resetPosition();
         drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
