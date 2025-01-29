@@ -120,6 +120,7 @@ Tester
         OcServo intakeTilt = robot.intakeTilt.intakeTilt;
         OcServo depoWrist = robot.depoWrist.depoWrist;
         OcServo latch = robot.latch.latch;
+        OcServo trapdoor = robot.trapdoor.trapdoor;
         OcServo claw = robot.claw.claw;
         OcServo clawSmallTilt = robot.clawSmallTilt.clawSmallTilt;
         OcServo clawBigTilt = robot.clawBigTilt.clawBigTilt;
@@ -127,6 +128,7 @@ Tester
         servos.add(intakeTilt);
         servos.add(depoWrist);
         servos.add(latch);
+        servos.add(trapdoor);
         servos.add(claw);
         servos.add(clawSmallTilt);
         servos.add(clawBigTilt);
@@ -152,6 +154,10 @@ Tester
                         latch,
                         robot.latch.INIT,
                         robot.latch.OUT),
+                new ServoTestInfo(
+                        trapdoor,
+                        robot.trapdoor.CLOSED,
+                        robot.trapdoor.OPEN),
                 new ServoTestInfo(
                         clawSmallTilt,
                         robot.clawSmallTilt.TRANSFER,

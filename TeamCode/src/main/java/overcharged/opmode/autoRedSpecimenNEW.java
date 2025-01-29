@@ -192,7 +192,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 robot.claw.setClose();
                 waitFor(300);
                 follower.followPath(preload);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1);
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1);
                 robot.depoHslide.setOut();
                 robot.clawBigTilt.setOut();
                 robot.clawSmallTilt.setFlat();
@@ -221,7 +221,7 @@ public class autoRedSpecimenNEW extends OpMode {
                     robot.clawBigTilt.setWall();
                     robot.intakeTilt.setOut();
                     robot.intake.off();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(16);
                 }
@@ -298,7 +298,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 26:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(179));
+                    follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(27);
@@ -307,7 +307,7 @@ public class autoRedSpecimenNEW extends OpMode {
             case 27:
                 if(!follower.isBusy()) {
                     follower.followPath(scoreSample3);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
@@ -329,14 +329,14 @@ public class autoRedSpecimenNEW extends OpMode {
                     robot.claw.setOpen();
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(29);
                 }
                 break;
             case 29:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(179));
+                    follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(30);
@@ -345,7 +345,7 @@ public class autoRedSpecimenNEW extends OpMode {
             case 30:
                 if(!follower.isBusy()) {
                     follower.followPath(scoreSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
@@ -355,7 +355,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 31:
                 if(!follower.isBusy()){
-                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(179));
+                    follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(180));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     waitFor(200);
@@ -367,14 +367,14 @@ public class autoRedSpecimenNEW extends OpMode {
                     robot.claw.setOpen();
                     robot.clawBigTilt.setWall();
                     robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(32);
                 }
                 break;
             case 32:
                 if(!follower.isBusy()) {
-                    follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(179));
+                    follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(33);
@@ -383,7 +383,7 @@ public class autoRedSpecimenNEW extends OpMode {
             case 33:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-130, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoHslide.setOut();
@@ -393,7 +393,7 @@ public class autoRedSpecimenNEW extends OpMode {
                 break;
             case 34:
                 if(!follower.isBusy()){
-                    follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(179));
+                    follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(180));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     waitFor(200);
@@ -405,7 +405,7 @@ public class autoRedSpecimenNEW extends OpMode {
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-160, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(100);
                 }

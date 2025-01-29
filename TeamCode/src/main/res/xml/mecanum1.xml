@@ -15,6 +15,7 @@
             <Servo name="intakeTilt" port="5" />
             <Servo name="latch" port="4" />
             <Servo name="pto" port="3" />
+            <Servo name="trapdoor" port="2" />
 
         </LynxModule>
         <LynxModule name="Control Hub" port="173">

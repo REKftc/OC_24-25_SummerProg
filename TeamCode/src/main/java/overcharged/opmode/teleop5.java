@@ -291,16 +291,18 @@ public class teleop5 extends OpMode{
             }
 
             if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                robot.intakeTilt.setFlat();
+                robot.trapdoor.setOut();
                 sense = false;
                 intakeOn = true;
-                intakeMode = IntakeMode.OUT;
-                robot.intake.out();
+                //intakeMode = IntakeMode.IN;
+                //robot.intake.in();
                 intakeDelay = true;
                 outDelay = System.currentTimeMillis();
             }
         }
 
-        if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
+       if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;
@@ -470,11 +472,15 @@ public class teleop5 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>550){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>350){
             intakeDelay = false;
+            sense = true;
             outDelay =0;
+            robot.trapdoor.setInit();
+            robot.intakeTilt.setInOut();
             intakeMode = IntakeMode.IN;
             robot.intake.in();
+
         }
 
         if (!hlimitswitch.getState() && hSlideGoBottom) {
@@ -493,6 +499,7 @@ public class teleop5 extends OpMode{
             cDelay = true;
             hSlideGoBottom = false;
         }
+        telemetry.addData("sensorF color", robot.sensorF.getColor());
     }
 
     public void slideBottom() { //Slide bottom

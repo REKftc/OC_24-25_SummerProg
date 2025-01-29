@@ -35,6 +35,7 @@ public class RobotMecanum {
     public Intake intake;
     public hang hang;
     public latch latch;
+    public trapdoor trapdoor;
     public vSlides vSlides;
     public clawSmallTilt clawSmallTilt;
     public clawBigTilt clawBigTilt;
@@ -199,6 +200,13 @@ public class RobotMecanum {
         } catch (Exception e) {
             RobotLog.ee(RobotConstants.TAG_R,  "missing: latch " + e.getMessage());
             missing = missing + ", latch";
+            numberMissing++;
+        }
+        try {
+            trapdoor = new trapdoor(hardwareMap);
+        } catch (Exception e) {
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: trapdoor " + e.getMessage());
+            missing = missing + ", trapdoor";
             numberMissing++;
         }
         try {
