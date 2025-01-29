@@ -77,8 +77,8 @@ public class autoBucket4_135 extends OpMode{
     public void firstBucket(){
         beforeBucket = new Pose(120,19.75, Math.PI);
         beforeBucket2 = new Pose(120,13, Math.PI);
-        ready2Score = new Pose(130,12.25,Math.toRadians(135));
-        wallScore = new Pose(127,8.75, Math.PI);
+        ready2Score = new Pose(130,13,Math.toRadians(135));
+        wallScore = new Pose(127,9, Math.PI);
     }
 
     //TODO: here are where the paths are defined
@@ -87,8 +87,8 @@ public class autoBucket4_135 extends OpMode{
         preload = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
-                .setZeroPowerAccelerationMultiplier(3.5)
-                .setPathEndTValueConstraint(0.7)
+                .setZeroPowerAccelerationMultiplier(3)
+                //.setPathEndTValueConstraint(0.7)
                 .setPathEndVelocityConstraint(3)
                 .build();
 
@@ -139,17 +139,16 @@ public class autoBucket4_135 extends OpMode{
                 robot.intakeTilt.setFlat();
                 robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
                 follower.followPath(preload, true);
-                firstScore.setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading());
+                follower.setMaxPower(0.7f);
                 setPathState(12);
                 nowDelay = false;
                 break;
             case 12:
                 if(pathTimer.milliseconds()>550){
-                    pathTimer.reset();
+                    //delayTimer.reset();
                     nowDelay = true;
-                if(delayTimer.milliseconds()>300 && nowDelay){
+                if(delayTimer.milliseconds()>850 && nowDelay){
                     nowDelay = false;
-                    delayTimer.reset();
                     robot.depoWrist.setOut();
                     setPathState(13);
                     runOnce = true;
@@ -191,14 +190,14 @@ public class autoBucket4_135 extends OpMode{
                     }
                 }
                 waitFor(300);
-                robot.depoWrist.setIn();
                 nowDelay = true;
+                robot.clawSmallTilt.setTransfer();
                 if (nowDelay) {
+                    robot.clawBigTilt.setTransfer();
                     waitFor(500);
                     nowDelay = false;
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
+                    robot.depoWrist.setIn();
                     if (scored) {
                         scored = false;
                         if (floorRep == 3) {
@@ -318,7 +317,7 @@ public class autoBucket4_135 extends OpMode{
                             thiTimer.reset();
                         }
                     }
-                    if (thiTimer.milliseconds()>200 && s2Delay) {
+                    if (thiTimer.milliseconds()>600 && s2Delay) {
                         s2Delay = false;
                         robot.clawBigTilt.setBucket();
                         robot.depoWrist.setOut();
@@ -328,7 +327,7 @@ public class autoBucket4_135 extends OpMode{
 
                 break;
             case 171:
-                if(pathTimer.milliseconds()>650){
+                if(pathTimer.milliseconds()>850){
                     pathTimer.reset();
                     robot.clawBigTilt.setBucket();
                     robot.depoHslide.setInit();
@@ -338,7 +337,7 @@ public class autoBucket4_135 extends OpMode{
                 }
                 break;
             case 1710:
-                if(pathTimer.milliseconds() > 360){
+                if(pathTimer.milliseconds() > 460){
                     if(floorRep==3){
                         tempWait = 600;
                     }
@@ -458,6 +457,7 @@ public class autoBucket4_135 extends OpMode{
             hSlideGoBottom = false;
             RobotLog.ii(TAG_SL, "Force stopped");
         }
+
         if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
