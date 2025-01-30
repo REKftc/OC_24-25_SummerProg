@@ -24,7 +24,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
 
 @Config
-@TeleOp(name="new tele", group="Teleop")
+@TeleOp(name="new tele", group="1Teleop")
 public class teleop5 extends OpMode{
 
     RobotMecanum robot;
@@ -56,6 +56,7 @@ public class teleop5 extends OpMode{
     boolean vslideOut = false;
     boolean manualOut = false;
     boolean sense = false;
+    boolean manualCheck = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -64,7 +65,6 @@ public class teleop5 extends OpMode{
     boolean latch = true;
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
-
 
     IntakeMode intakeMode = IntakeMode.OFF;
     SlideHeight slideHeight = SlideHeight.DOWN;
@@ -128,9 +128,10 @@ public class teleop5 extends OpMode{
         robot.driveRightBack.setPower(backRightPower);
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
+            robot.intakeTilt.setGoOut();
             robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.60f;
+            turnConstant = 0.65f;
             robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
             robot.intake.in();
             intakeMode = IntakeMode.IN;
@@ -138,6 +139,8 @@ public class teleop5 extends OpMode{
 
             manualDelay = System.currentTimeMillis();
             hslideOut = true;
+            manualCheck = true;
+
         }
 
         if (manualOut) {
@@ -161,14 +164,13 @@ public class teleop5 extends OpMode{
                     cDelay = true;
                 }
             } else {
-                robot.intakeTilt.setFlat();
                 if(hslideOut) {
                     robot.intakeTilt.setOut();
                     intakeTiltDelay = System.currentTimeMillis();
                     intTiltDelay = true;
                 }
                 else{
-                    robot.intakeTilt.setMid();
+                    robot.intakeTilt.setInOut();
                 }
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
@@ -228,17 +230,17 @@ public class teleop5 extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>210){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>160){
             robot.intakeTilt.setTransfer();
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>340){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>330){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
-            intakeMode = IntakeMode.IN;
+            intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
         }
@@ -261,8 +263,6 @@ public class teleop5 extends OpMode{
         if (transferStep ==2 & System.currentTimeMillis()-clawDelay>140){
             robot.claw.setClose();
             clawOpen = false;
-            gamepad2.rumble(400);
-            gamepad2.setLedColor(0,255,0,1000);
             transferStep = 0;
             clawDelay = 0;
         }
@@ -289,14 +289,12 @@ public class teleop5 extends OpMode{
                 transferNow();
                 hslideOut = false;
             }
-
             if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
-                robot.intakeTilt.setFlat();
-                robot.trapdoor.setOut();
                 sense = false;
+                intakeMode = IntakeMode.OFF;
+                robot.intake.off();
+                robot.trapdoor.setOut();
                 intakeOn = true;
-                //intakeMode = IntakeMode.IN;
-                //robot.intake.in();
                 intakeDelay = true;
                 outDelay = System.currentTimeMillis();
             }
@@ -383,8 +381,8 @@ public class teleop5 extends OpMode{
             slideBottom();
         }
 
-        if(hslideOut && System.currentTimeMillis()-manualDelay>800){
-            hslideOut = false;
+        if(hslideOut && System.currentTimeMillis()-manualDelay>800 && manualCheck){
+            manualCheck = false;
             manualDelay = 0;
             manualOut = true;
         }
@@ -419,7 +417,7 @@ public class teleop5 extends OpMode{
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 140){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 120){
             robot.claw.setClose();
             clawOpen = false;
             robot.intakeTilt.setFlat();
@@ -429,7 +427,7 @@ public class teleop5 extends OpMode{
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 140){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 130){
             robot.clawSmallTilt.setTranSeq();
             robot.claw.setClose();
             clawOpen = false;
@@ -439,7 +437,7 @@ public class teleop5 extends OpMode{
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 550){
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 580){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -447,7 +445,7 @@ public class teleop5 extends OpMode{
         }
 
         //slide reset seq
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>150 && dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>140 && dDelay){
             robot.claw.setOpen();
             clawOpen = true;
 
@@ -455,7 +453,7 @@ public class teleop5 extends OpMode{
             resetDelay =0;
             dDelay =false;
         }
-        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 300){
+        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 280){
             robot.clawSmallTilt.setTransfer();
             robot.clawBigTilt.setTransfer();
             robot.claw.setOpen();
@@ -464,7 +462,7 @@ public class teleop5 extends OpMode{
             resetDelay = System.currentTimeMillis();
             resetStep++;
         }
-        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 600){
+        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 500){
             robot.intakeTilt.setTransfer();
             slideHeight = SlideHeight.DOWN;
 
@@ -472,12 +470,12 @@ public class teleop5 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>350){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>500){
             intakeDelay = false;
             sense = true;
             outDelay =0;
             robot.trapdoor.setInit();
-            robot.intakeTilt.setInOut();
+            robot.intakeTilt.setOut();
             intakeMode = IntakeMode.IN;
             robot.intake.in();
 

@@ -60,6 +60,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
  */
 
+@Disabled
 @Config
 @TeleOp(name="RED sexy smooth teleop", group="Teleop")
 public class teleop4 extends OpMode {

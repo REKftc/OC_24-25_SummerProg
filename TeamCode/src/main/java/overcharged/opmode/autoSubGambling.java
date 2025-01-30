@@ -34,6 +34,11 @@ public class autoSubGambling extends OpMode{
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
 
+    boolean oneTime = false;
+
+    int turnCoeff = 0;
+
+
 
     // Init
     private RobotMecanum robot;
@@ -78,40 +83,41 @@ public class autoSubGambling extends OpMode{
                 setPathState(11);
                 break;
             case 11: ;
-                follower.holdPoint(staySigma);
+                follower.holdPoint(new Point(staySigma.getX(), staySigma.getY()), staySigma.getHeading()-2*turnCoeff);
                 robot.intake.in();
-                waitFor(500);
-                robot.intakeTilt.setFlat();
-                waitFor(400);
+                waitFor(300);
+                robot.trapdoor.setInit();
                 robot.intakeTilt.setOut();
                 pathTimer.resetTimer();
                 setPathState(12);
                 break;
             case 12:
-                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 0.8f);
+                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 1f);
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
-                    robot.intakeTilt.setHigh();
+                    robot.intakeTilt.setTransfer();
                     setPathState(13);
                 }
                 else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
-                    robot.intake.out();
-                    setPathState(121);
+                    robot.intakeTilt.setFlat();
+                    robot.trapdoor.setOut();
+                    setPathState(11);
                 }
-                else if (pathTimer.getElapsedTime()>1300){
+                else if (pathTimer.getElapsedTime()>3000){
                     robot.intake.out();
+                    turnCoeff += 1;
                     setPathState(121);
                 }
                 break;
             case 121:
-                robot.intakeTilt.setTransfer();
-                waitFor(300);
+                hSlideGoBottom = true;
+                waitFor(200);
                 robot.intake.in();
                 setPathState(11);
                 break;
             case 13:
-                waitFor(400);
+                waitFor(200);
                 robot.intake.out();
-                waitFor(400);
+                waitFor(200);
                 hSlideGoBottom = true;
                 waitFor(300);
                 robot.intake.off();
