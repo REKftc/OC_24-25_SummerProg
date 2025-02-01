@@ -103,15 +103,15 @@ public class autoRedSpecimenFRFR extends OpMode {
         bitForward = new Pose(119,109, Math.PI);
         bitBack = new Pose(85,109, Math.PI);
         toSample = new Pose(85,116, Math.PI);
-        secondScore = new Pose(119,116, Math.PI);
+        secondScore = new Pose(117.5,116, Math.PI);
         bitCloser = new Pose(85,116, Math.PI);
         bitBitBack = new Pose(85,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(132,110, Math.PI);
         thirdScore = new Pose(107,59, Math.PI);
         thirdScoreCloser = new Pose(133,102, Math.PI);
-        fourthScore = new Pose(107,63, Math.PI);
-        fourthScoreCloser = new Pose(107,64, Math.PI);
+        fourthScore = new Pose(108,63, Math.PI);
+        fourthScoreCloser = new Pose(108,63, Math.PI);
         grabFourthSample = new Pose(133,101, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
@@ -224,7 +224,7 @@ public class autoRedSpecimenFRFR extends OpMode {
                     robot.clawBigTilt.setWall();
                     robot.intakeTilt.setOut();
                     robot.intake.off();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-60, 1f);
                     vslideGoBottom = true;
                     setPathState(16);
                 }
@@ -301,6 +301,7 @@ public class autoRedSpecimenFRFR extends OpMode {
                 break;*/
             case 25: //grabs second spec
                 if(!follower.isBusy()) {
+                    waitFor(200);
                     follower.holdPoint(new BezierPoint(new Point(secondScore)), Math.toRadians(180));
                     follower.followPath(grabSample3);
                     setPathState(26);
@@ -397,6 +398,7 @@ public class autoRedSpecimenFRFR extends OpMode {
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
+                    //waitFor(1000);
                     robot.depoHslide.setOut();
                     robot.clawSmallTilt.setFlat();
                     setPathState(34);
