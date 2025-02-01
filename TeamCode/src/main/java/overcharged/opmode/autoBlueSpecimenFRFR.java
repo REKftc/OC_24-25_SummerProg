@@ -23,8 +23,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen 1+3", group = "1Autonomous")
-public class autoRedSpecimenFRFR extends OpMode {
+@Autonomous(name = "blue specimen 1+3", group = "1Autonomous")
+public class autoBlueSpecimenFRFR extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
@@ -103,7 +103,7 @@ public class autoRedSpecimenFRFR extends OpMode {
         bitForward = new Pose(119,109, Math.PI);
         bitBack = new Pose(85,109, Math.PI);
         toSample = new Pose(85,116, Math.PI);
-        secondScore = new Pose(117.5,116, Math.PI);
+        secondScore = new Pose(118,116, Math.PI);
         bitCloser = new Pose(85,116, Math.PI);
         bitBitBack = new Pose(85,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
@@ -224,7 +224,7 @@ public class autoRedSpecimenFRFR extends OpMode {
                     robot.clawBigTilt.setWall();
                     robot.intakeTilt.setOut();
                     robot.intake.off();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-60, 1f);
                     vslideGoBottom = true;
                     setPathState(16);
                 }
@@ -544,4 +544,5 @@ public class autoRedSpecimenFRFR extends OpMode {
         }
     }
 }
+
 
