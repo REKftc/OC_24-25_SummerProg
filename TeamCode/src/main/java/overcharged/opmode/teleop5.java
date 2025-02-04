@@ -112,6 +112,7 @@ public class teleop5 extends OpMode{
     public void loop(){
         robot.clearBulkCache();
         long timestamp = System.currentTimeMillis();
+        slowPower = 0.85f;
 
         double y = gamepad1.left_stick_y;
         double x = -gamepad1.left_stick_x * 1.1;
@@ -243,14 +244,14 @@ public class teleop5 extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>160){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>100){
             robot.intakeTilt.setTransfer();
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>330){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>350){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
@@ -433,27 +434,29 @@ public class teleop5 extends OpMode{
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 100){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 40){
             robot.claw.setClose();
             clawOpen = false;
-            robot.intakeTilt.setFlat();
+        }
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 130){
+            robot.intakeTilt.setInOut();
+            robot.clawSmallTilt.setWall();
             robot.clawBigTilt.setFlat();
             robot.depoHslide.setInit();
 
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 170){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 160){
             robot.clawSmallTilt.setTranSeq();
             robot.claw.setClose();
             clawOpen = false;
-            robot.clawSmallTilt.setWall();
             robot.clawBigTilt.setWall();
 
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 650){
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 630){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -486,10 +489,10 @@ public class teleop5 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>250){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>210){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>550){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>490){
             intakeDelay = false;
             sense = true;
             outDelay =0;

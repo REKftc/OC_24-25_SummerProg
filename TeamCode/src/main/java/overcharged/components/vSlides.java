@@ -30,7 +30,7 @@ public class vSlides {
     public static final int wall = 0;
     public static final int mid = 410;//400;
     public static final int lower = 450;
-    public static final int high1 = 950;
+    public static final int high1 = 910;
     public static final int autohigh1 = 840;
     public static final int high2 = 850;
     public static double p = 18;

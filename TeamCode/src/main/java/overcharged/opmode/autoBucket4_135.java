@@ -42,6 +42,7 @@ public class autoBucket4_135 extends OpMode{
     boolean doOnce = false;
 
     long totalTime;
+    long tempTime;
 
 
     int floorRep = 3;
@@ -75,10 +76,10 @@ public class autoBucket4_135 extends OpMode{
 
     //TODO: Starting from here are the poses for the paths
     public void firstBucket(){
-        beforeBucket = new Pose(126,19.75, Math.PI);
+        beforeBucket = new Pose(126,19, Math.PI);
         beforeBucket2 = new Pose(120,13, Math.PI);
-        ready2Score = new Pose(132.5,15.7,Math.toRadians(135));
-        wallScore = new Pose(128.5,11, Math.PI);
+        ready2Score = new Pose(132.5,16,Math.toRadians(135));
+        wallScore = new Pose(128,11, Math.PI);
     }
 
     //TODO: here are where the paths are defined
@@ -87,12 +88,7 @@ public class autoBucket4_135 extends OpMode{
         preload = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
-                .setZeroPowerAccelerationMultiplier(1.5) //2.5
-        /*        .setPathEndTValueConstraint(0.95)
-                .setPathEndVelocityConstraint(5)
-                .setPathEndTimeoutConstraint(150)
-
-         */
+                .setZeroPowerAccelerationMultiplier(3)
                 .build();
 
         firstScore = new Path(new BezierLine(new Point(startPose),new Point(ready2Score)));
@@ -107,19 +103,13 @@ public class autoBucket4_135 extends OpMode{
 
         floor2 = new Path(new BezierLine(new Point(beforeBucket2), new Point(wallScore)));
         floor2.setConstantHeadingInterpolation(Math.PI);
-        /*floor2.setZeroPowerAccelerationMultiplier(1);
-        floor2.setPathEndTValueConstraint(0.95);
-        floor2.setPathEndVelocityConstraint(5);
-        floor2.setPathEndTimeoutConstraint(150);
-         */
+        floor2.setZeroPowerAccelerationMultiplier(3);
+
 
         floorCycle = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(beforeBucket), new Point(wallScore)))
                 .setConstantHeadingInterpolation(Math.PI)
-           /*     .setZeroPowerAccelerationMultiplier(1)
-                .setPathEndTValueConstraint(0.95)
-                .setPathEndVelocityConstraint(5)
-                .setPathEndTimeoutConstraint(150)*/
+                .setZeroPowerAccelerationMultiplier(3)
                 .build();
 
         toSub = follower.pathBuilder()
@@ -129,8 +119,7 @@ public class autoBucket4_135 extends OpMode{
                                 new Point(75.000, 10.000, Point.CARTESIAN),
                                 new Point(82.000, 45.500, Point.CARTESIAN)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
-                .setZeroPowerAccelerationMultiplier(2.5)
-                .setPathEndVelocityConstraint(5)
+                .setZeroPowerAccelerationMultiplier(3.25)
                 .build();
     }
 
@@ -176,7 +165,6 @@ public class autoBucket4_135 extends OpMode{
                     if (delayTimer.milliseconds() > 750 && nowDelay) {
                         nowDelay = false;
                         robot.claw.setOpen();
-                        scored = true;
                         runOnce = true;
                         setPathState(14);
                     }
@@ -194,13 +182,16 @@ public class autoBucket4_135 extends OpMode{
                         floorRep -= 1;
                     }
                 }
-                waitFor(100);
-                robot.clawBigTilt.setTransfer();
-                robot.clawSmallTilt.setTransfer();
-                waitFor(150);
-                nowDelay = false;
-                robot.claw.setOpen();
-                robot.depoWrist.setIn();
+                if(pathTimer.milliseconds() > 100) {
+                    robot.clawBigTilt.setTransfer();
+                    robot.clawSmallTilt.setTransfer();
+                }
+                if(pathTimer.milliseconds() > 250) {
+                    nowDelay = false;
+                    robot.claw.setOpen();
+                    robot.depoWrist.setIn();
+                    scored = true;
+                }
                 if (scored) {
                     scored = false;
                     if (floorRep == 3) {
@@ -220,7 +211,7 @@ public class autoBucket4_135 extends OpMode{
                     } else if (floorRep == 1) {
                         robot.latch.setOut();
                         robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 1f);
-                        follower.followPath(secondBack, false);
+                        follower.followPath(secondBack, true);
                         secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(205));
                         vslideGoBottom = true;
                         setPathState(16);
@@ -242,8 +233,8 @@ public class autoBucket4_135 extends OpMode{
                 }
                 break;
             case 161:
-                waitFor(100);
                 if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
+                    tempTime = System.currentTimeMillis();
                     if (runOnce){
                         secTimer.reset();
                         runOnce = false;
@@ -251,12 +242,12 @@ public class autoBucket4_135 extends OpMode{
                         hSlideGoBottom = true;
                         robot.intake.in();
                     }
-                    waitFor(150);
-                    secTimer.reset();
-                    robot.intake.out();
-                    setPathState(17);
-                    nowDelay = false;
-                    runOnce = true;
+                    if(tempTime > 100) {
+                        robot.intake.out();
+                        setPathState(17);
+                        nowDelay = false;
+                        runOnce = true;
+                    }
                 }
                 else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1800) {
                     if (broken){
@@ -286,16 +277,17 @@ public class autoBucket4_135 extends OpMode{
 
                 break;
             case 17:
-                waitFor(200);
-                robot.intake.in();
+                if(pathTimer.milliseconds()>300) {
+                    robot.intake.in();
+                }
                 if (in) {
                     if (runOnce) {
                         runOnce = false;
                         robot.intakeTilt.setTransfer();
                         if (floorRep == 3) {
-                            follower.followPath(floorCycle, false);
+                            follower.followPath(floorCycle, true);
                         } else if (floorRep >0) {
-                            follower.followPath(floor2, false);
+                            follower.followPath(floor2, true);
                         }
                         if (floorRep == 1) {
                             floor2.setLinearHeadingInterpolation(Math.toRadians(205), Math.PI);
@@ -306,7 +298,6 @@ public class autoBucket4_135 extends OpMode{
                     if(secTimer.milliseconds()>550 && hlimitswitch.getState() && backDelay) {
                         backDelay = false;
                         if (doOnce) {
-                            waitFor(150);
                             doOnce = false;
                             robot.claw.setClose();
                             robot.intake.off();
@@ -316,7 +307,6 @@ public class autoBucket4_135 extends OpMode{
                     }
                     if (pathTimer.milliseconds()>200 && nowDelay) {
                         if (runOnce) {
-                            waitFor(40);
                             runOnce = false;
                             nowDelay = false;
                             robot.intakeTilt.setFlat();
@@ -354,8 +344,9 @@ public class autoBucket4_135 extends OpMode{
             case 172:
                 if (floorRep > 1) {
                     floorRep -= 1;
-                    waitFor(100);
-                    setPathState(14);
+                    if(pathTimer.milliseconds() > 100) {
+                        setPathState(14);
+                    }
                 }
                 else{
                     setPathState(18);
@@ -385,7 +376,7 @@ public class autoBucket4_135 extends OpMode{
             case 19:
                 if(!follower.isBusy()){
                     follower.followPath(toSub, true);
-                    follower.setMaxPower(0.6f);
+                    follower.setMaxPower(0.8f);
                     setPathState(191);
                 }
                 break;
