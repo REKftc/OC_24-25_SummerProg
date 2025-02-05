@@ -23,8 +23,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen 1+4", group = "1Autonomous")
-public class autoRedSpecimenFive extends OpMode {
+@Autonomous(name = "blue specimen 1+4", group = "1Autonomous")
+public class autoBlueSpecimenFive extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;

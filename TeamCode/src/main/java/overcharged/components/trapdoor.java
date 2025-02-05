@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 public class trapdoor {
 
     public OcServo trapdoor;
-    public static final float CLOSED = 54f;
+    public static final float CLOSED = 53f;
     public static final float OPEN = 164f;
 
     public trapdoor(HardwareMap hardwareMap) {

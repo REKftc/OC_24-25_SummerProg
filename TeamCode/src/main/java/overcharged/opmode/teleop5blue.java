@@ -24,8 +24,8 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
 
 @Config
-@TeleOp(name="new tele", group="1Teleop")
-public class teleop5 extends OpMode{
+@TeleOp(name="new tele blue", group="1Teleop")
+public class teleop5blue extends OpMode{
 
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -105,8 +105,8 @@ public class teleop5 extends OpMode{
             telemetry.addData("Init Failed", e.getMessage());
             telemetry.update();
         }
-            robot.vSlides.vSlidesR.resetPosition();
-            robot.vSlides.vSlidesL.resetPosition();
+        robot.vSlides.vSlidesR.resetPosition();
+        robot.vSlides.vSlidesL.resetPosition();
     }
 
     public void loop(){
@@ -287,7 +287,7 @@ public class teleop5 extends OpMode{
         }
 
         if(intakeMode == IntakeMode.IN && sense){
-            if (robot.sensorF.getColor() == colorSensor.Color.RED){
+            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
@@ -305,7 +305,7 @@ public class teleop5 extends OpMode{
                 transferNow();
                 hslideOut = false;
             }
-            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+            if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 sense = false;
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
@@ -317,7 +317,7 @@ public class teleop5 extends OpMode{
             }
         }
 
-       if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
+        if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;
