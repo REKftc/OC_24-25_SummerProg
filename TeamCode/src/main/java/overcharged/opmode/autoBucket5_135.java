@@ -1,0 +1,640 @@
+package overcharged.opmode;
+
+import static overcharged.config.RobotConstants.TAG_SL;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
+
+import overcharged.components.RobotMecanum;
+import overcharged.components.colorSensor;
+import overcharged.components.hslides;
+import overcharged.components.vSlides;
+import overcharged.drive.SampleMecanumDrive;
+
+import overcharged.pedroPathing.follower.Follower;
+import overcharged.pedroPathing.localization.Pose;
+import overcharged.pedroPathing.pathGeneration.BezierCurve;
+import overcharged.pedroPathing.pathGeneration.BezierLine;
+import overcharged.pedroPathing.pathGeneration.Path;
+import overcharged.pedroPathing.pathGeneration.PathChain;
+import overcharged.pedroPathing.pathGeneration.Point;
+import overcharged.pedroPathing.util.Timer;
+
+// Main Class
+@Autonomous(name = "0+5 bucket test", group = "1Autonomous")
+public class autoBucket5_135 extends OpMode{
+
+    //stuff
+    boolean vslideGoBottom = false;
+    boolean hSlideGoBottom = false;
+    boolean scored = false;
+    boolean in = true;
+    boolean broken = false;
+    boolean nowDelay = false;
+    boolean backDelay = false;
+    boolean s2Delay = false;
+    boolean runOnce = false;
+    boolean doOnce = false;
+
+    long totalTime;
+    long tempTime;
+
+
+    int floorRep = 3;
+    int tempWait = 0;
+
+    // Init
+    private RobotMecanum robot;
+    private DigitalChannel hlimitswitch;
+    private DigitalChannel vlimitswitch;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    SampleMecanumDrive drive;
+    MultipleTelemetry telems;
+    private ElapsedTime pathTimer, delayTimer, secTimer, thiTimer;
+
+    // Other init
+    private int pathState;
+    int turnCoeff = 1;
+
+    // LOCATIONS
+    // GUIDE:
+    // (0,0) is the corner. (144, 144) is the opposite.
+
+    // OTHER POSES
+    private Pose initBucket, beforeBucket, ready2Score, wallScore, beforeBucket2, subFront;
+    private Pose startPose = new Pose(136, 32, Math.toRadians(90));
+
+    private Path firstScore, inchBucket, goSafe, goBack, secondBack, floor2, slightMove;
+
+    private PathChain preload, floorCycle, toSub, backSub;
+
+    private Follower follower;
+
+    //TODO: Starting from here are the poses for the paths
+    public void firstBucket(){
+        beforeBucket = new Pose(126,21.5, Math.PI);
+        beforeBucket2 = new Pose(120,13, Math.PI);
+        ready2Score = new Pose(132.5,16,Math.toRadians(135));
+        wallScore = new Pose(128.5,12, Math.PI);
+        subFront = new Pose(81.500, 45.500, Math.PI/2);
+    }
+
+    //TODO: here are where the paths are defined
+    public void buildPaths() {
+
+        preload = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(startPose),new Point(ready2Score)))
+                .setLinearHeadingInterpolation(startPose.getHeading(), ready2Score.getHeading())
+                .setZeroPowerAccelerationMultiplier(3)
+                .build();
+
+        firstScore = new Path(new BezierLine(new Point(startPose),new Point(ready2Score)));
+        firstScore.setConstantHeadingInterpolation(ready2Score.getHeading());
+
+
+        goSafe = new Path(new BezierLine(new Point(ready2Score), new Point(beforeBucket)));
+        //goSafe.setConstantHeadingInterpolation(Math.PI);
+
+        secondBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket2)));
+        secondBack.setConstantHeadingInterpolation(Math.PI);
+
+        floor2 = new Path(new BezierLine(new Point(beforeBucket2), new Point(wallScore)));
+        floor2.setConstantHeadingInterpolation(Math.PI);
+        floor2.setZeroPowerAccelerationMultiplier(3);
+
+
+        floorCycle = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(beforeBucket), new Point(wallScore)))
+                .setConstantHeadingInterpolation(Math.PI)
+                .setZeroPowerAccelerationMultiplier(3)
+                .build();
+
+        toSub = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(wallScore),
+                        new Point(125.000, 30.000, Point.CARTESIAN),
+                        new Point(75.000, 10.000, Point.CARTESIAN),
+                        new Point(subFront)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();
+
+        backSub = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(subFront),
+                        new Point(75.000, 10.000, Point.CARTESIAN),
+                        new Point(125.000, 30.000, Point.CARTESIAN),
+                        new Point(wallScore)))
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();
+
+        slightMove = new Path(new BezierLine(new Point(subFront.getX()+(turnCoeff-1)*2, subFront.getY()), new Point(subFront.getX()+(turnCoeff)*2, subFront.getY())));
+    }
+
+
+    // TODO: HERE IS WHERE THE MAIN PATH IS
+    // Main pathing
+    public void autoPath() {
+        switch (pathState) {
+            // Auto Body
+            //
+            case 10: // scores initial specimen
+                robot.intakeTilt.setFlat();
+                robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
+                follower.followPath(preload, true);
+                follower.setMaxPower(0.7f);
+                setPathState(12);
+                nowDelay = false;
+                break;
+            case 12:
+                if(pathTimer.milliseconds()>550){
+                    nowDelay = true;
+                    if(delayTimer.milliseconds()>750 && nowDelay){
+                        nowDelay = false;
+                        robot.depoWrist.setOut();
+                        setPathState(13);
+                        runOnce = true;
+                    }
+                }
+                break;
+            case 13:
+                if(pathTimer.milliseconds()>200) {
+                    if (runOnce) {
+                        runOnce = false;
+                        robot.clawSmallTilt.setOut();
+                        robot.clawBigTilt.setBucket();
+                        robot.depoHslide.setInit();
+                        delayTimer.reset();
+                        nowDelay = true;
+                    }
+                    if (delayTimer.milliseconds() > 300 && nowDelay){
+                        robot.clawSmallTilt.setLeft();
+                    }
+                    if (delayTimer.milliseconds() > 750 && nowDelay) {
+                        nowDelay = false;
+                        robot.claw.setOpen();
+                        runOnce = true;
+                        setPathState(14);
+                    }
+                }
+                break;
+            case 14:
+                if(floorRep == 0){
+                    setPathState(18);
+                    runOnce = true;
+                }
+                if (broken){
+                    broken = false;
+                    if (doOnce){
+                        doOnce = false;
+                        floorRep -= 1;
+                    }
+                }
+                waitFor(100);
+                robot.clawBigTilt.setTransfer();
+                robot.clawSmallTilt.setTransfer();
+                waitFor(150);
+                nowDelay = false;
+                robot.claw.setOpen();
+                robot.depoWrist.setIn();
+                scored=true;
+                if (scored) {
+                    scored = false;
+                    if (floorRep == 3) {
+                        robot.latch.setOut();
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
+                        follower.followPath(goSafe, true);
+                        goSafe.setLinearHeadingInterpolation(ready2Score.getHeading(), Math.toRadians(180));
+                        vslideGoBottom = true;
+                        setPathState(16);
+                    } else if (floorRep == 2) {
+                        robot.latch.setOut();
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
+                        follower.followPath(secondBack, true);
+                        vslideGoBottom = true;
+                        setPathState(16);
+                    } else if (floorRep == 1) {
+                        robot.latch.setOut();
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 1f);
+                        follower.followPath(secondBack, true);
+                        secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(205));
+                        vslideGoBottom = true;
+                        setPathState(16);
+                    } else {
+                        telemetry.addLine("aw man");
+                    }
+                }
+
+                break;
+            case 16:
+                robot.intake.in();
+                robot.intakeTilt.setInOut();
+                robot.latch.setOut();
+                if(!follower.isBusy()) {
+                    in = false;
+                    runOnce = true;
+                    setPathState(161);
+
+                }
+                break;
+            case 161:
+                if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
+                    tempTime = System.currentTimeMillis();
+                    if (runOnce){
+                        secTimer.reset();
+                        runOnce = false;
+                        robot.intakeTilt.setTransfer();
+                        hSlideGoBottom = true;
+                        robot.intake.in();
+                    }
+                    if(tempTime > 100) {
+                        robot.intake.out();
+                        setPathState(17);
+                        nowDelay = false;
+                        runOnce = true;
+                    }
+                }
+                else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1800) {
+                    if (broken){
+                        broken = false;
+                        if (floorRep > 1){
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+240, 0.6f);
+                        }
+                        else if (floorRep == 1){
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET3+150, 0.6f);
+                        }
+                    }
+                    else{
+                        robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+240,0.6f);
+                    }
+                }
+                if (robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>1800) {
+                    pathTimer.reset();
+                    robot.intake.off();
+                    robot.intakeTilt.setTransfer();
+                    hSlideGoBottom = true;
+                    scored = true;
+                    broken = true;
+                    runOnce = true;
+                    doOnce = true;
+                    setPathState(14);
+                }
+
+                break;
+            case 17:
+                if(pathTimer.milliseconds()>300) {
+                    robot.intake.in();
+                }
+                if (in) {
+                    if (runOnce) {
+                        runOnce = false;
+                        robot.intakeTilt.setTransfer();
+                        if (floorRep == 3) {
+                            follower.followPath(floorCycle, true);
+                        } else if (floorRep >0) {
+                            follower.followPath(floor2, true);
+                        }
+                        if (floorRep == 1) {
+                            floor2.setLinearHeadingInterpolation(Math.toRadians(205), Math.PI);
+                        }
+                        backDelay = true;
+                        doOnce = true;
+                    }
+                    if(secTimer.milliseconds()>570 && hlimitswitch.getState() && backDelay) {
+                        backDelay = false;
+                        if (doOnce) {
+                            doOnce = false;
+                            robot.claw.setClose();
+                            robot.intake.off();
+                            nowDelay = true;
+                            runOnce = true;
+                        }
+                    }
+                    if (secTimer.milliseconds()>650 && nowDelay) {
+                        if (runOnce) {
+                            runOnce = false;
+                            nowDelay = false;
+                            robot.intakeTilt.setFlat();
+                            robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
+                            s2Delay = true;
+                            thiTimer.reset();
+                        }
+                    }
+                    if (thiTimer.milliseconds()>300 && s2Delay) {
+                        s2Delay = false;
+                        robot.clawBigTilt.setBucket();
+                        robot.depoWrist.setOut();
+                        setPathState(171);
+                    }
+                }
+
+                break;
+            case 171:
+                if(pathTimer.milliseconds()>250){
+                    robot.depoHslide.setInit();
+                    robot.clawSmallTilt.setRight();
+                    robot.intakeTilt.setTransfer();
+                    setPathState(1710);
+                }
+                break;
+            case 1710:
+                if(pathTimer.milliseconds() > 800){
+                    delayTimer.reset();
+                    robot.claw.setBig();
+                    scored = true;
+                    setPathState(172);
+
+                }
+                break;
+            case 172:
+                if(pathTimer.milliseconds() > 100) {
+                    if (floorRep > 1) {
+                        floorRep -= 1;
+                        setPathState(14);
+                    } else {
+                        setPathState(18);
+                        runOnce = true;
+                    }
+                }
+                break;
+
+            case 18:
+                if(delayTimer.milliseconds()>300) {
+                    if (runOnce) {
+                        runOnce = false;
+                        delayTimer.reset();
+                        robot.depoWrist.setIn();
+                        nowDelay = true;
+                        secTimer.reset();
+                    }
+                }
+                if (secTimer.milliseconds()>350 && nowDelay) {
+                    secTimer.reset();
+                    nowDelay = false;
+                    robot.claw.setOpen();
+                    robot.clawBigTilt.setTransfer();
+                    vslideGoBottom = true;
+                    robot.clawSmallTilt.setTransfer();
+                    setPathState(19);
+                }
+                break;
+            case 19:
+                //if(!follower.isBusy()){
+                follower.followPath(toSub, true);
+                robot.intakeTilt.setTransfer();
+                follower.setMaxPower(0.8f);
+                setPathState(191);
+                //}
+                break;
+            case 191:
+                if(pathTimer.milliseconds()>1300) {
+                    robot.latch.setOut();
+                    robot.hslides.moveEncoderTo(hslides.SMALL,1f);
+                    waitFor(200);
+                    setPathState(20);
+                    runOnce = true;
+                }
+                break;
+            case 20:
+                if(!follower.isBusy()) {
+                    if (runOnce) {
+                        runOnce = false;
+                        follower.followPath(slightMove);
+                        slightMove.setConstantHeadingInterpolation(Math.toRadians(90));
+                        s2Delay = true;
+                        pathTimer.reset();
+                    }
+                    if(s2Delay && pathTimer.milliseconds()>300) {
+                        robot.trapdoor.setInit();
+                        robot.intake.in();
+                        robot.intakeTilt.setOut();
+                        setPathState(21);
+                    }
+                }
+                break;
+            case 21:
+                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 1f);
+                if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
+                    robot.intakeTilt.setTransfer();
+                    setPathState(22);
+                }
+                else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                    robot.intakeTilt.setFlat();
+                    robot.trapdoor.setOut();
+                    turnCoeff += 1;
+                    setPathState(20);
+                }
+                else if (robot.hslides.hslides.getCurrentPosition() > 600) {
+                    robot.intake.out();
+                    turnCoeff += 1;
+                    setPathState(211);
+                }
+                else if (pathTimer.milliseconds()>3000){
+                    robot.intake.out();
+                    turnCoeff += 1;
+                    setPathState(211);
+                }
+                break;
+            case 211:
+                hSlideGoBottom = true;
+                waitFor(200);
+                robot.intake.in();
+                setPathState(20);
+                break;
+            case 22:
+                waitFor(200);
+                robot.intake.out();
+                waitFor(200);
+                hSlideGoBottom = true;
+                robot.intakeTilt.setTransfer();
+                waitFor(300);
+                robot.intake.off();
+                setPathState(23);
+                break;
+            case 23:
+                follower.followPath(backSub);
+                follower.setMaxPower(0.8f);
+                setPathState(24);
+                runOnce = true;
+                break;
+            case 24:
+                if(pathTimer.milliseconds()>400 && hlimitswitch.getState()){
+                    robot.claw.setClose();
+                }
+                if(pathTimer.milliseconds()>550){
+                    if(runOnce) {
+                        runOnce = false;
+                        robot.intakeTilt.setFlat();
+                        robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
+                        thiTimer.reset();
+                        s2Delay = true;
+                    }
+                }
+                if (thiTimer.milliseconds()>400 && s2Delay) {
+                    s2Delay = false;
+                    robot.clawBigTilt.setBucket();
+                    robot.depoWrist.setOut();
+                    setPathState(241);
+                }
+                break;
+            case 241:
+                if(pathTimer.milliseconds()>500){
+                    robot.depoHslide.setInit();
+                    robot.clawSmallTilt.setRight();
+                    robot.intakeTilt.setTransfer();
+                }
+                if(pathTimer.milliseconds()>800 && !follower.isBusy()){
+                    robot.claw.setBig();
+                    setPathState(25);
+                }
+                break;
+            case 25:
+                if(pathTimer.milliseconds()>400){
+                    robot.clawBigTilt.setTransfer();
+                    robot.depoWrist.setIn();
+                }
+                if(pathTimer.milliseconds()>500){
+                    robot.intakeTilt.setTransfer();
+                    vslideGoBottom = true;
+                    setPathState(100);
+                }
+                break;
+
+
+
+
+            case 100: // EMPTY TEST CASE
+                //follower.holdPoint(new BezierPoint(firstScore.getLastControlPoint()), Math.toRadians(-90));
+                telems.addLine("CASE 100 - IN TEST CASE!!");
+                break;
+
+        }
+    }
+
+
+    // path setter
+    public void setPathState(int state){
+        pathState = state;
+        pathTimer.reset();
+        delayTimer.reset();
+        secTimer.reset();
+        thiTimer.reset();
+        autoPath();
+    }
+
+    // Distance Sensor Checker
+    public void startDistanceSensorDisconnectDetection(int state) {
+    }
+
+    //loop de loop
+    @Override
+    public void loop() {
+        follower.update();
+        autoPath();
+        telemetry.addLine("TValue: "+follower.getCurrentTValue());
+        telemetry.addLine("Path: " + pathState);
+        telemetry.addLine("Position: " + follower.getPose());
+        telemetry.addLine("heading: " + follower.getTotalHeading());
+        //telemetry.addLine("color: "+robot.sensorF.getColor());
+        //telemetry.addLine("vLimit" + vlimitswitch.getState());
+        //telemetry.addLine("hLimit" + hlimitswitch.getState());
+        telemetry.addLine("Rep Count"+ floorRep);
+        telemetry.addLine("pathTimer: " + pathTimer);
+        telemetry.addLine("delayTimer: " + delayTimer);
+        telemetry.addLine("secTimer: " + secTimer);
+        telemetry.addLine("thiTimer: " + thiTimer);
+        telemetry.addLine("hslideGoBottom: " + hSlideGoBottom);
+        telemetry.addLine("floorRep: " + floorRep);
+        telemetry.addLine("color: " + robot.sensorF.getColor());
+        //functions
+        if (!hlimitswitch.getState() && hSlideGoBottom) {
+            in = true;
+            robot.latch.setInit();
+            robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.hslides.hslides.setPower(-1);
+            RobotLog.ii(TAG_SL, "Going down");
+        } else if (hlimitswitch.getState() && hSlideGoBottom) {
+            robot.latch.setInit();
+            robot.intakeTilt.setTransfer();
+            robot.hslides.hslides.setPower(0);
+            robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            hSlideGoBottom = false;
+            RobotLog.ii(TAG_SL, "Force stopped");
+        }
+
+        if (!vlimitswitch.getState() && vslideGoBottom) {
+            robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.vSlides.vSlidesR.setPower(-0.55f);
+            robot.vSlides.vSlidesL.setPower(-0.55f);
+            RobotLog.ii(TAG_SL, "Going down");
+        } else if (vlimitswitch.getState() && vslideGoBottom) {
+            robot.vSlides.vSlidesR.setPower(0);
+            robot.vSlides.vSlidesL.setPower(0);
+            robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            vslideGoBottom = false;
+            RobotLog.ii(TAG_SL, "Force stopped");
+        }
+    }
+
+    // initialize robot
+    @Override
+    public void init() {
+
+        // Robot things init
+        telems = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
+        robot = new RobotMecanum(this, true, false);
+        drive = new SampleMecanumDrive(hardwareMap);
+        delayTimer = new ElapsedTime();
+        pathTimer = new ElapsedTime();
+        secTimer = new ElapsedTime();
+        thiTimer = new ElapsedTime();
+
+
+        //follower init
+        follower = new Follower(hardwareMap);
+        follower.setStartingPose(startPose);
+
+        //Pose init
+        firstBucket();
+        buildPaths();
+
+        //robot init
+        hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
+        vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
+        robot.intakeTilt.setTransfer();
+        robot.clawBigTilt.setTransfer();
+        robot.clawSmallTilt.setTransfer();
+        robot.claw.setClose();
+    }
+
+    //loop de loop but initialized
+    @Override
+    public void init_loop() {
+
+    }
+
+    @Override
+    public void start() {
+        // starts auto paths
+        setPathState(10);
+
+        // safety net if auto doesn't start for some reason
+        autoPath();
+    }
+
+    public static void waitFor(int milliseconds) { //Waitor Function
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < milliseconds) {
+            // loop
+        }
+    }
+}

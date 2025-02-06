@@ -36,7 +36,7 @@ public class autoSubGambling extends OpMode{
 
     boolean oneTime = false;
 
-    int turnCoeff = 0;
+    int turnCoeff = 1;
 
 
 
@@ -57,7 +57,7 @@ public class autoSubGambling extends OpMode{
     private Pose staySigma;
     private Pose startPose = new Pose(84, 49.5, Math.toRadians(90));
 
-    private Path woahLigma;
+    private Path woahLigma, slightMove;
 
     private Follower follower;
 
@@ -66,7 +66,7 @@ public class autoSubGambling extends OpMode{
     }
 
     public void buildPaths() {
-
+        slightMove = new Path(new BezierLine(new Point(staySigma.getX()+(turnCoeff-1)*2, staySigma.getY()), new Point(staySigma.getX()+(turnCoeff)*2, staySigma.getY())));
     }
 
 
@@ -83,10 +83,11 @@ public class autoSubGambling extends OpMode{
                 setPathState(11);
                 break;
             case 11: ;
-                follower.holdPoint(new Point(staySigma.getX(), staySigma.getY()), staySigma.getHeading()-2*turnCoeff);
-                robot.intake.in();
+                follower.followPath(slightMove);
+                slightMove.setConstantHeadingInterpolation(Math.toRadians(90));
                 waitFor(300);
                 robot.trapdoor.setInit();
+                robot.intake.in();
                 robot.intakeTilt.setOut();
                 pathTimer.resetTimer();
                 setPathState(12);
@@ -100,7 +101,13 @@ public class autoSubGambling extends OpMode{
                 else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intakeTilt.setFlat();
                     robot.trapdoor.setOut();
+                    turnCoeff += 1;
                     setPathState(11);
+                }
+                else if (robot.hslides.hslides.getCurrentPosition() > 600) {
+                    robot.intake.out();
+                    turnCoeff += 1;
+                    setPathState(121);
                 }
                 else if (pathTimer.getElapsedTime()>3000){
                     robot.intake.out();
