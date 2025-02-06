@@ -27,7 +27,7 @@ import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
 // Main Class
-@Autonomous(name = "0+5 bucket test", group = "1Autonomous")
+@Autonomous(name = "0+5 red bucket test", group = "1Autonomous")
 public class autoBucket5_135 extends OpMode{
 
     //stuff
@@ -81,8 +81,8 @@ public class autoBucket5_135 extends OpMode{
         beforeBucket = new Pose(126,21.5, Math.PI);
         beforeBucket2 = new Pose(120,13, Math.PI);
         ready2Score = new Pose(132.5,16,Math.toRadians(135));
-        wallScore = new Pose(128.5,12, Math.PI);
-        subFront = new Pose(81.500, 45.500, Math.PI/2);
+        wallScore = new Pose(128.75,12, Math.PI);
+        subFront = new Pose(81.500, 46.000, Math.PI/2);
     }
 
     //TODO: here are where the paths are defined
@@ -197,7 +197,7 @@ public class autoBucket5_135 extends OpMode{
                         floorRep -= 1;
                     }
                 }
-                waitFor(100);
+                waitFor(300);
                 robot.clawBigTilt.setTransfer();
                 robot.clawSmallTilt.setTransfer();
                 waitFor(150);
@@ -209,7 +209,7 @@ public class autoBucket5_135 extends OpMode{
                     scored = false;
                     if (floorRep == 3) {
                         robot.latch.setOut();
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
+                       // robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
                         follower.followPath(goSafe, true);
                         goSafe.setLinearHeadingInterpolation(ready2Score.getHeading(), Math.toRadians(180));
                         vslideGoBottom = true;
@@ -234,17 +234,24 @@ public class autoBucket5_135 extends OpMode{
 
                 break;
             case 16:
-                robot.intake.in();
-                robot.intakeTilt.setInOut();
-                robot.latch.setOut();
-                if(!follower.isBusy()) {
-                    in = false;
-                    runOnce = true;
-                    setPathState(161);
 
+                    robot.intake.in();
+                    robot.intakeTilt.setInOut();
+                    robot.latch.setOut();
+                    if(!follower.isBusy()) {
+                        in = false;
+                        runOnce = true;
+                        if (floorRep == 3 &&  pathTimer.milliseconds()>800){
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 1f);
+                            setPathState(161);
+                        }
+                        else if(floorRep < 3) {
+                            setPathState(161);
+                        }
                 }
                 break;
             case 161:
+
                 if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     tempTime = System.currentTimeMillis();
                     if (runOnce){
@@ -254,30 +261,42 @@ public class autoBucket5_135 extends OpMode{
                         hSlideGoBottom = true;
                         robot.intake.in();
                     }
-                    if(tempTime > 100) {
+                    if(tempTime > 300) {
                         robot.intake.out();
                         setPathState(17);
                         nowDelay = false;
                         runOnce = true;
+
                     }
                 }
                 else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1800) {
                     if (broken){
                         broken = false;
-                        if (floorRep > 1){
-                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+240, 0.6f);
+                        if (floorRep == 3){
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+270, 0.6f);
+                        }
+                        else if (floorRep == 2){
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+270, 0.6f);
                         }
                         else if (floorRep == 1){
                             robot.hslides.moveEncoderTo(robot.hslides.PRESET3+150, 0.6f);
                         }
                     }
                     else{
-                        robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+240,0.6f);
+                        if (floorRep ==3){
+                            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 270, 0.6f);
+                        }
+                        else if (floorRep == 2){
+                            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 270, 0.6f);
+                        }
+                        else {
+                            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 240, 0.6f);
+                        }
                     }
                 }
                 if (robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>1800) {
                     pathTimer.reset();
-                    robot.intake.off();
+                    robot.intake.out();
                     robot.intakeTilt.setTransfer();
                     hSlideGoBottom = true;
                     scored = true;
@@ -394,16 +413,19 @@ public class autoBucket5_135 extends OpMode{
                 //}
                 break;
             case 191:
-                if(pathTimer.milliseconds()>1300) {
-                    robot.latch.setOut();
-                    robot.hslides.moveEncoderTo(hslides.SMALL,1f);
-                    waitFor(200);
-                    setPathState(20);
-                    runOnce = true;
+                if (!follower.isBusy()) {
+                    if (pathTimer.milliseconds() > 2000) {
+                        robot.latch.setOut();
+                        robot.hslides.moveEncoderTo(hslides.SMALL, 1f);
+                        waitFor(100);
+                        // robot.intake.in();
+                        setPathState(20);
+                        runOnce = true;
+                    }
                 }
                 break;
             case 20:
-                if(!follower.isBusy()) {
+                //if(!follower.isBusy()) {
                     if (runOnce) {
                         runOnce = false;
                         follower.followPath(slightMove);
@@ -417,10 +439,10 @@ public class autoBucket5_135 extends OpMode{
                         robot.intakeTilt.setOut();
                         setPathState(21);
                     }
-                }
+               // }
                 break;
             case 21:
-                robot.hslides.moveEncoderTo((int)robot.hslides.hslides.getCurrentPosition() + 120, 1f);
+                robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 120, .6f);
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.intakeTilt.setTransfer();
                     setPathState(22);
@@ -429,6 +451,7 @@ public class autoBucket5_135 extends OpMode{
                     robot.intakeTilt.setFlat();
                     robot.trapdoor.setOut();
                     turnCoeff += 1;
+                    runOnce = true;
                     setPathState(20);
                 }
                 else if (robot.hslides.hslides.getCurrentPosition() > 600) {
@@ -446,6 +469,7 @@ public class autoBucket5_135 extends OpMode{
                 hSlideGoBottom = true;
                 waitFor(200);
                 robot.intake.in();
+                runOnce =true;
                 setPathState(20);
                 break;
             case 22:
@@ -461,23 +485,28 @@ public class autoBucket5_135 extends OpMode{
             case 23:
                 follower.followPath(backSub);
                 follower.setMaxPower(0.8f);
+                //runOnce = true;
+                s2Delay = false;
+                nowDelay = true;
                 setPathState(24);
-                runOnce = true;
                 break;
             case 24:
-                if(pathTimer.milliseconds()>400 && hlimitswitch.getState()){
+                if(pathTimer.milliseconds()>400 && hlimitswitch.getState() && nowDelay){
                     robot.claw.setClose();
+                    nowDelay =false;
+                    runOnce =true;
                 }
                 if(pathTimer.milliseconds()>550){
                     if(runOnce) {
                         runOnce = false;
                         robot.intakeTilt.setFlat();
+                        s2Delay = true;
                         robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
                         thiTimer.reset();
-                        s2Delay = true;
+
                     }
                 }
-                if (thiTimer.milliseconds()>400 && s2Delay) {
+                if (thiTimer.milliseconds()>300 && s2Delay) {
                     s2Delay = false;
                     robot.clawBigTilt.setBucket();
                     robot.depoWrist.setOut();
@@ -492,16 +521,18 @@ public class autoBucket5_135 extends OpMode{
                 }
                 if(pathTimer.milliseconds()>800 && !follower.isBusy()){
                     robot.claw.setBig();
+                    robot.depoWrist.setIn();
                     setPathState(25);
                 }
                 break;
             case 25:
                 if(pathTimer.milliseconds()>400){
                     robot.clawBigTilt.setTransfer();
-                    robot.depoWrist.setIn();
+
                 }
                 if(pathTimer.milliseconds()>500){
                     robot.intakeTilt.setTransfer();
+
                     vslideGoBottom = true;
                     setPathState(100);
                 }
@@ -551,7 +582,7 @@ public class autoBucket5_135 extends OpMode{
         telemetry.addLine("secTimer: " + secTimer);
         telemetry.addLine("thiTimer: " + thiTimer);
         telemetry.addLine("hslideGoBottom: " + hSlideGoBottom);
-        telemetry.addLine("floorRep: " + floorRep);
+        telemetry.addLine("vslides: " + robot.vSlides.vSlidesR.getCurrentPosition());
         telemetry.addLine("color: " + robot.sensorF.getColor());
         //functions
         if (!hlimitswitch.getState() && hSlideGoBottom) {
