@@ -4,28 +4,32 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class hang {
     public OcServo hang1, hang2;
-    public static final float INIT = 189f;
-    public static final float OUT = 49f;
+    public static final float INIT1 = 19f;
+    public static final float OUT1 = 205f;
+
+    public static final float INIT2 = 223f;
+    public static final float OUT2 = 35f;
+
 
 
     public hang(HardwareMap hardwareMap) {
-        //hang1 = new OcServo(hardwareMap, "hangL", INIT);
-        hang2 = new OcServo(hardwareMap, "hangR", INIT);
+        hang1 = new OcServo(hardwareMap, "hangL", INIT1);
+        hang2 = new OcServo(hardwareMap, "hangR", INIT2);
     }
 
     public void setPosition(float pos) {
-        //hang1.setPosition(pos);
+        hang1.setPosition(pos);
         hang2.setPosition(pos);
     }
 
 
     public void setInit() {
-        //hang1.setPosition(INIT);
-        hang2.setPosition(INIT);
+        hang1.setPosition(INIT1);
+        hang2.setPosition(INIT2);
     }
 
     public void setOut() {
-        //hang1.setPosition(OUT);
-        hang2.setPosition(INIT);
+        hang1.setPosition(OUT1);
+        hang2.setPosition(OUT2);
     }
 }

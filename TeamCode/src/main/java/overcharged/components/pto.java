@@ -6,8 +6,8 @@ public class pto {
     //public OcServo intakeTilt;
     public OcServo pto;
     //public VoltageSensor intakeVolt;
-    public static final float INIT = 189f;
-    public static final float OUT = 49f;
+    public static final float INIT = 74f;
+    public static final float OUT = 120f;
 
 
     public pto(HardwareMap hardwareMap) {

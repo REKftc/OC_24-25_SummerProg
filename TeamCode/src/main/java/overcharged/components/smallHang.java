@@ -3,8 +3,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class smallHang {
     public OcServo smallHang;
-    public static final float INIT = 189f;
-    public static final float OUT = 49f;
+    public static final float INIT = 215f;
+    public static final float OUT = 45f;
 
 
     public smallHang(HardwareMap hardwareMap) {

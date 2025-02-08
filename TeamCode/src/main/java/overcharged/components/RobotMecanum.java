@@ -194,7 +194,7 @@ public class RobotMecanum {
             hang = new hang(hardwareMap);
         } catch (Exception e){
             RobotLog.ee(RobotConstants.TAG_R,  "missing: hang " + e.getMessage());
-            missing = missing + ", IntakeBigTilt";
+            missing = missing + ", hang";
             numberMissing++;
         }
         try {
@@ -211,6 +211,21 @@ public class RobotMecanum {
             missing = missing + ", trapdoor";
             numberMissing++;
         }
+        try {
+            pto = new pto(hardwareMap);
+        } catch (Exception e) {
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: pto " + e.getMessage());
+            missing = missing + ", pto";
+            numberMissing++;
+        }
+        try {
+            smallHang = new smallHang(hardwareMap);
+        } catch (Exception e) {
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: smallHang " + e.getMessage());
+            missing = missing + ", smallHang";
+            numberMissing++;
+        }
+
         try {
             sensorF = new colorSensor(hardwareMap);
         } catch (Exception e) {
