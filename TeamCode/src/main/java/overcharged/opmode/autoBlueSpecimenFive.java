@@ -82,7 +82,7 @@ public class autoBlueSpecimenFive extends OpMode {
 
     // OTHER POSES
     private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample, secondScore, bitCloser, bitBitBack, thirdSample, getThirdSample, thirdScore, thirdScoreCloser, fourthScore, fourthScoreCloser, finalPark, grabFourthSample, pushFirstSample, pushThirdSample, pushThirdSampleSide, pushThirdSampleBack, grabFifthSample, scoreFifthSample;
-    private Pose startPose = new Pose(135, 66, Math.PI);
+    private Pose startPose = new Pose(135, 67, Math.PI);
 
     private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample, nextSample, getCloser, getGetBack, toSample3, grabSample3, scoreSample3, scoredSample3, scoreSample4, scoredSample4, endPark, grabSample4, firstSamplePush, goingToThirdSample, sideToThirdSample, pushingThirdSample, getFifthSample, scoredFifthSample;
 
@@ -114,8 +114,8 @@ public class autoBlueSpecimenFive extends OpMode {
         thirdScore = new Pose(107,59, Math.PI);
         thirdScoreCloser = new Pose(134,102, Math.PI);
         fourthScore = new Pose(108,63, Math.PI);
-        fourthScoreCloser = new Pose(108,63, Math.PI);
-        grabFourthSample = new Pose(133,101, Math.PI); //maybe this too 134 maybe
+        fourthScoreCloser = new Pose(108,64, Math.PI);
+        grabFourthSample = new Pose(134,101, Math.PI); //maybe this too 134 maybe
         grabFifthSample = new Pose(134,101, Math.PI);
         scoreFifthSample = new Pose(108,63, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
