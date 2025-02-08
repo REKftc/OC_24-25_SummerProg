@@ -82,7 +82,7 @@ public class autoBucket4_135 extends OpMode{
         beforeBucket2 = new Pose(120,13, Math.PI);
         ready2Score = new Pose(132.5,16,Math.toRadians(135));
         wallScore = new Pose(128.75,12, Math.PI);
-        subFront = new Pose(81.500, 46.000, Math.PI/2);
+        subFront = new Pose(81.500, 52.000, Math.PI/2);
     }
 
     //TODO: here are where the paths are defined
@@ -346,7 +346,7 @@ public class autoBucket4_135 extends OpMode{
                             thiTimer.reset();
                         }
                     }
-                    if (thiTimer.milliseconds()>300 && s2Delay) {
+                    if (thiTimer.milliseconds()>600 && s2Delay) {
                         s2Delay = false;
                         robot.clawBigTilt.setBucket();
                         robot.depoWrist.setOut();
@@ -364,7 +364,7 @@ public class autoBucket4_135 extends OpMode{
                 }
                 break;
             case 1710:
-                if(pathTimer.milliseconds() > 800){
+                if(pathTimer.milliseconds() > 500){
                     delayTimer.reset();
                     robot.claw.setBig();
                     scored = true;

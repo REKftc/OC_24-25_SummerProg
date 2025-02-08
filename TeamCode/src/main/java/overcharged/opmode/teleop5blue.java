@@ -25,7 +25,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
 
 @Config
-@TeleOp(name="new tele blue", group="1Teleop")
+@TeleOp(name="new tele blue", group="0Teleop")
 public class teleop5blue extends OpMode{
 
     RobotMecanum robot;
@@ -302,7 +302,7 @@ public class teleop5blue extends OpMode{
         }
 
         if(intakeMode == IntakeMode.IN && sense){
-            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+            if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
@@ -320,7 +320,7 @@ public class teleop5blue extends OpMode{
                 transferNow();
                 hslideOut = false;
             }
-            if (robot.sensorF.getColor() == colorSensor.Color.RED){
+            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 sense = false;
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
@@ -330,99 +330,6 @@ public class teleop5blue extends OpMode{
                 intakeDelay = true;
                 outDelay = System.currentTimeMillis();
             }
-        }
-
-        if (gamepad1.back && Button.BTN_HANG.canPress(timestamp)){
-            hangCheck += 1;
-            if (hangCheck == 2){
-                hang2 = true;
-                hangDelay = System.currentTimeMillis();
-                hangTick = 1;
-            } else if (hangCheck == 3){
-                hang2 = false;
-                hang3 = true;
-                hangDelay = System.currentTimeMillis();
-                hangTick = 1;
-            } else if (hangCheck > 3){
-                hang2=false;
-                hang3=false;
-                hangCheck = 1;
-            }
-        }
-
-        if(hang2 && hangTick == 3){
-            robot.smallHang.setOut();
-            robot.vSlides.moveEncoderTo(robot.vSlides.hang2, 1f);
-        }
-
-        if(hang2 && System.currentTimeMillis()-hangDelay>1500 && hangTick == 3){
-            robot.vSlides.moveEncoderTo(robot.vSlides.vSlidesL.getCurrentPosition()-30, 1f);
-            if(Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-vSlides.hang2-30)<15) {
-                robot.pto.setOut();
-                hangTick += 1;
-                hangSeq = true;
-            }
-        }
-        if(hang2 && System.currentTimeMillis()-hangDelay>2400 && hangTick == 4 && hangSeq){
-            robot.driveLeftFront.setPower(1f);
-            robot.driveLeftBack.setPower(1f);
-        }
-        if(hang2 && System.currentTimeMillis()-hangDelay>4500 && hangTick == 4 && hangSeq){
-            robot.driveLeftFront.setPower(0);
-            robot.driveLeftBack.setPower(0);
-            hangTick += 1;
-            hangSeq = false;
-        }
-        if(hang2 && System.currentTimeMillis()-hangDelay>9000 && hangTick == 5) {
-            robot.hang.hang1.setPosition(hang.OUT1);
-            robot.hang.hang2.setPosition(hang.OUT2);
-            hang2 = false;
-            hangDelay = 0;
-            hangTick = 0;
-        }
-
-
-        if(hang3 && System.currentTimeMillis()-hangDelay>300 && hangTick == 1){
-            robot.hang.setOut();
-            hangTick += 1;
-        }
-        if(hang3 && System.currentTimeMillis()-hangDelay>800 && hangTick == 2){
-            robot.hang.setOut();
-            hangTick += 1;
-        }
-        if(hang3 && System.currentTimeMillis()-hangDelay>1200 && hangTick == 3){
-            robot.vSlides.moveEncoderTo(robot.vSlides.hang2, 1f);
-            hangTick += 1;
-        }
-        if(hang3 && System.currentTimeMillis()-hangDelay>1900 && hangTick == 4){
-            vslideGoBottom = true;
-            hangTick = 0;
-            hang3 = false;
-        }
-
-        if(gamepad2.left_trigger>0.9f){
-            robot.smallHang.setOut();
-            robot.vSlides.moveEncoderTo(robot.vSlides.hang2, 1f);
-            hang2 = true;
-        }
-
-        if(gamepad2.right_trigger >0.9f){
-            robot.pto.setOut();
-        }
-
-        if(gamepad2.left_stick_button){
-            if (runLeft){
-                robot.driveLeftFront.setPower(0);
-                robot.driveLeftBack.setPower(0);
-            }
-            if (!runLeft) {
-                robot.driveLeftFront.setPower(1f);
-                robot.driveLeftBack.setPower(1f);
-                //robot.vSlides.setPower(-0.2f);
-            }
-        }
-        if(gamepad2.right_stick_button){
-            robot.hang.setOut();
         }
 
 
@@ -505,14 +412,14 @@ public class teleop5blue extends OpMode{
 
         if(gamepad2.x && Button.SLIGHT_UP.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() < robot.vSlides.high1){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.7f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.9f);
             }
         }
 
 
         if(gamepad2.b && Button.SLIGHT_DOWN.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() > 100){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.7f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.3f);
             }
         }
 
@@ -615,11 +522,10 @@ public class teleop5blue extends OpMode{
         if(intakeDelay && System.currentTimeMillis()-outDelay>200){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>420){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>320){
             intakeDelay = false;
             sense = true;
             outDelay =0;
-            robot.intakeTilt.setOut();
             intakeMode = IntakeMode.IN;
             robot.intake.in();
         }

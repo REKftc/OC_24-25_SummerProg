@@ -25,7 +25,7 @@ import overcharged.pedroPathing.pathGeneration.Vector;
 
 
 @Config
-@TeleOp(name="new tele red", group="1Teleop")
+@TeleOp(name="new tele red", group="0Teleop")
 public class teleop6 extends OpMode{
 
     RobotMecanum robot;
@@ -412,14 +412,14 @@ public class teleop6 extends OpMode{
 
         if(gamepad2.x && Button.SLIGHT_UP.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() < robot.vSlides.high1){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.7f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())+90, 0.9f);
             }
         }
 
 
         if(gamepad2.b && Button.SLIGHT_DOWN.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() > 100){
-                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.7f);
+                robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.3f);
             }
         }
 
@@ -519,14 +519,14 @@ public class teleop6 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>200){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>240){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>420){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>380){
+            robot.intakeTilt.setOut();
             intakeDelay = false;
             sense = true;
             outDelay =0;
-            robot.intakeTilt.setOut();
             intakeMode = IntakeMode.IN;
             robot.intake.in();
         }
