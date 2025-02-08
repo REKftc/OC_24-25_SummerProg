@@ -45,6 +45,8 @@ public class RobotMecanum {
     public hslides hslides;
     public intakeTilt intakeTilt;
     public colorSensor sensorF;
+    public pto pto;
+    public smallHang smallHang;
     private final OcLed ledYellow;
     private final OcLed ledGreen;
     private final OcLed ledWhite;

@@ -46,6 +46,7 @@ public class teleop5 extends OpMode{
     int resetStep = 0;
     int transferStep = 0;
     int intakeStep = 0;
+    int hangCheck = 0;
 
     boolean intakeTransfer = true;
     boolean intakeDelay = false;
@@ -322,7 +323,16 @@ public class teleop5 extends OpMode{
             }
         }
 
-       if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
+        if (gamepad1.start && Button.BTN_HANG.canPress(timestamp)){
+            hangCheck += 1;
+            if (hangCheck == 2){
+
+            } else if (hangCheck == 3){
+
+            }
+        }
+
+        if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;

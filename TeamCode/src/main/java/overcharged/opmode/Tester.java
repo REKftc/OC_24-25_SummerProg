@@ -125,6 +125,9 @@ Tester
         OcServo clawSmallTilt = robot.clawSmallTilt.clawSmallTilt;
         OcServo clawBigTilt = robot.clawBigTilt.clawBigTilt;
         OcServo depoHslide = robot.depoHslide.depoHslide;
+        //OcServo hang2 = robot.hang.hang2;
+        //OcServo pto = robot.pto.pto;
+        OcServo smallHang = robot.smallHang.smallHang;
         servos.add(intakeTilt);
         servos.add(depoWrist);
         servos.add(latch);
@@ -133,15 +136,10 @@ Tester
         servos.add(clawSmallTilt);
         servos.add(clawBigTilt);
         servos.add(depoHslide);
+        //servos.add(hang2);
+        //servos.add(pto);
+        servos.add(smallHang);
 
-        /*OcServo depoDoor = robot.depoDoor.depoDoor;
-        servos.add(depoDoor);
-        OcServo depoTilt = robot.depoTilt.depoTilt;
-        servos.add(depoTilt);*/
-        /*OcServo leftPixel = robot.pixel.leftPixelDropper;
-        servos.add(leftPixel);
-        OcServo rightPixel = robot.pixel.rightPixelDropper;
-        servos.add(rightPixel);*/
 
 
         servoTestInfos = new ServoTestInfo[]{
@@ -166,6 +164,7 @@ Tester
                         clawBigTilt,
                         robot.clawBigTilt.TRANSFER,
                         robot.clawBigTilt.OUT),
+
 
         };
 
