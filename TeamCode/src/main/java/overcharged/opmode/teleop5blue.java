@@ -302,7 +302,7 @@ public class teleop5blue extends OpMode{
         }
 
         if(intakeMode == IntakeMode.IN && sense){
-            if (robot.sensorF.getColor() == colorSensor.Color.RED){
+            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
@@ -320,7 +320,7 @@ public class teleop5blue extends OpMode{
                 transferNow();
                 hslideOut = false;
             }
-            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+            if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 sense = false;
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
@@ -525,6 +525,7 @@ public class teleop5blue extends OpMode{
         if(intakeDelay && System.currentTimeMillis()-outDelay>320){
             intakeDelay = false;
             sense = true;
+            robot.intakeTilt.setOut();
             outDelay =0;
             intakeMode = IntakeMode.IN;
             robot.intake.in();

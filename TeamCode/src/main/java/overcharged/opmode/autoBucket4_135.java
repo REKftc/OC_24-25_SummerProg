@@ -82,7 +82,7 @@ public class autoBucket4_135 extends OpMode{
         beforeBucket2 = new Pose(120,13, Math.PI);
         ready2Score = new Pose(132.5,16,Math.toRadians(135));
         wallScore = new Pose(128.75,12, Math.PI);
-        subFront = new Pose(81.500, 52.000, Math.PI/2);
+        subFront = new Pose(81.500, 50.500, Math.PI/2);
     }
 
     //TODO: here are where the paths are defined
@@ -222,7 +222,7 @@ public class autoBucket4_135 extends OpMode{
                         setPathState(16);
                     } else if (floorRep == 1) {
                         robot.latch.setOut();
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET2, 1f);
+                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
                         follower.followPath(secondBack, true);
                         secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(205));
                         vslideGoBottom = true;
@@ -269,14 +269,14 @@ public class autoBucket4_135 extends OpMode{
 
                     }
                 }
-                else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1800) {
+                else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<2000) {
                     if (broken){
                         broken = false;
                         if (floorRep == 3){
-                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+270, 0.6f);
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+250, 0.6f);
                         }
                         else if (floorRep == 2){
-                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+270, 0.6f);
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET2+250, 0.6f);
                         }
                         else if (floorRep == 1){
                             robot.hslides.moveEncoderTo(robot.hslides.PRESET3+150, 0.6f);
@@ -326,7 +326,7 @@ public class autoBucket4_135 extends OpMode{
                         backDelay = true;
                         doOnce = true;
                     }
-                    if(secTimer.milliseconds()>570 && hlimitswitch.getState() && backDelay) {
+                    if(secTimer.milliseconds()>620 && hlimitswitch.getState() && backDelay) {
                         backDelay = false;
                         if (doOnce) {
                             doOnce = false;
@@ -407,6 +407,7 @@ public class autoBucket4_135 extends OpMode{
             case 19:
                 //if(!follower.isBusy()){
                 follower.followPath(toSub, true);
+                robot.intake.off();
                 robot.intakeTilt.setTransfer();
                 follower.setMaxPower(0.8f);
                 setPathState(191);
