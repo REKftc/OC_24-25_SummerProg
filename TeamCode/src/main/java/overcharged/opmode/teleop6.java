@@ -427,7 +427,7 @@ public class teleop6 extends OpMode{
             slideBottom();
         }
 
-        if(hslideOut && System.currentTimeMillis()-manualDelay>800 && manualCheck){
+        if(hslideOut && System.currentTimeMillis()-manualDelay>500 && manualCheck){
             manualCheck = false;
             manualDelay = 0;
             manualOut = true;
