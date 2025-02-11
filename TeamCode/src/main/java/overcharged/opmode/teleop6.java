@@ -149,7 +149,7 @@ public class teleop6 extends OpMode{
             robot.clawBigTilt.setSlides();
             robot.latch.setOut();
             turnConstant = 0.50f;
-            robot.hslides.moveEncoderTo(robot.hslides.OUT,1f);
+            robot.hslides.moveEncoderTo(robot.hslides.SMALL_OUT,1f);
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             sense = true;
