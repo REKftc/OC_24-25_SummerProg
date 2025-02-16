@@ -66,7 +66,7 @@ public class autoBucket5_135 extends OpMode{
 
     // OTHER POSES
     private Pose initBucket, beforeBucket, ready2Score, wallScore, beforeBucket2, subFront;
-    private Pose startPose = new Pose(136, 32, Math.toRadians(90));
+    private Pose startPose = new Pose(137, 31, Math.toRadians(90));
 
     private Path firstScore, inchBucket, goSafe, goBack, secondBack, floor2, slightMove;
 
@@ -78,9 +78,9 @@ public class autoBucket5_135 extends OpMode{
     public void firstBucket(){
         beforeBucket = new Pose(126,21.5, Math.PI);
         beforeBucket2 = new Pose(120,13, Math.PI);
-        ready2Score = new Pose(132.5,16,Math.toRadians(135));
-        wallScore = new Pose(128.75,12, Math.PI);
-        subFront = new Pose(81.500, 46.000, Math.PI/2);
+        ready2Score = new Pose(130.5,13.7,Math.toRadians(135));
+        wallScore = new Pose(128,8.5, Math.PI);
+        subFront = new Pose(83.500, 46.000, Math.PI/2);
     }
 
     //TODO: here are where the paths are defined
