@@ -126,8 +126,7 @@ Tester
         OcServo clawBigTilt = robot.clawBigTilt.clawBigTilt;
         OcServo depoHslide = robot.depoHslide.depoHslide;
         OcServo pto = robot.pto.pto;
-        OcServo hang2 = robot.hang.hang2;
-        OcServo hang1 = robot.hang.hang1;
+        OcServo pto2 = robot.pto.pto2;
         OcServo smallHang = robot.smallHang.smallHang;
         servos.add(intakeTilt);
         servos.add(depoWrist);
@@ -138,9 +137,8 @@ Tester
         servos.add(clawBigTilt);
         servos.add(depoHslide);
         servos.add(pto);
+        servos.add(pto2);
         servos.add(smallHang);
-        servos.add(hang1);
-        servos.add(hang2);
 
 
 
@@ -159,14 +157,6 @@ Tester
                         smallHang,
                         robot.smallHang.INIT,
                         robot.smallHang.OUT),
-                new ServoTestInfo(
-                        hang2,
-                        robot.hang.INIT2,
-                        robot.hang.OUT2),
-                new ServoTestInfo(
-                        hang1,
-                        robot.hang.INIT1,
-                        robot.hang.OUT1),
                 new ServoTestInfo(
                         pto,
                         robot.pto.INIT,
