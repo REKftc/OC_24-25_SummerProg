@@ -15,7 +15,7 @@ public class pto {
 
     public pto(HardwareMap hardwareMap) {
         pto = new OcServo(hardwareMap, "pto", INIT);
-        pto2 = new OcServo(hardwareMap, "pto2", INIT);
+        pto2 = new OcServo(hardwareMap, "pto2", INIT2);
     }
     public void setPosition(float pos){
         pto.setPosition(pos);

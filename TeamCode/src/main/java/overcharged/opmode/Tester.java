@@ -118,23 +118,23 @@ Tester
 
 
         OcServo intakeTilt = robot.intakeTilt.intakeTilt;
-        OcServo depoWrist = robot.depoWrist.depoWrist;
         OcServo latch = robot.latch.latch;
         OcServo trapdoor = robot.trapdoor.trapdoor;
         OcServo claw = robot.claw.claw;
         OcServo clawSmallTilt = robot.clawSmallTilt.clawSmallTilt;
         OcServo clawBigTilt = robot.clawBigTilt.clawBigTilt;
+        OcServo depoWrist = robot.depoWrist.depoWrist;
         OcServo depoHslide = robot.depoHslide.depoHslide;
         OcServo pto = robot.pto.pto;
         OcServo pto2 = robot.pto.pto2;
         OcServo smallHang = robot.smallHang.smallHang;
         servos.add(intakeTilt);
-        servos.add(depoWrist);
         servos.add(latch);
         servos.add(trapdoor);
         servos.add(claw);
         servos.add(clawSmallTilt);
         servos.add(clawBigTilt);
+        servos.add(depoWrist);
         servos.add(depoHslide);
         servos.add(pto);
         servos.add(pto2);
