@@ -3,6 +3,8 @@ package overcharged.opmode;
 import static overcharged.config.RobotConstants.TAG_SL;
 import static overcharged.config.RobotConstants.TAG_T;
 
+import android.transition.Slide;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -40,6 +42,8 @@ public class teleop7 extends OpMode{
     long manualDelay;
     long outDelay;
     long hangDelay;
+    long lastButtonPressTime = 0;
+    final long debounceTime = 200;
 
     double slowPower = 1;
     float turnConstant = 1f;
@@ -61,9 +65,10 @@ public class teleop7 extends OpMode{
     boolean manualOut = false;
     boolean sense = false;
     boolean manualCheck = false;
-    boolean trapOnce = false;
+    boolean trapOnce = true;
     boolean hangSeq = false;
     boolean runLeft = false;
+    boolean ptoOn = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -181,14 +186,9 @@ public class teleop7 extends OpMode{
                     cDelay = true;
                 }
             } else {
-                if(hslideOut) {
-                    robot.intakeTilt.setOut();
-                    intakeTiltDelay = System.currentTimeMillis();
-                    intTiltDelay = true;
-                }
-                else{
-                    robot.intakeTilt.setInOut();
-                }
+                robot.intakeTilt.setOut();
+                intakeTiltDelay = System.currentTimeMillis();
+                intTiltDelay = true;
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
                 intakeTransfer = false;
@@ -235,15 +235,17 @@ public class teleop7 extends OpMode{
             }
         }
 
-        if(gamepad1.x) {
-            if(trapOnce) {
+        if (gamepad1.x) {
+            if (trapOnce && (System.currentTimeMillis() - lastButtonPressTime > debounceTime)) {
                 trapOnce = false;
-                robot.trapdoor.setOut();
+                robot.trapdoor.setOut(); // Open the trapdoor
+                lastButtonPressTime = System.currentTimeMillis();
             }
         } else {
-            if(!trapOnce) {
-                robot.trapdoor.setInit();
+            if (!trapOnce && (System.currentTimeMillis() - lastButtonPressTime > debounceTime)) {
+                robot.trapdoor.setInit(); // Close the trapdoor
                 trapOnce = true;
+                lastButtonPressTime = System.currentTimeMillis();
             }
         }
 
@@ -259,14 +261,14 @@ public class teleop7 extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>40){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>90){
             robot.intakeTilt.setTransfer();
             robot.intake.out();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>270){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>280){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
@@ -455,7 +457,7 @@ public class teleop7 extends OpMode{
         if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>620 && dDelay) { // Depo to Specimen
             robot.claw.setSpec();
             robot.clawBigTilt.setOut();
-            robot.depoWrist.setOut();
+            robot.depoWrist.setSpecimen();
             robot.depoHslide.setOut();
             robot.clawSmallTilt.setFlat();
             score = ScoreType.SPECIMEN;
@@ -524,16 +526,43 @@ public class teleop7 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>240){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>20){
+            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 1f);
+        }
+        if(intakeDelay && System.currentTimeMillis()-outDelay>260){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>380){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>360){
             robot.intakeTilt.setOut();
             intakeDelay = false;
             sense = true;
             outDelay =0;
             intakeMode = IntakeMode.IN;
             robot.intake.in();
+        }
+
+
+
+        //TODO: HANG
+        if(gamepad2.ps){
+            if(!ptoOn) {
+                robot.pto.setOut();
+            } else{
+                robot.pto.setInit();
+            }
+        }
+
+        if(gamepad2.back){
+            robot.smallHang.setOut();
+            robot.vSlides.moveEncoderTo(robot.vSlides.hang2, 1f);
+        }
+
+        if(gamepad2.left_stick_button){
+            robot.vSlides.setPower(0f);
+            robot.driveLeftFront.setPower(1f);
+            robot.driveLeftBack.setPower(1f);
+            robot.driveRightFront.setPower(1f);
+            robot.driveRightBack.setPower(1f);
         }
 
         if (!hlimitswitch.getState() && hSlideGoBottom) {
@@ -548,12 +577,18 @@ public class teleop7 extends OpMode{
             robot.latch.setInit();
             robot.intakeTilt.setTransfer();
             robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.hslides.hslides.resetPosition();
             clawDelay = System.currentTimeMillis();
             cDelay = true;
             hSlideGoBottom = false;
         }
         telemetry.addData("sensorF color", robot.sensorF.getColor());
+        //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        //telemetry.addData("Position trying to reach: ", slideHeight);
+        telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
+
     }
+
 
     public void slideBottom() { //Slide bottom
         if (!vlimitswitch.getState() && vslideGoBottom) {

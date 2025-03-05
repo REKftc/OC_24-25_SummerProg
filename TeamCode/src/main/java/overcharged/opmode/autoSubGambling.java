@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import overcharged.components.RobotMecanum;
@@ -33,6 +34,7 @@ public class autoSubGambling extends OpMode{
     boolean hSlideGoBottom = false;
 
     boolean oneTime = false;
+    boolean runOnce = true;
 
     int moveCoEff = 1;
 
@@ -46,7 +48,8 @@ public class autoSubGambling extends OpMode{
     FtcDashboard dashboard = FtcDashboard.getInstance();
     SampleMecanumDrive drive;
     MultipleTelemetry telems;
-    private Timer pathTimer, opmodeTimer, scanTimer, distanceSensorUpdateTimer, distanceSensorDecimationTimer;
+    private Timer opmodeTimer, scanTimer, distanceSensorUpdateTimer, distanceSensorDecimationTimer;
+    private ElapsedTime pathTimer;
 
     // Other init
     private int pathState;
@@ -64,7 +67,7 @@ public class autoSubGambling extends OpMode{
     }
 
     public void buildPaths() {
-        slightMove = new Path(new BezierLine(new Point(staySigma.getX()-(moveCoEff -1)*2, staySigma.getY()), new Point(staySigma.getX()-(moveCoEff)*2, staySigma.getY())));
+        slightMove = new Path(new BezierLine(new Point(staySigma.getX()-(moveCoEff -1)*1.35, staySigma.getY()), new Point(staySigma.getX()-(moveCoEff)*1.35, staySigma.getY())));
         slightMove.setConstantHeadingInterpolation(Math.toRadians(90));
     }
 
@@ -75,67 +78,69 @@ public class autoSubGambling extends OpMode{
         switch (pathState) {
             // Auto Body
             //
-            case 10: // starts following the spike mark detected
+            case 20: // SUB CODE
+                //TODO: COMMENT NEXT LINES OUT
                 robot.latch.setOut();
-                robot.hslides.moveEncoderTo(hslides.SMALL,1f);
-                setPathState(11);
-                break;
-            case 11:
-                if(!follower.isBusy()) {
+                robot.hslides.moveEncoderTo(hslides.SMALL, 1f);
+                if (runOnce) {
+                    runOnce = false;
                     follower.followPath(slightMove, false);
                     slightMove.setConstantHeadingInterpolation(Math.toRadians(90));
-                    waitFor(300);
+                    setPathState(201);
+                }
+                break;
+            case 201:
+                if(pathTimer.milliseconds()>300) {
                     robot.trapdoor.setInit();
                     robot.intake.in();
                     robot.intakeTilt.setOut();
-                    pathTimer.resetTimer();
-                    setPathState(12);
+                    setPathState(21);
                 }
-                break;
-            case 12:
-                if(robot.hslides.hslides.getCurrentPosition()<550) {
-                    robot.hslides.moveEncoderTo((int) robot.hslides.hslides.getCurrentPosition() + 120, 1f);
+            case 21:
+                if(robot.hslides.hslides.getCurrentPosition()<600) {
+                    robot.hslides.moveEncoderTo((int) robot.hslides.hslides.getCurrentPosition() + 80, 1f);
                 }
                 else{
-                    robot.intake.out();
                     moveCoEff += 1;
-                    setPathState(121);
+                    setPathState(211);
                 }
                 if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.intakeTilt.setTransfer();
-                    setPathState(13);
+                    setPathState(22);
                 }
                 else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intakeTilt.setFlat();
                     robot.trapdoor.setOut();
                     moveCoEff += 1;
-                    setPathState(11);
+                    setPathState(20);
                 }
                 else if (robot.hslides.hslides.getCurrentPosition() > 600) {
-                    robot.intake.out();
                     moveCoEff += 1;
-                    setPathState(121);
+                    setPathState(211);
                 }
-                else if (pathTimer.getElapsedTime()>2000){
-                    robot.intake.out();
+                else if (pathTimer.milliseconds()>1600){
                     moveCoEff += 1;
-                    setPathState(121);
+                    setPathState(211);
                 }
                 break;
-            case 121:
+            case 211:
                 hSlideGoBottom = true;
-                waitFor(200);
-                robot.intake.in();
-                setPathState(11);
+                if(pathTimer.milliseconds() > 200) {
+                    robot.intake.out();
+                }
+                if(pathTimer.milliseconds() > 360) {
+                    robot.intake.in();
+                    runOnce = true;
+                    setPathState(20);
+                }
                 break;
-            case 13:
-                waitFor(200);
-                robot.intake.out();
-                waitFor(200);
-                hSlideGoBottom = true;
-                waitFor(300);
-                robot.intake.off();
-                setPathState(100);
+            case 22:
+                if(pathTimer.milliseconds()>300) {
+                    robot.intake.out();
+                    hSlideGoBottom = true;
+                    //setPathState(23);
+                    setPathState(100);
+                }
                 break;
             case 100: // EMPTY TEST CASE
                 telems.addLine("CASE 100 - IN TEST CASE!!");
@@ -148,7 +153,7 @@ public class autoSubGambling extends OpMode{
     // path setter
     public void setPathState(int state){
         pathState = state;
-        pathTimer.resetTimer();
+        pathTimer.reset();
         autoPath();
     }
 
@@ -174,6 +179,7 @@ public class autoSubGambling extends OpMode{
             robot.intakeTilt.setTransfer();
             robot.hslides.hslides.setPower(0);
             robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.hslides.hslides.resetPosition();
             hSlideGoBottom = false;
             RobotLog.ii(TAG_SL, "Force stopped");
         }
@@ -201,7 +207,7 @@ public class autoSubGambling extends OpMode{
         telems = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
         robot = new RobotMecanum(this, true, true);
         drive = new SampleMecanumDrive(hardwareMap);
-        pathTimer = new Timer();
+        pathTimer = new ElapsedTime();
 
         //Pose init
         Paths();
@@ -226,7 +232,7 @@ public class autoSubGambling extends OpMode{
     @Override
     public void start() {
         // starts auto paths
-        setPathState(10);
+        setPathState(20);
         // safety net if auto doesn't start for some reason
         autoPath();
     }
