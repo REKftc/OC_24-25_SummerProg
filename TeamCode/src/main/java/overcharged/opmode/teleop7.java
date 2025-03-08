@@ -153,7 +153,7 @@ public class teleop7 extends OpMode{
             robot.intakeTilt.setGoOut();
             //robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.50f;
+            turnConstant = 0.55f;
             robot.hslides.moveEncoderTo(robot.hslides.SMALL_OUT,1f);
             robot.intake.in();
             intakeMode = IntakeMode.IN;
@@ -541,6 +541,29 @@ public class teleop7 extends OpMode{
             robot.intake.in();
         }
 
+        //TODO: QoL functions
+        if(gamepad1.ps && Button.BTN_REJECT.canPress(timestamp)){ //Force all reset
+            robot.latch.setOut();
+            robot.claw.setOpen();
+            robot.hslides.moveEncoderTo(500,1f);
+            robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
+            robot.intakeTilt.setTransfer();
+            robot.intake.off();
+            robot.depoWrist.setIn();
+            robot.clawBigTilt.setTransfer();
+            robot.clawSmallTilt.setTransfer();
+            robot.depoHslide.setInit();
+            waitFor(500);
+            robot.latch.setInit();
+            hSlideGoBottom = true;
+            waitFor(500);
+            slideBottom();
+            slideHeight = SlideHeight.DOWN;
+            hslideOut = false;
+            clawOpen = true;
+            vslideGoBottom = true;
+        }
+
 
 
         //TODO: HANG
@@ -604,8 +627,8 @@ public class teleop7 extends OpMode{
         if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-0.5f);
-            robot.vSlides.vSlidesL.setPower(-0.5f);
+            robot.vSlides.vSlidesR.setPower(-0.7f);
+            robot.vSlides.vSlidesL.setPower(-0.7f);
         } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);

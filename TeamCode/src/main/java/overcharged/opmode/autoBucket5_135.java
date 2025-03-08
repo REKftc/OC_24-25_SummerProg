@@ -177,7 +177,7 @@ public class autoBucket5_135 extends OpMode{
                     if (delayTimer.milliseconds() > 280 && nowDelay){
                         canScore = true;
                     }
-                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-860) < 15 && canScore) {
+                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-830) < 20 && canScore) {
                         nowDelay = false;
                         robot.claw.setBig();
                         runOnce = true;
@@ -359,7 +359,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 1710:
-                if(pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-860) < 30){
+                if(pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-830) < 30){
                     delayTimer.reset();
                     robot.claw.setBig();
                     scored = true;
@@ -398,7 +398,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 19:
-                if(!follower.isBusy()){
+                if(follower.getCurrentTValue()>0.85){
                     follower.followPath(toSub, true);
                     robot.intakeTilt.setTransfer();
                     follower.setMaxPower(0.9f);
@@ -524,7 +524,7 @@ public class autoBucket5_135 extends OpMode{
                     robot.intakeTilt.setTransfer();
                     canScore = true;
                 }
-                if(pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8)){
+                if(pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-830) < 30){
                     robot.claw.setBig();
                     canScore = false;
                     setPathState(25);
