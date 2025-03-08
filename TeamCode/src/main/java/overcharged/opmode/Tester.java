@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.Range;
 
 import java.text.DecimalFormat;
@@ -34,7 +35,7 @@ Tester
     MecanumDrive drive;
     //OcSwitch slideSwitch;
     //private TankDriveLinear drive;
-
+    private DigitalChannel vlimitswitch;
     private ServoTestInfo[] servoTestInfos;
     /**
      * Counter of servos in servo test
@@ -111,6 +112,7 @@ Tester
     public void runOpMode() {
         //Initialization
         robot = new RobotMecanum(this, true, false);
+        vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
         drive = robot.getDrive();
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
@@ -390,7 +392,7 @@ Tester
             /*for (OcSwitch s : robot.switchs) {
                 telemetry.addData(s.toString(), Boolean.toString(s.isTouch()));
             }*/
-
+            telemetry.addData("V slide", vlimitswitch.getState());
             telemetry.addData("Back", "LeftStick");
 
             telemetry.update();

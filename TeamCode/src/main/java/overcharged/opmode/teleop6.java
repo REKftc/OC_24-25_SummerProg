@@ -554,8 +554,8 @@ public class teleop6 extends OpMode{
         if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-0.55f);
-            robot.vSlides.vSlidesL.setPower(-0.55f);
+            robot.vSlides.vSlidesR.setPower(-1f);
+            robot.vSlides.vSlidesL.setPower(-1f);
         } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);

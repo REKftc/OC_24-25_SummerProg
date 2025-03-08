@@ -582,7 +582,17 @@ public class teleop7 extends OpMode{
             cDelay = true;
             hSlideGoBottom = false;
         }
+
+        if (vlimitswitch.getState()){
+            robot.vSlides.vSlidesR.resetPosition();
+            robot.vSlides.vSlidesL.resetPosition();
+        }
+
         telemetry.addData("sensorF color", robot.sensorF.getColor());
+        telemetry.addData("vslides R power", robot.vSlides.getPowerR());
+        telemetry.addData("vslides L power", robot.vSlides.getPowerL());
+        telemetry.addData("vslides limit", vlimitswitch.getState());
+        telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
         //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
         //telemetry.addData("Position trying to reach: ", slideHeight);
         telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
@@ -594,8 +604,8 @@ public class teleop7 extends OpMode{
         if (!vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-0.55f);
-            robot.vSlides.vSlidesL.setPower(-0.55f);
+            robot.vSlides.vSlidesR.setPower(-0.5f);
+            robot.vSlides.vSlidesL.setPower(-0.5f);
         } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);
