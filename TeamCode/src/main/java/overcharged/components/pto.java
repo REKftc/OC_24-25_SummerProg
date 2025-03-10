@@ -9,8 +9,8 @@ public class pto {
     public static final float INIT = 74f;
     public static final float INIT2 = 105f;
 
-    public static final float OUT = 122f;
-    public static final float OUT2 = 64f;
+    public static final float OUT = 118f;
+    public static final float OUT2 = 62f;
 
 
     public pto(HardwareMap hardwareMap) {

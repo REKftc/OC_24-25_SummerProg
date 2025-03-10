@@ -25,8 +25,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 
 // Main Class
-@Autonomous(name = "0+5 red bucket test", group = "1Autonomous")
-public class autoBucket5_135 extends OpMode{
+@Autonomous(name = "0+5 blue bucket test", group = "1Autonomous")
+public class autoBucket5blue extends OpMode{
 
     //stuff
     boolean vslideGoBottom = false;
@@ -464,14 +464,14 @@ public class autoBucket5_135 extends OpMode{
                     robot.trapdoor.setInit();
                     setPathState(211);
                 }
-                if(robot.sensorF.getColor() == colorSensor.Color.RED || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
+                if(robot.sensorF.getColor() == colorSensor.Color.BLUE || robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     robot.trapdoor.setInit();
                     robot.intakeTilt.setTransfer();
                     waitFor(300);
                     robot.intake.out();
                     setPathState(22);
                 }
-                else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                else if (robot.sensorF.getColor() == colorSensor.Color.RED){
                     robot.trapdoor.setOut();
                     trappy = true;
                 }
