@@ -6,11 +6,12 @@ public class depoHslide {
     //public OcServo intakeTilt;
     public OcServo depoHslide;
     //public VoltageSensor intakeVolt;
-    public static final float INIT = 53f;
+    public static final float INIT = 50f;
+    public static final float MID = 140f;
     //public static final float TRANSFER  = 20f;
     // public static final float TRANSFER = 70f;//175f;
     // public static final float SPEC = 171f;//158f;
-    public static final float OUT = 176f;
+    public static final float OUT = 174f;
 
 
     public depoHslide(HardwareMap hardwareMap) {
@@ -23,6 +24,8 @@ public class depoHslide {
     }
 
     public void setInit() { depoHslide.setPosition(INIT); }
+
+    public void setMid() { depoHslide.setPosition(MID); }
    // public void setTransfer() { depoHslide.setPosition(TRANSFER); }
 
     //public void setTransfer() { intakeTilt.setPosition(TRANSFER); }

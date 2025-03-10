@@ -6,9 +6,9 @@ public class depoWrist {
     public OcServo depoWrist;
     public static final float IN = 213f;//124f;//125f;
     public static final float OUT = 57f;//198f;
-    public static final float TRANSFER = 224f;
-    public static final float SPEC = 173f;
-    public static final float FLAT = 204f;
+    public static final float TRANSFER = 234f;
+    public static final float SPEC = 196f;//173f;
+    public static final float FLAT = 82f;//75f;//204f;
     public static final float BUCKET = 40f;
     public static final float WALL = 70f;
 
