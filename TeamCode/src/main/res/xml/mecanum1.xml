@@ -14,9 +14,7 @@
 
             <Servo name="intakeTilt" port="5" />
             <Servo name="latch" port="4" />
-            <Servo name="pto" port="3" />
             <Servo name="trapdoor" port="2" />
-            <Servo name="smallHang" port="0" />
 
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
@@ -29,7 +27,6 @@
             <Servo name="depoWrist" port="0" />
             <Servo name="depoHslide" port="1" />
             <Servo name="clawBigTilt" port="2" />
-            <Servo name="pto2" port="3" />
             <Servo name="clawSmallTilt" port="4" />
             <Servo name="claw" port="5" />
 

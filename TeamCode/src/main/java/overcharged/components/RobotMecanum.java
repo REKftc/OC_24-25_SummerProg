@@ -47,12 +47,6 @@ public class RobotMecanum {
     public colorSensor sensorF;
     public pto pto;
     public smallHang smallHang;
-    private final OcLed ledYellow;
-    private final OcLed ledGreen;
-    private final OcLed ledWhite;
-    private final OcLed ledBlue;
-    private final OcLed ledRed;;
-    public final List<OcLed> leds = new ArrayList<>();
 
     public final List<OcServo> servos = new ArrayList<>();
     public List<LynxModule> allHubs;
@@ -233,62 +227,6 @@ public class RobotMecanum {
             missing = missing + ", latch";
             numberMissing++;
         }
-        RobotLog.ii(TAG_R,  "Initializing Leds");
-        OcLed led = null;
-        try {
-            led = new OcLed(hardwareMap,
-                    "led_yellow");
-            leds.add(led);
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "missing: led_yellow " + e.getMessage());
-            missing = missing + ", led_yellow";
-            numberMissing++;
-        }
-        ledYellow = led;
-        led = null;
-        try {
-            led = new OcLed(hardwareMap,
-                    "led_green");
-            leds.add(led);
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "missing: led_green " + e.getMessage());
-            missing = missing + ", led_green";
-            numberMissing++;
-        }
-        ledGreen = led;
-        led = null;
-        try {
-            led = new OcLed(hardwareMap,
-                    "led_white");
-            leds.add(led);
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "missing: led_white " + e.getMessage());
-            missing = missing + ", led_white";
-            numberMissing++;
-        }
-        ledWhite = led;
-        led = null;
-        try {
-            led = new OcLed(hardwareMap,
-                    "led_blue");
-            leds.add(led);
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "missing: led_blue " + e.getMessage());
-            missing = missing + ", led_blue";
-            numberMissing++;
-        }
-        ledBlue = led;
-        led = null;
-        try {
-            led = new OcLed(hardwareMap,
-                    "led_red");
-            leds.add(led);
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "missing: led_red " + e.getMessage());
-            missing = missing + ", led_red";
-            numberMissing++;
-        }
-        ledRed = led;
     }
 
 
@@ -355,56 +293,14 @@ public class RobotMecanum {
      * because the caches are being handled manually and cleared
      * once a loop
      */
+
+    public void setBulkReadAuto() {
+        setBulkReadMode(LynxModule.BulkCachingMode.AUTO);
+    }
+
     public void clearBulkCache() {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
     }
-
-
-    /**
-     * update LEDs to display the colors
-     */
-
-    public void drawLed () {
-        for (OcLed led: leds) {
-            led.draw();
-        }
-    }
-    public void ledBlueOn(boolean on) {
-        try {
-            if (on) {
-                this.ledBlue.on();
-            } else {
-                this.ledBlue.off();
-            }
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "Error: led_Blue " + e.getMessage());
-        }
-    }
-    public void ledYellowOn(boolean on) {
-        try {
-            if (on) {
-                this.ledYellow.on();
-            } else {
-                this.ledYellow.off();
-            }
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "Error: led_yellow " + e.getMessage());
-        }
-    }
-    public void ledRedOn(boolean on) {
-        try {
-            if (on) {
-                this.ledRed.on();
-            } else {
-                this.ledRed.off();
-            }
-        } catch (Exception e) {
-            RobotLog.ee(TAG_R,  "Error: led_red " + e.getMessage());
-        }
-    }
-
-
-
 }

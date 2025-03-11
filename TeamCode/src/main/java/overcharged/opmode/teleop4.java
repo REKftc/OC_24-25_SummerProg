@@ -753,28 +753,6 @@ public class teleop4 extends OpMode {
             robot.intake.in();
         }
 
-        // LED code
-        robot.drawLed();
-        if(robot.sensorF.getColor() == colorSensor.Color.RED){
-            robot.ledRedOn(true);
-        }
-        else{
-            robot.ledRedOn(false);
-        }
-        if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
-            robot.ledYellowOn(true);
-        }
-        else{
-            robot.ledYellowOn(false);
-        }
-
-        if(robot.sensorF.getColor() == colorSensor.Color.BLUE){
-            robot.ledBlueOn(true);
-        }
-        else{
-            robot.ledBlueOn(false);
-        }
-
         /// Telems TODO: DO NOT DELETE ANYTHING
         telemetry.addData("Current Mode:",mode);
         //telemetry.addData("intake mode", intakeMode);
