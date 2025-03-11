@@ -417,12 +417,20 @@ public class teleop7 extends OpMode{
 
                 resetDelay = System.currentTimeMillis();
                 resetStep++;
+            } else if (slideHeight == SlideHeight.MID){
+                vslideGoBottom = true;
+                robot.clawSmallTilt.setTransfer();
+                robot.depoWrist.setTransfer();
+                robot.clawBigTilt.setTransfer();
+
+                slideHeight = SlideHeight.DOWN;
+                resetDelay = System.currentTimeMillis();
+                dDelay = true;
             }
             else{
+                vslideGoBottom = true;
                 robot.depoWrist.setTransfer();
-                robot.clawSmallTilt.setTransfer();
                 robot.clawBigTilt.setTransfer();
-                robot.intakeTilt.setTransfer();
 
                 slideHeight = SlideHeight.DOWN;
                 resetDelay = System.currentTimeMillis();
@@ -519,14 +527,15 @@ public class teleop7 extends OpMode{
         }
 
         //slide reset seq
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>120 && dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>280 && dDelay){
+            robot.intakeTilt.setTransfer();
+            robot.clawSmallTilt.setTransfer();
             robot.claw.setOpen();
             clawOpen = true;
-
-            vslideGoBottom = true;
             resetDelay =0;
             dDelay =false;
         }
+
         if(resetStep==1 && System.currentTimeMillis() - resetDelay > 240){
             robot.clawSmallTilt.setTransfer();
             robot.clawBigTilt.setTransfer();
