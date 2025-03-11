@@ -36,6 +36,7 @@ Tester
     //OcSwitch slideSwitch;
     //private TankDriveLinear drive;
     private DigitalChannel vlimitswitch;
+    private DigitalChannel hlimitswitch;
     private ServoTestInfo[] servoTestInfos;
     /**
      * Counter of servos in servo test
@@ -113,6 +114,7 @@ Tester
         //Initialization
         robot = new RobotMecanum(this, true, false);
         vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
+        hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
         drive = robot.getDrive();
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
@@ -387,12 +389,16 @@ Tester
                 break;
             }
 
-            telemetry.addData("Test", "Switches");
+            telemetry.addData("Test", "Switches/Sensors");
           //  telemetry.addData(robot.vSlides.vlimitswitch.toString(), Boolean.toString(robot.vSlides.vlimitswitch.isTouch()));
             /*for (OcSwitch s : robot.switchs) {
                 telemetry.addData(s.toString(), Boolean.toString(s.isTouch()));
             }*/
-            telemetry.addData("V slide", vlimitswitch.getState());
+            telemetry.addData("V slide:", vlimitswitch.getState());
+            telemetry.addData("H slide:", hlimitswitch.getState());
+            telemetry.addData("Color:", robot.sensorF.getColor());
+
+            telemetry.addData("Color HSV:", robot.sensorF.getHSV());
             telemetry.addData("Back", "LeftStick");
 
             telemetry.update();
