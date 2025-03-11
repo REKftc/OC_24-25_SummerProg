@@ -557,7 +557,7 @@ public class teleop7 extends OpMode{
         if(intakeDelay && System.currentTimeMillis()-outDelay>20){
             robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 1f);
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>260){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>300){
             robot.trapdoor.setInit();
         }
         if(intakeDelay && System.currentTimeMillis()-outDelay>360){

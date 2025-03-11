@@ -16,6 +16,7 @@ import overcharged.components.colorSensor;
 import overcharged.drive.SampleMecanumDrive;
 import overcharged.pedroPathing.follower.Follower;
 import overcharged.pedroPathing.localization.Pose;
+import overcharged.pedroPathing.pathGeneration.BezierCurve;
 import overcharged.pedroPathing.pathGeneration.BezierLine;
 import overcharged.pedroPathing.pathGeneration.BezierPoint;
 import overcharged.pedroPathing.pathGeneration.Path;
@@ -23,8 +24,8 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen 1+4", group = "1Autonomous")
-public class autoRedSpecimenFive extends OpMode {
+@Autonomous(name = "red specimen 1+4 side", group = "1Autonomous")
+public class autoRedSpecimenSide extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
@@ -81,10 +82,10 @@ public class autoRedSpecimenFive extends OpMode {
     private Pose redRightBasket = new Pose();
 
     // OTHER POSES
-    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample, secondScore, bitCloser, bitBitBack, thirdSample, getThirdSample, thirdScore, thirdScoreCloser, fourthScore, fourthScoreCloser, finalPark, grabFourthSample, pushFirstSample, pushThirdSample, pushThirdSampleSide, pushThirdSampleBack, grabFifthSample, scoreFifthSample;
+    private Pose beforeSpecimen, atSpecimen, backUp, goPark, goForward, goRotate, bitForward, bitBack, toSample, secondScore, bitCloser, bitBitBack, thirdSample, getThirdSample, thirdScore, thirdScoreCloser, fourthScore, fourthScoreCloser, finalPark, grabFourthSample, pushFirstSample, pushThirdSample, pushThirdSampleSide, pushThirdSampleBack, grabFifthSample, scoreFifthSample, thirdScoreSide, fourthScoreSide, fourthScoreCloserSide, scoreFifthSampleSide;
     private Pose startPose = new Pose(135, 66, Math.PI);
 
-    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample, nextSample, getCloser, getGetBack, toSample3, grabSample3, scoreSample3, scoredSample3, scoreSample4, scoredSample4, endPark, grabSample4, firstSamplePush, goingToThirdSample, sideToThirdSample, pushingThirdSample, getFifthSample, scoredFifthSample;
+    private Path redPark, redPark2, slightMove, nextRotate, bitRotate, toSample2, grabSample, nextSample, getCloser, getGetBack, toSample3, grabSample3,scoredSample3, endPark, grabSample4, firstSamplePush, goingToThirdSample, sideToThirdSample, pushingThirdSample, getFifthSample, scoreSample3, scoreSample4, scoredSample4, scoredFifthSample, sideToSample3, sideToSample4, sideScoredSample4, sideToSample5;
 
     private PathChain preload;
 
@@ -93,7 +94,7 @@ public class autoRedSpecimenFive extends OpMode {
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(112,64,Math.PI);
+        beforeSpecimen = new Pose(110,64,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(120,64, Math.PI);
@@ -111,13 +112,17 @@ public class autoRedSpecimenFive extends OpMode {
         bitBitBack = new Pose(85,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(132,110, Math.PI);
-        thirdScore = new Pose(107,59, Math.PI);
+        thirdScoreSide = new Pose(130,68, Math.PI);
+        thirdScore = new Pose(105,64, Math.PI);
         thirdScoreCloser = new Pose(134,102, Math.PI);
-        fourthScore = new Pose(107,63, Math.PI);
+        fourthScoreSide = new Pose(132,63, Math.PI);
+        fourthScore = new Pose(108,63, Math.PI);
+        grabFourthSample = new Pose(133,101, Math.PI);//maybe this too 134 maybe
+        fourthScoreCloserSide = new Pose(131,63, Math.PI);
         fourthScoreCloser = new Pose(108,63, Math.PI);
-        grabFourthSample = new Pose(133,101, Math.PI); //maybe this too 134 maybe
         grabFifthSample = new Pose(134,101, Math.PI);
-        scoreFifthSample = new Pose(107,63, Math.PI);
+        scoreFifthSampleSide = new Pose(132,63, Math.PI);
+        scoreFifthSample = new Pose(108,63, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -189,21 +194,73 @@ public class autoRedSpecimenFive extends OpMode {
         toSample3.setConstantHeadingInterpolation(Math.PI);
         grabSample3 = new Path(new BezierLine(new Point(pushThirdSampleBack), new Point(getThirdSample)));
         grabSample3.setConstantHeadingInterpolation(Math.PI);
-        scoreSample3 = new Path(new BezierLine(new Point(getThirdSample), new Point(thirdScore)));
+        scoreSample3 = new Path(new BezierLine(new Point(getThirdSample), new Point(thirdScoreSide)));
         scoreSample3.setConstantHeadingInterpolation(Math.PI);
+        //scoreSample3.setPathEndTimeoutConstraint(0);
+        /*scoreSample3 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(getThirdSample),
+                        new Point(133.000, 94.000, Point.CARTESIAN),
+                        new Point(110.000, 64.000, Point.CARTESIAN),
+                        new Point(thirdScore)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();*/
+        sideToSample3 = new Path(new BezierLine(new Point(thirdScoreSide), new Point(thirdScore)));
+        sideToSample3.setConstantHeadingInterpolation(Math.PI);
         scoredSample3 = new Path(new BezierLine(new Point(thirdScore), new Point(thirdScoreCloser)));
         scoredSample3.setConstantHeadingInterpolation(Math.PI);
-        scoreSample4 = new Path(new BezierLine(new Point(thirdScoreCloser), new Point(fourthScore)));
+
+        scoreSample4 = new Path(new BezierLine(new Point(thirdScoreCloser), new Point(fourthScoreSide)));
         scoreSample4.setConstantHeadingInterpolation(Math.PI);
+        scoreSample4.setPathEndTimeoutConstraint(0);
+        /*scoreSample4 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(thirdScoreCloser),
+                        new Point(125.000, 89.000, Point.CARTESIAN),
+                        new Point(116.000, 76.000, Point.CARTESIAN),
+                        new Point(fourthScore)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();*/
+
+        sideToSample4 = new Path(new BezierLine(new Point(fourthScoreSide), new Point(fourthScore)));
+        sideToSample4.setConstantHeadingInterpolation(Math.PI);
         grabSample4 = new Path(new BezierLine(new Point(fourthScore), new Point(grabFourthSample)));
         grabSample4.setConstantHeadingInterpolation(Math.PI);
-        scoredSample4 = new Path(new BezierLine(new Point(grabFourthSample), new Point(fourthScoreCloser)));
+
+        scoredSample4 = new Path(new BezierLine(new Point(grabFourthSample), new Point(fourthScoreCloserSide)));
         scoredSample4.setConstantHeadingInterpolation(Math.PI);
+        scoredSample4.setPathEndTimeoutConstraint(0);
+        /*scoredSample4 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(grabFourthSample),
+                        new Point(125.000, 89.000, Point.CARTESIAN),
+                        new Point(116.000, 76.000, Point.CARTESIAN),
+                        new Point(fourthScoreCloser)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();*/
+        sideScoredSample4 = new Path(new BezierLine(new Point(fourthScoreCloserSide), new Point(fourthScoreCloser)));
+        sideScoredSample4.setConstantHeadingInterpolation(Math.PI);
         //scoredSample4.setPathEndTimeoutConstraint(0);
         getFifthSample = new Path(new BezierLine(new Point(fourthScoreCloser), new Point(grabFifthSample)));
         getFifthSample.setConstantHeadingInterpolation(Math.PI);
-        scoredFifthSample = new Path(new BezierLine(new Point(grabFifthSample), new Point(scoreFifthSample)));
+
+        scoredFifthSample = new Path(new BezierLine(new Point(grabFifthSample), new Point(scoreFifthSampleSide)));
         scoredFifthSample.setConstantHeadingInterpolation(Math.PI);
+        scoredFifthSample.setPathEndTimeoutConstraint(0);
+        /*scoredFifthSample = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        new Point(grabFifthSample),
+                        new Point(126.000, 89.000, Point.CARTESIAN),
+                        new Point(117.000, 76.000, Point.CARTESIAN),
+                        new Point(scoreFifthSample)))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setZeroPowerAccelerationMultiplier(3.25)
+                .build();*/
+        sideToSample5 = new Path(new BezierLine(new Point(scoreFifthSampleSide), new Point(scoreFifthSample)));
+        sideToSample5.setConstantHeadingInterpolation(Math.PI);
         endPark = new Path(new BezierLine(new Point(scoreFifthSample), new Point(finalPark)));
         endPark.setConstantHeadingInterpolation(Math.PI);
 
@@ -220,13 +277,11 @@ public class autoRedSpecimenFive extends OpMode {
             //
             case 10: // scores initial specimen
                 pathTimer.reset();
+                robot.depoHslide.setOut();
                 follower.followPath(preload);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid+35, 1f);
-                robot.claw.setClose();
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1);
                 robot.clawBigTilt.setOut();
                 robot.depoWrist.setSpecimen();
-                robot.depoHslide.setOut();
-                waitFor(300);
                 robot.clawSmallTilt.setFlat();
                 setPathState(11);
                 break;
@@ -309,8 +364,11 @@ public class autoRedSpecimenFive extends OpMode {
                 if(!follower.isBusy()) {
                     //follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(180));
                     follower.followPath(sideToThirdSample);
-                    setPathState(21);
                 }
+                robot.claw.setOpen();
+                robot.claw.setOpen();
+                robot.claw.setOpen();
+                setPathState(21);
                 break;
             case 21: //pushes second sample back
                 if(!follower.isBusy()) {
@@ -352,20 +410,26 @@ public class autoRedSpecimenFive extends OpMode {
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.claw.setClose();
-                    robot.vSlides.moveEncoderTo(80, 1f);
+                    robot.vSlides.moveEncoderTo(100, 1f);
+                    setPathState(271);
+                }
+                break;
+            case 271: //scores second spec
+                if(!follower.isBusy()) {
+                    follower.followPath(sideToSample3);
+                    robot.claw.setClose();
+                    robot.clawBigTilt.setOut();
+                    robot.depoWrist.setSpecimen();
+                    waitFor(300);
+                    robot.clawSmallTilt.setFlat();
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     setPathState(27);
                 }
                 break;
             case 27: //brings slides up
                 if(!follower.isBusy()) {
                     follower.followPath(scoreSample3);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
-                    robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
-                    waitFor(300);
-                    robot.clawSmallTilt.setFlat();
+                    robot.depoHslide.setOut();
                     setPathState(28);
                 }
                 break;
@@ -391,6 +455,12 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
+                    setPathState(301);
+                }
+                break;
+            case 301: //scores second spec
+                if(!follower.isBusy()) {
+                    follower.followPath(sideToSample4);
                     setPathState(30);
                 }
                 break;
@@ -401,7 +471,7 @@ public class autoRedSpecimenFive extends OpMode {
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
+                    robot.depoHslide.setOut();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
                     setPathState(31);
@@ -429,18 +499,24 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
+                    setPathState(331);
+                }
+                break;
+            case 331: //scores second spec
+                if(!follower.isBusy()) {
+                    follower.followPath(sideScoredSample4);
                     setPathState(33);
                 }
                 break;
             case 33:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    //waitFor(1000);
-                    robot.depoHslide.setMid();
+                    robot.depoHslide.setOut();
+                    waitFor(300);
                     robot.clawSmallTilt.setFlat();
                     setPathState(34);
                 }
@@ -467,17 +543,24 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(grabFifthSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
+                    setPathState(361);
+                }
+                break;
+            case 361: //scores second spec
+                if(!follower.isBusy()) {
+                    follower.followPath(sideToSample5);
                     setPathState(36);
                 }
                 break;
             case 36:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredFifthSample);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
+                    robot.depoHslide.setOut();
+                    waitFor(300);
                     robot.clawSmallTilt.setFlat();
                     setPathState(37);
                 }
@@ -491,6 +574,7 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(endPark);
                     robot.claw.setOpen();
+                    robot.depoWrist.setTransfer();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
@@ -585,11 +669,10 @@ public class autoRedSpecimenFive extends OpMode {
         buildPaths();
 
         //robot init
-        robot.intakeTilt.setInOut();
+        robot.intakeTilt.setOut();
         robot.clawBigTilt.setOut();
-        robot.depoWrist.setSpecimen();
         robot.clawSmallTilt.setFlat();
-        robot.depoWrist.setIn();
+        robot.depoWrist.setSpecimen();
         robot.claw.setClose();
 
         hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");

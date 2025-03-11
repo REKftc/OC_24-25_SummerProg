@@ -23,15 +23,11 @@ import overcharged.pedroPathing.pathGeneration.PathChain;
 import overcharged.pedroPathing.pathGeneration.Point;
 import overcharged.pedroPathing.util.Timer;
 
-@Autonomous(name = "red specimen 1+4", group = "1Autonomous")
-public class autoRedSpecimenFive extends OpMode {
+@Autonomous(name = "red specimen 1+4 short", group = "1Autonomous")
+public class autoRedSpecimenShort extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
     boolean in = true;
-    boolean stillBusy1 = false;
-    boolean stillBusy2 = false;
-    boolean stillBusy3 = false;
-    boolean stillBusy4 = false;
     // Init
     private RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -39,8 +35,7 @@ public class autoRedSpecimenFive extends OpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     SampleMecanumDrive drive;
     MultipleTelemetry telems;
-    private ElapsedTime pathTimer;
-
+    private ElapsedTime pathTimer, tempTimer;
     // Other init
     private int pathState;
 
@@ -89,11 +84,12 @@ public class autoRedSpecimenFive extends OpMode {
     private PathChain preload;
 
     private Follower follower;
+    int step = 0;
 
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(112,64,Math.PI);
+        beforeSpecimen = new Pose(111,64,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(120,64, Math.PI);
@@ -110,14 +106,14 @@ public class autoRedSpecimenFive extends OpMode {
         bitCloser = new Pose(85,116, Math.PI);
         bitBitBack = new Pose(85,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
-        getThirdSample = new Pose(132,110, Math.PI);
-        thirdScore = new Pose(107,59, Math.PI);
-        thirdScoreCloser = new Pose(134,102, Math.PI);
-        fourthScore = new Pose(107,63, Math.PI);
-        fourthScoreCloser = new Pose(108,63, Math.PI);
+        getThirdSample = new Pose(131,110, Math.PI);
+        thirdScore = new Pose(103,64, Math.PI);
+        thirdScoreCloser = new Pose(133,102, Math.PI);
+        fourthScore = new Pose(103,64, Math.PI);
+        fourthScoreCloser = new Pose(103,64, Math.PI);
         grabFourthSample = new Pose(133,101, Math.PI); //maybe this too 134 maybe
         grabFifthSample = new Pose(134,101, Math.PI);
-        scoreFifthSample = new Pose(107,63, Math.PI);
+        scoreFifthSample = new Pose(103,64, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -220,33 +216,40 @@ public class autoRedSpecimenFive extends OpMode {
             //
             case 10: // scores initial specimen
                 pathTimer.reset();
+                robot.depoHslide.setOut();
                 follower.followPath(preload);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid+35, 1f);
-                robot.claw.setClose();
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1);
                 robot.clawBigTilt.setOut();
                 robot.depoWrist.setSpecimen();
-                robot.depoHslide.setOut();
-                waitFor(300);
                 robot.clawSmallTilt.setFlat();
+                step = 1;
                 setPathState(11);
                 break;
             case 11: //backs away
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(beforeSpecimen)), Math.toRadians(180));
                     robot.claw.setOpen();
-                    waitFor(100);
-                    robot.depoHslide.setInit();
+                   // waitFor(100);
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(redPark);
-                    waitFor(100);
-                    // robot.depoWrist.setIn();
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
-                    robot.clawSmallTilt.setWall();
-                    robot.intake.off();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(12);
+                    if(pathTimer.milliseconds() > 1200 & step == 2) {
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    follower.followPath(redPark);
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.clawBigTilt.setFlat();
+                        robot.depoWrist.setFlat();
+                        robot.clawSmallTilt.setWall();
+                        robot.intake.off();
+                        // robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(12);
+                    }
                 }
                 break;
             case 12: //goes a little in front and to the side of first sample
@@ -309,8 +312,11 @@ public class autoRedSpecimenFive extends OpMode {
                 if(!follower.isBusy()) {
                     //follower.holdPoint(new BezierPoint(new Point(toSample)), Math.toRadians(180));
                     follower.followPath(sideToThirdSample);
-                    setPathState(21);
                 }
+                robot.claw.setOpen();
+                robot.claw.setOpen();
+                robot.claw.setOpen();
+                setPathState(21);
                 break;
             case 21: //pushes second sample back
                 if(!follower.isBusy()) {
@@ -349,10 +355,11 @@ public class autoRedSpecimenFive extends OpMode {
                 }
                 break;
             case 26: //scores second spec
-                if(!follower.isBusy()) {
+                if(follower.getCurrentTValue() > 0.97) {
                     follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
+                    step=1;
                     setPathState(27);
                 }
                 break;
@@ -363,12 +370,18 @@ public class autoRedSpecimenFive extends OpMode {
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
-                    waitFor(300);
-                    robot.clawSmallTilt.setFlat();
-                    setPathState(28);
+                    if(pathTimer.milliseconds() > 100 & step == 1) {
+                        robot.clawSmallTilt.setFlat();
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1500 & step == 2) {
+                        robot.depoHslide.setOut();
+                        step=0;
+                        setPathState(28);
+                    }
                 }
                 break;
+
             case 28: //
                 if(!follower.isBusy()){
                     follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(179));
@@ -387,7 +400,7 @@ public class autoRedSpecimenFive extends OpMode {
                 }
                 break;
             case 29:
-                if(!follower.isBusy()) {
+                if(follower.getCurrentTValue() > 0.95) {
                     follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
@@ -401,9 +414,10 @@ public class autoRedSpecimenFive extends OpMode {
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
+                    waitFor(500);
+                    robot.depoHslide.setMid();
                     setPathState(31);
                 }
                 break;
@@ -425,7 +439,7 @@ public class autoRedSpecimenFive extends OpMode {
                 }
                 break;
             case 32:
-                if(!follower.isBusy()) {
+                if(follower.getCurrentTValue() > 0.95) {
                     follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
@@ -435,12 +449,12 @@ public class autoRedSpecimenFive extends OpMode {
             case 33:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    //waitFor(1000);
-                    robot.depoHslide.setMid();
+                    robot.depoHslide.setInit();
+                    waitFor(300);
                     robot.clawSmallTilt.setFlat();
                     setPathState(34);
                 }
@@ -463,7 +477,7 @@ public class autoRedSpecimenFive extends OpMode {
                 }
                 break;
             case 35:
-                if(!follower.isBusy()) {
+                if(follower.getCurrentTValue() > 0.95) {
                     follower.holdPoint(new BezierPoint(new Point(grabFifthSample)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
@@ -473,11 +487,12 @@ public class autoRedSpecimenFive extends OpMode {
             case 36:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredFifthSample);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
-                    robot.depoHslide.setMid();
+                    robot.depoHslide.setInit();
+                    waitFor(300);
                     robot.clawSmallTilt.setFlat();
                     setPathState(37);
                 }
@@ -493,6 +508,7 @@ public class autoRedSpecimenFive extends OpMode {
                     robot.claw.setOpen();
                     robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
+                    robot.depoWrist.setTransfer();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(100);
@@ -529,7 +545,7 @@ public class autoRedSpecimenFive extends OpMode {
         telemetry.addLine("Path: " + pathState);
         telemetry.addLine("vLimit" + vlimitswitch.getState());
         telemetry.addLine("hLimit" + hlimitswitch.getState());
-
+        telemetry.addLine("Path timer" + pathTimer.milliseconds());
         //functions
         if (!hlimitswitch.getState() && hSlideGoBottom) {
             // in = true;
@@ -585,11 +601,11 @@ public class autoRedSpecimenFive extends OpMode {
         buildPaths();
 
         //robot init
+
         robot.intakeTilt.setInOut();
         robot.clawBigTilt.setOut();
-        robot.depoWrist.setSpecimen();
         robot.clawSmallTilt.setFlat();
-        robot.depoWrist.setIn();
+        robot.depoWrist.setSpecimen();
         robot.claw.setClose();
 
         hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
