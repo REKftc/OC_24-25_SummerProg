@@ -8,7 +8,7 @@ public class depoWrist {
     public static final float OUT = 57f;//198f;
     public static final float TRANSFER = 234f;
     public static final float SPEC = 189f;
-    public static final float FLAT = 229f;
+    public static final float FLAT = 223f;
     public static final float BUCKET = 52f;
     public static final float WALL = 87f;
 
