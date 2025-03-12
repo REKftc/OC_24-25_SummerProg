@@ -212,7 +212,7 @@ public class autoBucket5_135 extends OpMode{
                     }
                 }
                 waitFor(300);
-                robot.clawBigTilt.setTransfer();
+                robot.clawBigTilt.setFlat();
                 robot.depoWrist.setTransfer();
                 robot.clawSmallTilt.setTransfer();
                 waitFor(150);
@@ -251,6 +251,9 @@ public class autoBucket5_135 extends OpMode{
                 if(!follower.isBusy()) {
                     in = false;
                     runOnce = true;
+                    robot.depoWrist.setTransfer();
+                    robot.clawBigTilt.setFlat();
+                    robot.clawSmallTilt.setTransfer();
                     robot.intakeTilt.setOut();
                     setPathState(161);
                 }
@@ -261,11 +264,15 @@ public class autoBucket5_135 extends OpMode{
                     if (runOnce){
                         secTimer.reset();
                         runOnce = false;
+                        robot.depoWrist.setTransfer();
+                        robot.clawBigTilt.setFlat();
+                        robot.clawSmallTilt.setTransfer();
                         robot.intakeTilt.setTransfer();
-                        hSlideGoBottom = true;
+                        //hSlideGoBottom = true;
                         robot.intake.in();
                     }
-                    if(tempTime > 250) {
+                    if(tempTime > 500) {
+                        hSlideGoBottom = true;
                         setPathState(17);
                         nowDelay = false;
                         runOnce = true;
@@ -342,7 +349,7 @@ public class autoBucket5_135 extends OpMode{
                             runOnce = true;
                         }
                     }
-                    if (secTimer.milliseconds()>800 && nowDelay) {
+                    if (secTimer.milliseconds()>900 && nowDelay) {
                         if (runOnce) {
                             runOnce = false;
                             nowDelay = false;
