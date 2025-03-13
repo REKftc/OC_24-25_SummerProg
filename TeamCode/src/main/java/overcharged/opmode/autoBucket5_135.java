@@ -158,7 +158,7 @@ public class autoBucket5_135 extends OpMode{
                     if(delayTimer.milliseconds()>450 && nowDelay){
                         nowDelay = false;
                         robot.latch.setOut();
-                        robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
+                        robot.hslides.moveEncoderTo(robot.hslides.SMALL, 1f);
                         setPathState(13);
                         runOnce = true;
                     }
@@ -212,7 +212,7 @@ public class autoBucket5_135 extends OpMode{
                     }
                 }
                 waitFor(300);
-                robot.clawBigTilt.setFlat();
+                robot.clawBigTilt.setTransfer();
                 robot.depoWrist.setTransfer();
                 robot.clawSmallTilt.setTransfer();
                 waitFor(150);
@@ -252,7 +252,7 @@ public class autoBucket5_135 extends OpMode{
                     in = false;
                     runOnce = true;
                     robot.depoWrist.setTransfer();
-                    robot.clawBigTilt.setFlat();
+                    robot.clawBigTilt.setTransfer();
                     robot.clawSmallTilt.setTransfer();
                     robot.intakeTilt.setOut();
                     setPathState(161);
@@ -265,7 +265,7 @@ public class autoBucket5_135 extends OpMode{
                         secTimer.reset();
                         runOnce = false;
                         robot.depoWrist.setTransfer();
-                        robot.clawBigTilt.setFlat();
+                        robot.clawBigTilt.setTransfer();
                         robot.clawSmallTilt.setTransfer();
                         robot.intakeTilt.setTransfer();
                         //hSlideGoBottom = true;
@@ -284,7 +284,7 @@ public class autoBucket5_135 extends OpMode{
                         broken = false;
                         if (floorRep == 3){
                             robot.latch.setOut();
-                            robot.hslides.moveEncoderTo(robot.hslides.PRESET1+10, 0.7f);
+                            robot.hslides.moveEncoderTo(robot.hslides.PRESET1+80, 0.7f);
                         }
                         else if (floorRep == 2){
                             robot.latch.setOut();
@@ -336,20 +336,28 @@ public class autoBucket5_135 extends OpMode{
                         if (floorRep == 1) {
                             floor2.setLinearHeadingInterpolation(Math.toRadians(200), Math.PI);
                         }
+
                         backDelay = true;
-                        doOnce = true;
+                        //doOnce = true;
                     }
-                    if(secTimer.milliseconds()>580 && backDelay) {
+                    //delay claw close once hslides are back
+                    if(!hSlideGoBottom && backDelay){
+                        tempTime = System.currentTimeMillis();
+                        doOnce = true;
                         backDelay = false;
-                        if (doOnce) {
+                    }
+                    //claw close delay
+                    if(tempTime>200 && doOnce) {
                             doOnce = false;
                             robot.claw.setClose();
                             robot.intake.off();
                             nowDelay = true;
                             runOnce = true;
-                        }
+                            tempTime = System.currentTimeMillis();
+                            //delayTimer.reset();
                     }
-                    if (secTimer.milliseconds()>900 && nowDelay) {
+                    //vslide up delay
+                    if (tempTime>300 && nowDelay) {
                         if (runOnce) {
                             runOnce = false;
                             nowDelay = false;
@@ -624,6 +632,11 @@ public class autoBucket5_135 extends OpMode{
         //telemetry.addLine("delayTimer: " + delayTimer);
         //telemetry.addLine("secTimer: " + secTimer);
         //telemetry.addLine("thiTimer: " + thiTimer);
+        telemetry.addLine("delayTimer: " + tempTime);
+        telemetry.addLine("doOnce: " + doOnce);
+        telemetry.addLine("backDelay: " + backDelay);
+        telemetry.addLine("s2Delay: " + s2Delay);
+        telemetry.addLine("nowDelay: " + nowDelay);
         telemetry.addLine("hslideGoBottom: " + hSlideGoBottom);
         telemetry.addLine("vslides: " + robot.vSlides.vSlidesR.getCurrentPosition());
         telemetry.addLine("color: " + robot.sensorF.getColor());

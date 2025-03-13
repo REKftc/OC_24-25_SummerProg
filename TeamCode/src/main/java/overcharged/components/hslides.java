@@ -25,7 +25,7 @@ public class hslides {
 
     public static final int START = 0;
     public static final int SMALL = 180;
-    public static final int PRESET1 = 250;
+    public static final int PRESET1 = 200;
     public static final int PRESET2 = 410;
     public static final int PRESET3 = 450;
     public static final int OUT = 590;

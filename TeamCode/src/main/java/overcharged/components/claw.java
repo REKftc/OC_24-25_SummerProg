@@ -12,7 +12,7 @@ public class claw {
     public static final float CLOSE = 93f;//104f;//105f;
     public static final float SPEC = 93f;
     public static final float HALF_CLOSE = 109f;//257f;//255f;
-    public static final float OPEN = 130f;//149f;
+    public static final float OPEN = 155f;//149f;
     public static final float BIG = 165f;
 
 

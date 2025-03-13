@@ -363,11 +363,17 @@ public class teleop7 extends OpMode{
             }
         }
 
-        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)){ //vSlides Up to Bucket
+        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
             robot.claw.setClose();
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
             turnConstant = 0.7f;
             clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
+        }
+        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 300){
+            cDelay= false;
+            clawDelay = 0;
             robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
             dDelay = true;
             depoDelay = System.currentTimeMillis();
@@ -384,10 +390,16 @@ public class teleop7 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)){ // High Specimen
+        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             robot.claw.setClose();
             clawOpen = false;
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
             slideHeight = SlideHeight.MID;
+        }
+        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 300){
+            cDelay= false;
+            clawDelay = 0;
             vslideOut = true;
             dDelay = true;
             robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
