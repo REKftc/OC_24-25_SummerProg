@@ -274,6 +274,7 @@ public class autoBucket5_135 extends OpMode{
                     if(tempTime > 500) {
                         hSlideGoBottom = true;
                         setPathState(17);
+                        tempTime =0;
                         nowDelay = false;
                         runOnce = true;
 
@@ -330,7 +331,7 @@ public class autoBucket5_135 extends OpMode{
                         robot.intakeTilt.setTransfer();
                         if (floorRep == 3) {
                             follower.followPath(floorCycle, true);
-                        } else if (floorRep >0) {
+                        } else if (floorRep > 0) {
                             follower.followPath(floor2, true);
                         }
                         if (floorRep == 1) {
@@ -341,23 +342,29 @@ public class autoBucket5_135 extends OpMode{
                         //doOnce = true;
                     }
                     //delay claw close once hslides are back
-                    if(!hSlideGoBottom && backDelay){
-                        tempTime = System.currentTimeMillis();
+                    if (!hSlideGoBottom && backDelay) {
+                        pathTimer.reset();
                         doOnce = true;
                         backDelay = false;
                     }
+
                     //claw close delay
-                    if(tempTime>200 && doOnce) {
-                            doOnce = false;
-                            robot.claw.setClose();
-                            robot.intake.off();
-                            nowDelay = true;
-                            runOnce = true;
-                            tempTime = System.currentTimeMillis();
-                            //delayTimer.reset();
+                    if (pathTimer.milliseconds() > 200 && doOnce) {
+                        doOnce = false;
+                        robot.claw.setClose();
+                        robot.intake.off();
+                        nowDelay = true;
+                        runOnce = true;
+                        tempTime = System.currentTimeMillis();
+                        setPathState(170);
+                        //delayTimer.reset();
                     }
+                }
+                break;
+            case 170:
+
                     //vslide up delay
-                    if (tempTime>300 && nowDelay) {
+                    if (pathTimer.milliseconds()>300 && nowDelay) {
                         if (runOnce) {
                             runOnce = false;
                             nowDelay = false;
@@ -372,7 +379,7 @@ public class autoBucket5_135 extends OpMode{
                         robot.depoWrist.setBucket();
                         setPathState(171);
                     }
-                }
+
 
                 break;
             case 171:
@@ -632,11 +639,13 @@ public class autoBucket5_135 extends OpMode{
         //telemetry.addLine("delayTimer: " + delayTimer);
         //telemetry.addLine("secTimer: " + secTimer);
         //telemetry.addLine("thiTimer: " + thiTimer);
-        telemetry.addLine("delayTimer: " + tempTime);
-        telemetry.addLine("doOnce: " + doOnce);
+        telemetry.addLine("delayTimer: " + pathTimer.milliseconds());
+        /*telemetry.addLine("doOnce: " + doOnce);
         telemetry.addLine("backDelay: " + backDelay);
         telemetry.addLine("s2Delay: " + s2Delay);
         telemetry.addLine("nowDelay: " + nowDelay);
+
+         */
         telemetry.addLine("hslideGoBottom: " + hSlideGoBottom);
         telemetry.addLine("vslides: " + robot.vSlides.vSlidesR.getCurrentPosition());
         telemetry.addLine("color: " + robot.sensorF.getColor());
