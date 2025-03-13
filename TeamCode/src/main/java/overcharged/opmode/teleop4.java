@@ -19,8 +19,7 @@ import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
 import overcharged.components.hslides;
 import overcharged.components.vSlides;
-import overcharged.pedroPathing.follower.Follower;
-import overcharged.pedroPathing.pathGeneration.Vector;
+
 
 // TODO:BUTTON MAP
 /*

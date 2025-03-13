@@ -23,8 +23,7 @@ import overcharged.components.colorSensor;
 import overcharged.components.hang;
 import overcharged.components.hslides;
 import overcharged.components.vSlides;
-import overcharged.pedroPathing.follower.Follower;
-import overcharged.pedroPathing.pathGeneration.Vector;
+
 
 
 @Config
@@ -217,7 +216,7 @@ public class teleop7 extends OpMode{
             clearDelay = 0;
         }
 
-        if (gamepad1.back){
+        if (gamepad1.back && Button.INTAKEDOOR.canPress(timestamp)){
             canYellow = !canYellow;
         }
 
@@ -233,7 +232,7 @@ public class teleop7 extends OpMode{
             }
         }
 
-        if(gamepad1.left_trigger > 0.975&& Button.INTAKEOUT.canPress(timestamp)){
+        if(gamepad1.left_trigger > 0.75&& Button.INTAKEOUT.canPress(timestamp)){
             sense = false;
             if(intakeMode == IntakeMode.OFF || intakeMode == IntakeMode.IN) {
                 robot.intake.out();

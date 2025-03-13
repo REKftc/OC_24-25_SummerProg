@@ -11,8 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.RobotLog;
 import overcharged.components.Button;
 import overcharged.components.RobotMecanum;
-import overcharged.pedroPathing.follower.Follower;
-import overcharged.pedroPathing.pathGeneration.Vector;
+
 @Config
 @TeleOp(name="testswitch", group="Teleop")
 public class TestSwitch extends OpMode {

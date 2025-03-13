@@ -16,16 +16,16 @@ import overcharged.components.colorSensor;
 import overcharged.drive.SampleMecanumDrive;
 import overcharged.linear.util.SelectLinear;
 
-import overcharged.pedroPathing.follower.Follower;
-import overcharged.pedroPathing.localization.Pose;
-import overcharged.pedroPathing.pathGeneration.BezierCurve;
-import overcharged.pedroPathing.pathGeneration.BezierLine;
-import overcharged.pedroPathing.pathGeneration.BezierPoint;
-import overcharged.pedroPathing.pathGeneration.MathFunctions;
-import overcharged.pedroPathing.pathGeneration.Path;
-import overcharged.pedroPathing.pathGeneration.PathChain;
-import overcharged.pedroPathing.pathGeneration.Point;
-import overcharged.pedroPathing.util.Timer;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.BezierPoint;
+import com.pedropathing.pathgen.MathFunctions;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Timer;
 
 // Main Class
 //@Disabled

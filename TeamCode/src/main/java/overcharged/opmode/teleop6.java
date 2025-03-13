@@ -20,8 +20,7 @@ import overcharged.components.colorSensor;
 import overcharged.components.hang;
 import overcharged.components.hslides;
 import overcharged.components.vSlides;
-import overcharged.pedroPathing.follower.Follower;
-import overcharged.pedroPathing.pathGeneration.Vector;
+
 
 
 @Config
