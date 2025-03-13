@@ -156,9 +156,9 @@ public class autoBucket5_135 extends OpMode{
                 nowDelay = false;
                 break;
             case 12:
-                if(pathTimer.milliseconds()>150){
+                if(pathTimer.milliseconds()>90){
                     nowDelay = true;
-                    if(delayTimer.milliseconds()>350 && nowDelay){
+                    if(delayTimer.milliseconds()>190 && nowDelay){
                         nowDelay = false;
                         robot.latch.setOut();
                         robot.hslides.moveEncoderTo(robot.hslides.SMALL, 1f);
@@ -178,11 +178,11 @@ public class autoBucket5_135 extends OpMode{
                         delayTimer.reset();
                         nowDelay = true;
                     }
-                    if (delayTimer.milliseconds() > 280 && nowDelay){
+                    if (delayTimer.milliseconds() > 200 && nowDelay){
                         canScore = true;
                         doOnce = true;
                     }
-                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 2.5) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 30 && canScore) {
+                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 3.5) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 30 && canScore) {
                         if (doOnce) {
                             doOnce = false;
                             thiTimer.reset();
@@ -191,10 +191,10 @@ public class autoBucket5_135 extends OpMode{
                             canScore = false;
                         }
                     }
-                    if (thiTimer.milliseconds() > 350 && backDelay){
+                    if (thiTimer.milliseconds() > 320 && backDelay){
                         robot.claw.setBig();
                     }
-                    if (thiTimer.milliseconds() > 600 && backDelay){
+                    if (thiTimer.milliseconds() > 500 && backDelay){
                         backDelay = false;
                         robot.clawBigTilt.setTransfer();
                         robot.depoWrist.setTransfer();
@@ -228,24 +228,22 @@ public class autoBucket5_135 extends OpMode{
                     if (floorRep == 3) {
                         follower.followPath(goSafe, true);
                         goSafe.setLinearHeadingInterpolation(ready2Score.getHeading(), Math.toRadians(180));
-                        setPathState(16);
                     } else if (floorRep == 2) {
                         follower.followPath(secondBack);
-                        setPathState(16);
                     } else if (floorRep == 1) {
                         follower.followPath(secondBack);
                         secondBack.setLinearHeadingInterpolation(wallScore.getHeading(), Math.toRadians(202));
-                        setPathState(16);
                     } else {
                         telemetry.addLine("aw man");
                     }
+                    setPathState(16);
                 }
 
                 break;
             case 16:
                 robot.intake.in();
                 robot.intakeTilt.setOut();
-                if(pathTimer.milliseconds()>450){
+                if(pathTimer.milliseconds()>350){
                     if (runOnce) {
                         runOnce = false;
                         vslideGoBottom = true;
@@ -266,11 +264,7 @@ public class autoBucket5_135 extends OpMode{
                     if (runOnce){
                         secTimer.reset();
                         runOnce = false;
-                        robot.depoWrist.setTransfer();
-                        robot.clawBigTilt.setTransfer();
-                        robot.clawSmallTilt.setTransfer();
                         robot.intakeTilt.setTransfer();
-                        //hSlideGoBottom = true;
                         robot.intake.in();
                     }
                     if(tempTime > 500) {
@@ -332,7 +326,6 @@ public class autoBucket5_135 extends OpMode{
                         if (floorRep == 1) {
                             floor2.setLinearHeadingInterpolation(Math.toRadians(202), Math.PI);
                         }
-
                         backDelay = true;
                     }
                     //delay claw close once hslides are back
@@ -356,7 +349,7 @@ public class autoBucket5_135 extends OpMode{
                 break;
             case 170:
                     //vslide up delay
-                    if (pathTimer.milliseconds()>300 && nowDelay) {
+                    if (pathTimer.milliseconds()>200 && nowDelay) {
                         if (runOnce) {
                             runOnce = false;
                             nowDelay = false;
@@ -375,7 +368,7 @@ public class autoBucket5_135 extends OpMode{
 
                 break;
             case 171:
-                if(pathTimer.milliseconds()>250){
+                if(pathTimer.milliseconds()>220){
                     robot.depoHslide.setInit();
                     robot.clawSmallTilt.setRight();
                     robot.intakeTilt.setTransfer();
@@ -397,7 +390,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 172:
-                if(pathTimer.milliseconds() > 100) {
+                if(pathTimer.milliseconds() > 50) {
                     if (floorRep > 1) {
                         floorRep -= 1;
                         setPathState(14);
@@ -417,7 +410,7 @@ public class autoBucket5_135 extends OpMode{
                         secTimer.reset();
                     }
                 }
-                if (secTimer.milliseconds()>150 && nowDelay) {
+                if (secTimer.milliseconds()>120 && nowDelay) {
                     secTimer.reset();
                     nowDelay = false;
                     robot.claw.setOpen();
@@ -473,6 +466,7 @@ public class autoBucket5_135 extends OpMode{
                         robot.intake.in();
                         robot.trapdoor.setInit();
                         trappy = false;
+                        runningOutOfNames = true;
                     }
                 }
                 else{
@@ -484,9 +478,10 @@ public class autoBucket5_135 extends OpMode{
                     robot.intakeTilt.setTransfer();
                     setPathState(22);
                 }
-                else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                else if (robot.sensorF.getColor() == colorSensor.Color.BLUE && runningOutOfNames){
                     robot.trapdoor.setOut();
                     robot.intake.off();
+                    runningOutOfNames = false;
                     trappy = true;
                 }
                 else if (pathTimer.milliseconds()>1400){
@@ -509,6 +504,7 @@ public class autoBucket5_135 extends OpMode{
                 if(pathTimer.milliseconds()>250) {
                     robot.intake.out();
                     hSlideGoBottom = true;
+                    runningOutOfNames = false;
                     setPathState(23);
                     //setPathState(100);
                 }
@@ -527,7 +523,6 @@ public class autoBucket5_135 extends OpMode{
                 if(pathTimer.milliseconds()>400 && nowDelay && robot.hslides.hslides.getCurrentPosition() < 50){
                     if(runOnce) {
                         runOnce = false;
-                        robot.intake.off();
                         robot.claw.setClose();
                         nowDelay = false;
                         doOnce = true;
@@ -551,13 +546,13 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 241:
-                if(follower.getPose().getX() > (wallScore.getX() - 12) && follower.getPose().getY() < (wallScore.getY() + 12)){
+                if(follower.getPose().getX() > (wallScore.getX() - 24) && follower.getPose().getY() < (wallScore.getY() + 24)){
                     robot.clawBigTilt.setBucket();
                     robot.depoWrist.setBucket();
+                    robot.depoHslide.setInit();
                     runningOutOfNames = true;
                 }
                 if(pathTimer.milliseconds()>200 && robot.vSlides.vSlidesL.getCurrentPosition() > 500 && runningOutOfNames){
-                    robot.depoHslide.setInit();
                     robot.clawSmallTilt.setRight();
                     robot.intakeTilt.setTransfer();
                     canScore = true;
