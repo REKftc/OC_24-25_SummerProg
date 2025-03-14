@@ -1,5 +1,4 @@
 package overcharged.opmode;
-
 import static overcharged.config.RobotConstants.TAG_SL;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -13,7 +12,9 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
+import overcharged.components.hslides;
 import overcharged.drive.SampleMecanumDrive;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -22,7 +23,10 @@ import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Timer;
+import com.pedropathing.util.Constants;
+
+import overcharged.pedroPathing.constants.FConstants;
+import overcharged.pedroPathing.constants.LConstants;
 
 @Autonomous(name = "red specimen 1+4 curve", group = "1Autonomous")
 public class autoRedSpecimenCurvedPath extends OpMode {
@@ -280,8 +284,8 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     waitFor(100);
                    // robot.depoWrist.setIn();
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
+                    robot.clawBigTilt.setWall();
+                    robot.depoWrist.setWall();
                     robot.clawSmallTilt.setWall();
                     robot.intake.off();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
@@ -421,8 +425,8 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     waitFor(100);
                     follower.followPath(scoredSample3);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
+                    robot.clawBigTilt.setWall();
+                    robot.depoWrist.setWall();
                     robot.clawSmallTilt.setWall();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
@@ -434,7 +438,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
                     robot.claw.setClose();
                     robot.vSlides.moveEncoderTo(80, 1f);
-                    setPathState(31);
+                    setPathState(30);
                 }
                 break;
             case 30:
@@ -459,8 +463,8 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     waitFor(100);
                     follower.followPath(grabSample4);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
+                    robot.clawBigTilt.setWall();
+                    robot.depoWrist.setWall();
                     robot.clawSmallTilt.setWall();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
@@ -497,8 +501,8 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     waitFor(100);
                     follower.followPath(getFifthSample);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
+                    robot.clawBigTilt.setWall();
+                    robot.depoWrist.setWall();
                     robot.clawSmallTilt.setWall();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
@@ -621,6 +625,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
         robot.vSlides.vSlidesL.resetPosition();
 
         //follower init
+        Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 

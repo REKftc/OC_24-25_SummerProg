@@ -518,7 +518,6 @@ public class teleop7 extends OpMode{
             clawOpen = false;
             robot.clawBigTilt.setWall();
             robot.depoWrist.setWall();
-
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
