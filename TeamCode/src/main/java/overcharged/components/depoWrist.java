@@ -6,11 +6,11 @@ public class depoWrist {
     public OcServo depoWrist;
     public static final float IN = 213f;//124f;//125f;
     public static final float OUT = 57f;//198f;
-    public static final float TRANSFER = 238f;
-    public static final float SPEC = 189f;
+    public static final float TRANSFER = 234f;
+    public static final float SPEC = 190f;
     public static final float SPECHIGHER = 181f;
     public static final float FLAT = 223f;
-    public static final float BUCKET = 52f;
+    public static final float BUCKET = 51f;
     public static final float WALL = 85f;//87f;
 
     public depoWrist(HardwareMap hardwareMap) {

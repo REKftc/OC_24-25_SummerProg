@@ -103,30 +103,30 @@ public class autoRedSpecimenCurvedPath extends OpMode {
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(120,64, Math.PI);
         pushFirstSample = new Pose(120,98, Math.PI);
-        goPark = new Pose(85,98, Math.PI);
-        goRotate = new Pose(85,105, Math.PI);
+        goPark = new Pose(88,98, Math.PI);
+        goRotate = new Pose(88,105, Math.PI);
         bitForward = new Pose(118,109, Math.PI);
-        bitBack = new Pose(85,109, Math.PI);
-        toSample = new Pose(85,116, Math.PI);
+        bitBack = new Pose(88,109, Math.PI);
+        toSample = new Pose(88,116, Math.PI);
         secondScore = new Pose(118,116, Math.PI);
-        pushThirdSample = new Pose(85,120, Math.PI);
-        pushThirdSampleSide = new Pose(85,123, Math.PI);
+        pushThirdSample = new Pose(88,120, Math.PI);
+        pushThirdSampleSide = new Pose(88,123, Math.PI);
         pushThirdSampleBack = new Pose(115,123, Math.PI); //need to tune this, needs more back prob
-        bitCloser = new Pose(85,116, Math.PI);
-        bitBitBack = new Pose(85,121, Math.PI);
+        bitCloser = new Pose(88,116, Math.PI);
+        bitBitBack = new Pose(88,121, Math.PI);
         thirdSample = new Pose(119,121, Math.PI);
-        getThirdSample = new Pose(132,110, Math.PI);
+        getThirdSample = new Pose(128,104, Math.PI);
         thirdScoreSide = new Pose(130,63, Math.PI);
-        thirdScore = new Pose(107,61, Math.PI);
-        thirdScoreCloser = new Pose(134,102, Math.PI);
+        thirdScore = new Pose(112,63, Math.PI);
+        thirdScoreCloser = new Pose(128,90, Math.PI);
         fourthScoreSide = new Pose(132,63, Math.PI);
-        fourthScore = new Pose(108,63, Math.PI);
-        grabFourthSample = new Pose(128,101, Math.PI);//maybe this too 134 maybe
-        fourthScoreCloserSide = new Pose(129,63, Math.PI);
-        fourthScoreCloser = new Pose(108,63, Math.PI);
-        grabFifthSample = new Pose(129,101, Math.PI);
-        scoreFifthSampleSide = new Pose(129,63, Math.PI);
-        scoreFifthSample = new Pose(108,63, Math.PI);
+        fourthScore = new Pose(112,64, Math.PI);
+        grabFourthSample = new Pose(128,93, Math.PI);//maybe this too 134 maybe
+        fourthScoreCloserSide = new Pose(131,63, Math.PI);
+        fourthScoreCloser = new Pose(112,64, Math.PI);
+        grabFifthSample = new Pose(128,90, Math.PI);
+        scoreFifthSampleSide = new Pose(132,63, Math.PI);
+        scoreFifthSample = new Pose(112,63, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -203,7 +203,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(getThirdSample),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(110.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 64.000, Point.CARTESIAN),
                         new Point(thirdScore)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -216,7 +216,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(thirdScoreCloser),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(110.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 64.000, Point.CARTESIAN),
                         new Point(fourthScore)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -229,7 +229,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(grabFourthSample),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(110.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 64.000, Point.CARTESIAN),
                         new Point(fourthScoreCloser)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -244,7 +244,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(grabFifthSample),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(110.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 64.000, Point.CARTESIAN),
                         new Point(scoreFifthSample)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -268,7 +268,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 pathTimer.reset();
                 robot.depoHslide.setOut();
                 follower.followPath(preload);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1);
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid+20, 1);
                 robot.clawBigTilt.setOut();
                 robot.depoWrist.setSpecimen();
                 robot.clawSmallTilt.setFlat();

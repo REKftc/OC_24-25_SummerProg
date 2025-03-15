@@ -12,9 +12,9 @@ public class clawBigTilt {
     public static final float TEMP = 222f;//188f;
     public static final float FLAT = 96f;//161f;//107f;//158f; //TODO: flat
     public static final float OUTHIGHER = 151f;//133f;//187f;//159f;//139f DONE //TODO: Specimen
-    public static final float OUT = 133f;
+    public static final float OUT = 138f;
     public static final float WALL = 238f;//52f;
-    public static final float BUCKET = 164f;
+    public static final float BUCKET = 168f;
 
 
     public clawBigTilt(HardwareMap hardwareMap) {
