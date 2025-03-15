@@ -7,7 +7,7 @@ public class depoHslide {
     public OcServo depoHslide;
     //public VoltageSensor intakeVolt;
     public static final float INIT = 50f;
-    public static final float MID = 140f;
+    public static final float MID = 60f;
     //public static final float TRANSFER  = 20f;
     // public static final float TRANSFER = 70f;//175f;
     // public static final float SPEC = 171f;//158f;

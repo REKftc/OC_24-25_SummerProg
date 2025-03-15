@@ -9,6 +9,7 @@ public class intakeTilt {
     public VoltageSensor intakeVolt;
     public static final float INIT = 159f;//224f; //36f;//230f;
     public static final float TRANSFER = 130f;//159f;//180f;//225f;//255f;//84f;//36f;//175f;
+    public static final float HIGHER = 180f;
     public static final float HIGH = 222f;//16f;
     public static final float LOWER = 130f;
     public static final float FLAT = 98f;//158f;
@@ -33,6 +34,8 @@ public class intakeTilt {
     public void setGoOut() { intakeTilt.setPosition(LOWER);}
 
     public void setHigh() { intakeTilt.setPosition(HIGH);}
+
+    public void setHigher() { intakeTilt.setPosition(HIGHER);}
 
     public void setFlat() { intakeTilt.setPosition(FLAT); }
 

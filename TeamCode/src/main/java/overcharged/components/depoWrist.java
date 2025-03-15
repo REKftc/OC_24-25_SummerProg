@@ -8,9 +8,10 @@ public class depoWrist {
     public static final float OUT = 57f;//198f;
     public static final float TRANSFER = 238f;
     public static final float SPEC = 189f;
+    public static final float SPECHIGHER = 181f;
     public static final float FLAT = 223f;
     public static final float BUCKET = 52f;
-    public static final float WALL = 87f;
+    public static final float WALL = 85f;//87f;
 
     public depoWrist(HardwareMap hardwareMap) {
         depoWrist = new OcServo(hardwareMap, "depoWrist", TRANSFER);
@@ -26,6 +27,8 @@ public class depoWrist {
     public void setTransfer() { depoWrist.setPosition(TRANSFER); }
 
     public void setSpecimen() { depoWrist.setPosition(SPEC); }
+
+    public void setSpecimenHigher() { depoWrist.setPosition(SPECHIGHER); }
 
     public void setFlat() { depoWrist.setPosition(FLAT); }
 

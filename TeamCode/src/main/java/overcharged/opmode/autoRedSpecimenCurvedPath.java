@@ -117,15 +117,15 @@ public class autoRedSpecimenCurvedPath extends OpMode {
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(132,110, Math.PI);
         thirdScoreSide = new Pose(130,63, Math.PI);
-        thirdScore = new Pose(107,63, Math.PI);
+        thirdScore = new Pose(107,61, Math.PI);
         thirdScoreCloser = new Pose(134,102, Math.PI);
         fourthScoreSide = new Pose(132,63, Math.PI);
         fourthScore = new Pose(108,63, Math.PI);
-        grabFourthSample = new Pose(133,101, Math.PI);//maybe this too 134 maybe
-        fourthScoreCloserSide = new Pose(131,63, Math.PI);
+        grabFourthSample = new Pose(128,101, Math.PI);//maybe this too 134 maybe
+        fourthScoreCloserSide = new Pose(129,63, Math.PI);
         fourthScoreCloser = new Pose(108,63, Math.PI);
-        grabFifthSample = new Pose(134,101, Math.PI);
-        scoreFifthSampleSide = new Pose(132,63, Math.PI);
+        grabFifthSample = new Pose(129,101, Math.PI);
+        scoreFifthSampleSide = new Pose(129,63, Math.PI);
         scoreFifthSample = new Pose(108,63, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
@@ -287,7 +287,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     robot.clawBigTilt.setWall();
                     robot.depoWrist.setWall();
                     robot.clawSmallTilt.setWall();
-                    robot.intake.off();
+                    robot.intakeTilt.setHigher();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(12);
