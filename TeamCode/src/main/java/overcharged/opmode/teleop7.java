@@ -27,7 +27,7 @@ import overcharged.components.vSlides;
 
 
 @Config
-@TeleOp(name="diffy red", group="0Teleop")
+@TeleOp(name="diffy red", group="!Teleop")
 public class teleop7 extends OpMode{
 
     RobotMecanum robot;
@@ -166,7 +166,7 @@ public class teleop7 extends OpMode{
             float slidePower = -gamepad1.right_stick_y;
             if (Math.abs(slidePower) > 0.105) {
                 robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.hslides.hslides.setPower(slidePower*0.75f);
+                robot.hslides.hslides.setPower(slidePower*0.8f);
             } else {
                 robot.hslides.hslides.setPower(0);
             }
@@ -365,7 +365,7 @@ public class teleop7 extends OpMode{
         }
 
         if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
-            slowPower = 0.88f;
+            slowPower = 0.85f;
             robot.claw.setClose();
             clawDelay = System.currentTimeMillis();
             cDelay = true;
@@ -382,7 +382,7 @@ public class teleop7 extends OpMode{
         }
 
         if (gamepad2.left_bumper && Button.BTN_LEVEL2.canPress(timestamp)){ // Lower Bucket
-            slowPower = 0.88f;
+            slowPower = 0.85f;
             robot.claw.setClose();
             clawOpen = false;
 
@@ -605,6 +605,7 @@ public class teleop7 extends OpMode{
 
         if (hSlideGoBottom) {
             if (!hlimitswitch.getState()) {
+                manualOut = false;
                 turnConstant = 1f;
                 robot.latch.setInit();
                 robot.claw.setOpen();
@@ -633,7 +634,7 @@ public class teleop7 extends OpMode{
         }
 
         //telemetry.addData("sensorF color", robot.sensorF.getColor());
-        telemetry.addData("time: ", temp);
+        //telemetry.addData("time: ", temp);
         //telemetry.addData("vslides R power", robot.vSlides.getPowerR());
         //telemetry.addData("vslides L power", robot.vSlides.getPowerL());
         //telemetry.addData("vslides limit", vlimitswitch.getState());
