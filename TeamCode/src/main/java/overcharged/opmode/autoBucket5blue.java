@@ -179,7 +179,7 @@ public class autoBucket5blue extends OpMode{
                         canScore = true;
                         doOnce = true;
                     }
-                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1.4) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 21 && canScore) {
+                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 1.4) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-845) < 21 && canScore) {
                         if (doOnce) {
                             doOnce = false;
                             thiTimer.reset();
@@ -376,7 +376,7 @@ public class autoBucket5blue extends OpMode{
                 }
                 break;
             case 1710:
-                if(pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 24){
+                if(pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-845) < 24){
                     robot.claw.setBig();
                     scored = true;
                     setPathState(172);
@@ -544,7 +544,7 @@ public class autoBucket5blue extends OpMode{
                     canScore = true;
                     runOnce = true;
                 }
-                if(pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 25){
+                if(pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-845) < 25){
                     if (runOnce) {
                         runOnce = false;
                         backDelay = true;

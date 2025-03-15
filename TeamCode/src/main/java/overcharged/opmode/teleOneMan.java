@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import overcharged.components.Button;
@@ -26,7 +27,7 @@ import overcharged.components.vSlides;
 
 
 @Config
-@TeleOp(name="solo tele", group="0Teleop")
+@TeleOp(name="solo tele", group="Teleop")
 public class teleOneMan extends OpMode{
 
     RobotMecanum robot;
@@ -43,6 +44,8 @@ public class teleOneMan extends OpMode{
     long hangDelay;
     long lastButtonPressTime = 0;
     final long debounceTime = 200;
+    long clearDelay = 0;
+    ElapsedTime temp;
 
     double slowPower = 1;
     float turnConstant = 1f;
@@ -118,44 +121,35 @@ public class teleOneMan extends OpMode{
             telemetry.addData("Init Failed", e.getMessage());
             telemetry.update();
         }
+        robot.setBulkReadAuto();
+        temp = new ElapsedTime();
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
     }
 
     public void loop(){
+        temp.reset();
         robot.clearBulkCache();
         long timestamp = System.currentTimeMillis();
 
-        if(!hang2 || !hang3) {
-            double y = gamepad1.left_stick_y;
-            double x = -gamepad1.left_stick_x * 1.1;
-            double rx = -gamepad1.right_stick_x * turnConstant;
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double y = gamepad1.left_stick_y;
+        double x = -gamepad1.left_stick_x * 1.1;
+        double rx = -gamepad1.right_stick_x * turnConstant;
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
-            double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
-            double backLeftPower = ((y - x + rx) / denominator) * slowPower;
-            double frontRightPower = ((y - x - rx) / denominator) * slowPower;
-            double backRightPower = ((y + x - rx) / denominator) * slowPower;
+        double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
+        double backLeftPower = ((y - x + rx) / denominator) * slowPower;
+        double frontRightPower = ((y - x - rx) / denominator) * slowPower;
+        double backRightPower = ((y + x - rx) / denominator) * slowPower;
 
-            robot.driveLeftFront.setPower(frontLeftPower);
-            robot.driveLeftBack.setPower(backLeftPower);
-            robot.driveRightFront.setPower(frontRightPower);
-            robot.driveRightBack.setPower(backRightPower);
-        }
-
-        if(slideHeight == slideHeight.HIGH1 | slideHeight == slideHeight.LOWER){
-            slowPower = 0.85f;
-        } else {
-            slowPower = 0.95f;
-        }
+        robot.driveLeftFront.setPower(frontLeftPower);
+        robot.driveLeftBack.setPower(backLeftPower);
+        robot.driveRightFront.setPower(frontRightPower);
+        robot.driveRightBack.setPower(backRightPower);
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
             robot.intakeTilt.setGoOut();
             robot.latch.setOut();
-            robot.depoWrist.setFlat();
-            robot.clawBigTilt.setFlat();
-            robot.intakeTilt.setGoOut();
-            robot.clawSmallTilt.setTranSeq();
             turnConstant = 0.55f;
             robot.hslides.moveEncoderTo(robot.hslides.SMALL_OUT,1f);
             robot.intake.in();
@@ -170,9 +164,9 @@ public class teleOneMan extends OpMode{
 
         if (manualOut) {
             float slidePower = -gamepad1.right_stick_y;
-            if (Math.abs(slidePower) > 0.65) {
+            if (Math.abs(slidePower) > 0.105) {
                 robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.hslides.hslides.setPower(slidePower*0.5f);
+                robot.hslides.hslides.setPower(slidePower*0.75f);
             } else {
                 robot.hslides.hslides.setPower(0);
             }
@@ -180,7 +174,6 @@ public class teleOneMan extends OpMode{
 
         if (gamepad1.left_bumper && Button.TRANSFER.canPress(timestamp)) {
             if (!intakeTransfer) {
-                robot.claw.setOpen();
                 clawOpen = true;
                 robot.intakeTilt.setTransfer();
                 intakeTransfer = true;
@@ -197,29 +190,22 @@ public class teleOneMan extends OpMode{
                 intakeTransfer = false;
             }
         }
-        /*
-        if (gamepad1.dpad_up && Button.TRANSFER.canPress(timestamp)) {
-            if (!intakeTransfer) {
-                robot.intakeTilt.setFlat();
-                if(hslideOut) {
-                    robot.intakeTilt.setInOut();
-                    intakeTiltDelay = System.currentTimeMillis();
-                    intTiltDelay = true;
-                }
-                else{
-                    robot.intakeTilt.setMid();
-                }
-                robot.intake.in();
-                intakeMode = IntakeMode.IN;
-                intakeTransfer = false;
-            }
-        } */
 
-        if (gamepad1.back){
+        if(clearDelay > 400){
+            robot.intakeTilt.setInOut();
+            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()-80, 1f);
+        }
+        if(clearDelay > 750){
+            robot.intakeTilt.setOut();
+            manualOut = true;
+            clearDelay = 0;
+        }
+
+        if (gamepad1.back && Button.INTAKEDOOR.canPress(timestamp)){
             canYellow = !canYellow;
         }
 
-        if (gamepad1.right_trigger > 0.9 && Button.INTAKE.canPress(timestamp)) {
+        if (gamepad1.right_trigger > 0.75 && Button.INTAKE.canPress(timestamp)) {
             if (intakeMode == IntakeMode.OFF ||intakeMode == IntakeMode.OUT) {
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
@@ -231,7 +217,7 @@ public class teleOneMan extends OpMode{
             }
         }
 
-        if(gamepad1.left_trigger > 0.9 && Button.INTAKEOUT.canPress(timestamp)){
+        if(gamepad1.left_trigger > 0.75&& Button.INTAKEOUT.canPress(timestamp)){
             sense = false;
             if(intakeMode == IntakeMode.OFF || intakeMode == IntakeMode.IN) {
                 robot.intake.out();
@@ -269,15 +255,14 @@ public class teleOneMan extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>90){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>70){
             robot.intakeTilt.setTransfer();
-            robot.intake.out();
+            robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>280){
-            robot.intakeTilt.setTransfer();
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>400){
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
@@ -312,40 +297,42 @@ public class teleOneMan extends OpMode{
 
         if(intakeMode == IntakeMode.IN && sense){
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
-                sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
                 transferNow();
+                sense = false;
                 hslideOut = false;
             }
             if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
-                sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
                 transferNow();
+                sense = false;
                 hslideOut = false;
             } else if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && !canYellow){
-                sense = false;
                 intakeMode = IntakeMode.OFF;
-                robot.intake.off();
+                robot.intake.out();
                 robot.trapdoor.setOut();
                 robot.intakeTilt.setFlat();
                 intakeOn = true;
+                manualOut = false;
                 intakeDelay = true;
+                sense = false;
                 outDelay = System.currentTimeMillis();
             }
             if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
-                sense = false;
                 intakeMode = IntakeMode.OFF;
-                robot.intake.off();
+                robot.intake.out();
                 robot.trapdoor.setOut();
                 robot.intakeTilt.setFlat();
                 intakeOn = true;
+                manualOut = false;
                 intakeDelay = true;
+                sense = false;
                 outDelay = System.currentTimeMillis();
             }
         }
@@ -362,20 +349,33 @@ public class teleOneMan extends OpMode{
             }
         }
 
-        if(gamepad1.dpad_up && Button.HIGH1.canPress(timestamp)){ //vSlides Up to Bucket
+        if(gamepad1.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
+            slowPower = 0.88f;
             robot.claw.setClose();
-            turnConstant = 0.75f;
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
+            turnConstant = 0.7f;
             clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
+        }
+        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 300){
+            cDelay= false;
+            clawDelay = 0;
             robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
             dDelay = true;
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad1.dpad_left && Button.BTN_MID.canPress(timestamp)){ // High Specimen
+        if(gamepad1.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             robot.claw.setClose();
             clawOpen = false;
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
             slideHeight = SlideHeight.MID;
+        }
+        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 300){
+            cDelay= false;
+            clawDelay = 0;
             vslideOut = true;
             dDelay = true;
             robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
@@ -387,6 +387,7 @@ public class teleOneMan extends OpMode{
             robot.vSlides.moveEncoderTo(robot.vSlides.wall, 1f);
             vslideOut = true;
             wallStep = 0;
+            robot.depoHslide.setInit();
             robot.claw.setClose();
             clawOpen = false;
             depoDelay = System.currentTimeMillis();
@@ -394,23 +395,32 @@ public class teleOneMan extends OpMode{
         }
 
         if(gamepad1.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
+            slowPower = 1f;
             robot.depoHslide.setInit();
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 vslideGoBottom = true;
                 robot.depoWrist.setTransfer();
                 robot.claw.setClose();
-                robot.intakeTilt.setFlat();
+                robot.intakeTilt.setInOut();
                 robot.clawBigTilt.setFlat();
                 robot.clawSmallTilt.setTranSeq();
 
                 resetDelay = System.currentTimeMillis();
                 resetStep++;
+            } else if (slideHeight == SlideHeight.MID){
+                vslideGoBottom = true;
+                robot.clawSmallTilt.setTransfer();
+                robot.depoWrist.setTransfer();
+                robot.clawBigTilt.setTransfer();
+
+                slideHeight = SlideHeight.DOWN;
+                resetDelay = System.currentTimeMillis();
+                dDelay = true;
             }
             else{
+                vslideGoBottom = true;
                 robot.depoWrist.setTransfer();
-                robot.clawSmallTilt.setTransfer();
                 robot.clawBigTilt.setTransfer();
-                robot.intakeTilt.setTransfer();
 
                 slideHeight = SlideHeight.DOWN;
                 resetDelay = System.currentTimeMillis();
@@ -436,6 +446,7 @@ public class teleOneMan extends OpMode{
         }
 
         if(hslideOut && System.currentTimeMillis()-manualDelay>500 && manualCheck){
+            robot.clawSmallTilt.setOut();
             manualCheck = false;
             manualDelay = 0;
             manualOut = true;
@@ -461,7 +472,7 @@ public class teleOneMan extends OpMode{
         }
 
 
-        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>620 && dDelay) { // Depo to Specimen
+        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>480 && dDelay) { // Depo to Specimen
             robot.claw.setSpec();
             robot.clawBigTilt.setOut();
             robot.depoWrist.setSpecimen();
@@ -473,24 +484,15 @@ public class teleOneMan extends OpMode{
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 30){
-            robot.claw.setClose();
-            clawOpen = false;
-        }
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 110){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 100){
             robot.intakeTilt.setInOut();
             robot.clawSmallTilt.setWall();
             robot.clawBigTilt.setFlat();
             robot.depoWrist.setFlat();
-
-            robot.depoHslide.setInit();
-
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
         if(wallStep==2 && System.currentTimeMillis() - depoDelay > 130){
-            robot.clawSmallTilt.setTranSeq();
-            robot.claw.setClose();
             clawOpen = false;
             robot.clawBigTilt.setWall();
             robot.depoWrist.setWall();
@@ -498,7 +500,7 @@ public class teleOneMan extends OpMode{
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 630){
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 640){
             robot.clawSmallTilt.setWall();
             robot.claw.setOpen();
             clawOpen = true;
@@ -507,15 +509,16 @@ public class teleOneMan extends OpMode{
         }
 
         //slide reset seq
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>120 && dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>260 && dDelay){
+            robot.intakeTilt.setTransfer();
+            robot.clawSmallTilt.setTransfer();
             robot.claw.setOpen();
             clawOpen = true;
-
-            vslideGoBottom = true;
             resetDelay =0;
             dDelay =false;
         }
-        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 240){
+
+        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 230){
             robot.clawSmallTilt.setTransfer();
             robot.clawBigTilt.setTransfer();
             robot.depoWrist.setTransfer();
@@ -525,7 +528,7 @@ public class teleOneMan extends OpMode{
             resetDelay = System.currentTimeMillis();
             resetStep++;
         }
-        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 470){
+        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 450){
             robot.intakeTilt.setTransfer();
             slideHeight = SlideHeight.DOWN;
 
@@ -534,23 +537,25 @@ public class teleOneMan extends OpMode{
         }
 
         if(intakeDelay && System.currentTimeMillis()-outDelay>20){
-            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 1f);
+            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 0.95f);
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>260){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>350){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>360){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>420){
             robot.intakeTilt.setOut();
             intakeDelay = false;
+            manualOut = true;
             sense = true;
             outDelay =0;
             intakeMode = IntakeMode.IN;
             robot.intake.in();
         }
 
+
+        /*
         //TODO: QoL functions
         if(gamepad1.ps && Button.BTN_REJECT.canPress(timestamp)){ //Force all reset
-            robot.pto.setInit();
             robot.latch.setOut();
             robot.claw.setOpen();
             robot.hslides.moveEncoderTo(500,1f);
@@ -570,54 +575,30 @@ public class teleOneMan extends OpMode{
             hslideOut = false;
             clawOpen = true;
             vslideGoBottom = true;
-        }
+        } */
 
-        //TODO: HANG
-        if(gamepad2.ps){
-            if(!ptoOn) {
-                robot.pto.setOut();
-                ptoOn = !ptoOn;
-            } else{
-                robot.pto.setInit();
-                ptoOn = !ptoOn;
+        if (hSlideGoBottom) {
+            if (!hlimitswitch.getState()) {
+                turnConstant = 1f;
+                robot.latch.setInit();
+                robot.claw.setOpen();
+                robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.hslides.hslides.setPower(-1f);
+            } else if (hlimitswitch.getState()) {
+                robot.intake.off();
+                intakeMode = IntakeMode.OFF;
+                robot.hslides.hslides.setPower(0);
+                robot.latch.setInit();
+                robot.intakeTilt.setTransfer();
+                robot.clawBigTilt.setTransfer();
+                robot.depoWrist.setTransfer();
+                robot.clawSmallTilt.setTransfer();
+                robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.hslides.hslides.resetPosition();
+                clawDelay = System.currentTimeMillis();
+                cDelay = true;
+                hSlideGoBottom = false;
             }
-        }
-        if(ptoOn){
-            robot.vSlides.vSlidesR.setPower(0);
-            robot.vSlides.vSlidesL.setPower(0);
-        }
-
-        if(gamepad2.back){
-            robot.smallHang.setOut();
-            robot.vSlides.moveEncoderTo(robot.vSlides.hang2, 1f);
-        }
-
-        if(gamepad2.left_stick_button){
-            robot.driveLeftFront.setPower(1f);
-            robot.driveLeftBack.setPower(1f);
-            robot.driveRightFront.setPower(1f);
-            robot.driveRightBack.setPower(1f);
-        }
-
-        if (!hlimitswitch.getState() && hSlideGoBottom) {
-            turnConstant = 1f;
-            robot.latch.setInit();
-            robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.hslides.hslides.setPower(-1f);
-        } else if (hlimitswitch.getState() && hSlideGoBottom) {
-            robot.intake.off();
-            intakeMode = IntakeMode.OFF;
-            robot.hslides.hslides.setPower(0);
-            robot.latch.setInit();
-            robot.intakeTilt.setTransfer();
-            robot.clawBigTilt.setTransfer();
-            robot.depoWrist.setTransfer();
-            robot.clawSmallTilt.setTransfer();
-            robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.hslides.hslides.resetPosition();
-            clawDelay = System.currentTimeMillis();
-            cDelay = true;
-            hSlideGoBottom = false;
         }
 
         if (vlimitswitch.getState()){
@@ -625,14 +606,15 @@ public class teleOneMan extends OpMode{
             robot.vSlides.vSlidesL.resetPosition();
         }
 
-        telemetry.addData("sensorF color", robot.sensorF.getColor());
-        telemetry.addData("vslides R power", robot.vSlides.getPowerR());
-        telemetry.addData("vslides L power", robot.vSlides.getPowerL());
-        telemetry.addData("vslides limit", vlimitswitch.getState());
-        telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
+        //telemetry.addData("sensorF color", robot.sensorF.getColor());
+        telemetry.addData("time: ", temp);
+        //telemetry.addData("vslides R power", robot.vSlides.getPowerR());
+        //telemetry.addData("vslides L power", robot.vSlides.getPowerL());
+        //telemetry.addData("vslides limit", vlimitswitch.getState());
+        //telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
         //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
         //telemetry.addData("Position trying to reach: ", slideHeight);
-        telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
+        //telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
 
     }
 
@@ -658,15 +640,10 @@ public class teleOneMan extends OpMode{
     public void transferNow(){
         manualOut = false;
         intakeOutDelay = true;
-        robot.clawBigTilt.setTransfer();
-        robot.intakeTilt.setTransfer();
-        robot.latch.setInit();
-        robot.depoWrist.setTransfer();
         outakeTime = System.currentTimeMillis();
         robot.intake.in();
         intakeMode = IntakeMode.IN;
         intakeTransfer = true;
-        robot.claw.setOpen();
         hSlideGoBottom = true;
     }
 
