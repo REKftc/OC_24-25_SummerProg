@@ -11,7 +11,8 @@ public class claw {
     // public static final float SPEC = 171f;//158f;
     public static final float CLOSE = 93f;//104f;//105f;
     public static final float SPEC = 93f;
-    public static final float HALF_CLOSE = 109f;//257f;//255f;
+    public static final float MORECLOSE = 90f;
+    public static final float HALF_CLOSE = 130f;//257f;//255f;
     public static final float OPEN = 140f;//149f;
     public static final float BIG = 160f;
 
@@ -30,6 +31,10 @@ public class claw {
     public void setClose() { claw.setPosition(CLOSE); }
 
     public void setSpec() {claw.setPosition(SPEC);}
+
+    public void setHalfClose() {claw.setPosition(HALF_CLOSE);}
+
+    public void setMoreClose() {claw.setPosition(MORECLOSE);}
 
     // public void setFlat() { intakeTilt.setPosition(SPEC); }
 
