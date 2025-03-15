@@ -95,10 +95,12 @@ public class autoRedSpecimenCurvedPath extends OpMode {
 
     private Follower follower;
 
+    int step = 0;
+
     //TODO: Starting from here are the poses for the paths
     public void firstSpecimen(){
         //beforeBucket = new Pose(-10,-10,Math.PI/4);
-        beforeSpecimen = new Pose(116,64,Math.PI);
+        beforeSpecimen = new Pose(114,64,Math.PI);
         // atSpecimen = new Pose(117,70,0);
         goForward = new Pose(130,64, Math.PI);
         backUp = new Pose(120,64, Math.PI);
@@ -117,16 +119,16 @@ public class autoRedSpecimenCurvedPath extends OpMode {
         thirdSample = new Pose(119,121, Math.PI);
         getThirdSample = new Pose(128,104, Math.PI);
         thirdScoreSide = new Pose(130,63, Math.PI);
-        thirdScore = new Pose(112,63, Math.PI);
+        thirdScore = new Pose(112,68, Math.PI);
         thirdScoreCloser = new Pose(128,90, Math.PI);
         fourthScoreSide = new Pose(132,63, Math.PI);
         fourthScore = new Pose(112,68, Math.PI);
         grabFourthSample = new Pose(128,93, Math.PI);//maybe this too 134 maybe
         fourthScoreCloserSide = new Pose(131,63, Math.PI);
-        fourthScoreCloser = new Pose(112,64, Math.PI);
+        fourthScoreCloser = new Pose(112,68, Math.PI);
         grabFifthSample = new Pose(128,90, Math.PI);
         scoreFifthSampleSide = new Pose(132,63, Math.PI);
-        scoreFifthSample = new Pose(112,63, Math.PI);
+        scoreFifthSample = new Pose(112,68, Math.PI);
         finalPark = new Pose(130,100, Math.PI);
 
 
@@ -216,7 +218,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(thirdScoreCloser),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(133.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 68.000, Point.CARTESIAN),
                         new Point(fourthScore)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -229,7 +231,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(grabFourthSample),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(133.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 68.000, Point.CARTESIAN),
                         new Point(fourthScoreCloser)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
@@ -268,29 +270,41 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 pathTimer.reset();
                 robot.depoHslide.setOut();
                 follower.followPath(preload);
-                robot.vSlides.moveEncoderTo(robot.vSlides.mid+20, 1);
+                robot.vSlides.moveEncoderTo(robot.vSlides.mid+30, 1);
                 robot.clawBigTilt.setOut();
                 robot.depoWrist.setSpecimen();
                 robot.clawSmallTilt.setFlat();
+                step=1;
                 setPathState(11);
                 break;
             case 11: //backs away
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(beforeSpecimen)), Math.toRadians(180));
                     robot.claw.setOpen();
-                    waitFor(100);
-                    robot.depoHslide.setInit();
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(redPark);
-                    waitFor(100);
-                   // robot.depoWrist.setIn();
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.depoWrist.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.intakeTilt.setHigher();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(12);
+                    if(pathTimer.milliseconds() > 800 & step == 2) {
+                        robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1);
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.claw.setClose();
+                        robot.clawBigTilt.setWall();
+                        robot.depoWrist.setWall();
+                        robot.clawSmallTilt.setWall();
+                        step++;
+                    }
+
+                    if(pathTimer.milliseconds() > 1800 & step == 4) {
+                        robot.claw.setOpen();
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(12);
+                    }
                 }
                 break;
             case 12: //goes a little in front and to the side of first sample
@@ -399,6 +413,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
                     robot.claw.setClose();
+                    waitFor(200);
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(27);
                 }
@@ -406,13 +421,14 @@ public class autoRedSpecimenCurvedPath extends OpMode {
             case 27: //brings slides up
                 if(!follower.isBusy()) {
                     follower.followPath(scoreSample3);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+35, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
                     robot.depoHslide.setOut();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
+                    step=1;
                     setPathState(28);
                 }
                 break;
@@ -421,22 +437,36 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(thirdScore)), Math.toRadians(179));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
-                    robot.depoHslide.setInit();
-                    waitFor(100);
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(scoredSample3);
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.depoWrist.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(29);
+                    if(pathTimer.milliseconds() > 800 & step == 2) {
+                        robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1);
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.claw.setClose();
+                        robot.clawBigTilt.setWall();
+                        robot.depoWrist.setWall();
+                        robot.clawSmallTilt.setWall();
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1800 & step == 4) {
+                        robot.claw.setOpen();
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(29);
+                    }
                 }
                 break;
             case 29:
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(thirdScoreCloser)), Math.toRadians(180));
                     robot.claw.setClose();
+                    waitFor(200);
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(30);
                 }
@@ -444,13 +474,14 @@ public class autoRedSpecimenCurvedPath extends OpMode {
             case 30:
                 if(!follower.isBusy()) {
                     follower.followPath(scoreSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
                     robot.depoHslide.setOut();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
+                    step=1;
                     setPathState(31);
                 }
                 break;
@@ -459,22 +490,36 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(fourthScore)), Math.toRadians(180));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
-                    robot.depoHslide.setInit();
-                    waitFor(100);
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(grabSample4);
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.depoWrist.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(32);
+                    if(pathTimer.milliseconds() > 800 & step == 2) {
+                        robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1);
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.claw.setClose();
+                        robot.clawBigTilt.setWall();
+                        robot.depoWrist.setWall();
+                        robot.clawSmallTilt.setWall();
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1800 & step == 4) {
+                        robot.claw.setOpen();
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(32);
+                    }
                 }
                 break;
             case 32:
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(grabFourthSample)), Math.toRadians(180));
                     robot.claw.setClose();
+                    waitFor(200);
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(33);
                 }
@@ -482,13 +527,14 @@ public class autoRedSpecimenCurvedPath extends OpMode {
             case 33:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredSample4);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
                     robot.depoHslide.setOut();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
+                    step=1;
                     setPathState(34);
                 }
                 break;
@@ -497,22 +543,36 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(fourthScoreCloser)), Math.toRadians(180));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
-                    robot.depoHslide.setInit();
-                    waitFor(100);
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(getFifthSample);
-                    robot.claw.setOpen();
-                    robot.clawBigTilt.setWall();
-                    robot.depoWrist.setWall();
-                    robot.clawSmallTilt.setWall();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(35);
+                    if(pathTimer.milliseconds() > 800 & step == 2) {
+                        robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1);
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.claw.setClose();
+                        robot.clawBigTilt.setWall();
+                        robot.depoWrist.setWall();
+                        robot.clawSmallTilt.setWall();
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1800 & step == 4) {
+                        robot.claw.setOpen();
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(35);
+                    }
                 }
                 break;
             case 35:
                 if(!follower.isBusy()) {
                     follower.holdPoint(new BezierPoint(new Point(grabFifthSample)), Math.toRadians(180));
                     robot.claw.setClose();
+                    waitFor(200);
                     robot.vSlides.moveEncoderTo(80, 1f);
                     setPathState(36);
                 }
@@ -520,13 +580,14 @@ public class autoRedSpecimenCurvedPath extends OpMode {
             case 36:
                 if(!follower.isBusy()) {
                     follower.followPath(scoredFifthSample);
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
                     robot.claw.setClose();
                     robot.clawBigTilt.setOut();
                     robot.depoWrist.setSpecimen();
                     robot.depoHslide.setOut();
                     waitFor(300);
                     robot.clawSmallTilt.setFlat();
+                    step=1;
                     setPathState(37);
                 }
                 break;
@@ -535,16 +596,26 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                     follower.holdPoint(new BezierPoint(new Point(scoreFifthSample)), Math.toRadians(180));
                     robot.claw.setOpen();
                     //follower.holdPoint(new BezierPoint(new Point(getThirdSample)), Math.toRadians(180));
-                    robot.depoHslide.setInit();
-                    waitFor(100);
+                    if(pathTimer.milliseconds() > 300 & step == 1) {
+                        robot.depoHslide.setInit();
+                        step++;
+                    }
                     follower.followPath(endPark);
-                    robot.claw.setOpen();
-                    robot.depoWrist.setTransfer();
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
-                    robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
-                    vslideGoBottom = true;
-                    setPathState(100);
+                    if(pathTimer.milliseconds() > 800 & step == 2) {
+                        robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1);
+                        vslideGoBottom = true;
+                        step++;
+                    }
+                    if(pathTimer.milliseconds() > 1600 & step == 3) {
+                        robot.intakeTilt.setInOut();
+                        robot.claw.setOpen();
+                        robot.depoWrist.setTransfer();
+                        robot.clawBigTilt.setTransfer();
+                        robot.clawSmallTilt.setTransfer();
+                        step = 0;
+                        pathTimer.reset();
+                        setPathState(100);
+                    }
                 }
                 break;
 
