@@ -180,7 +180,7 @@ public class autoBucket5_135 extends OpMode{
                         nowDelay = false;
                         doOnce = true;
                     }
-                    if (follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 2.05) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 18 && canScore) {
+                    if ((follower.getPose().getX() > (ready2Score.getX() - 1) && follower.getPose().getY() > (ready2Score.getY() - 2.05) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 18 && canScore)|| pathTimer.milliseconds()>8000) {
                         if (doOnce) {
                             doOnce = false;
                             canScore = false;
@@ -211,6 +211,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 if (broken){
                     robot.latch.setOut();
+                    hSlideGoBottom = false;
                     robot.hslides.moveEncoderTo(robot.hslides.SMALL, 1f);
                     robot.intakeTilt.setOut();
                     if (doOnce){
@@ -343,22 +344,22 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 170:
-                    //vslide up delay
-                    if (pathTimer.milliseconds()>200 && nowDelay) {
-                        if (runOnce) {
-                            runOnce = false;
-                            nowDelay = false;
-                            robot.intakeTilt.setFlat();
-                            robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
-                            s2Delay = true;
-                        }
+                //vslide up delay
+                if (pathTimer.milliseconds()>200 && nowDelay) {
+                    if (runOnce) {
+                        runOnce = false;
+                        nowDelay = false;
+                        robot.intakeTilt.setFlat();
+                        robot.vSlides.moveEncoderTo(robot.vSlides.autohigh1, 1f);
+                        s2Delay = true;
                     }
-                    if (s2Delay && robot.vSlides.vSlidesL.getCurrentPosition()>470) {
-                        s2Delay = false;
-                        robot.clawBigTilt.setBucket();
-                        robot.depoWrist.setBucket();
-                        setPathState(171);
-                    }
+                }
+                if (s2Delay && robot.vSlides.vSlidesL.getCurrentPosition()>470) {
+                    s2Delay = false;
+                    robot.clawBigTilt.setBucket();
+                    robot.depoWrist.setBucket();
+                    setPathState(171);
+                }
 
 
                 break;
@@ -372,7 +373,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 break;
             case 1710:
-                if(pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 18){
+                if((pathTimer.milliseconds() > 200 && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 1.8) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 18)|| pathTimer.milliseconds()>5000){
                     if (runOnce) {
                         runOnce = false;
                         robot.latch.setOut();
@@ -578,7 +579,7 @@ public class autoBucket5_135 extends OpMode{
                     canScore = true;
                     runOnce = true;
                 }
-                if(pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 2.0) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 15){
+                if((pathTimer.milliseconds()>200 && canScore && follower.getPose().getX() > (wallScore.getX() - 1.2) && follower.getPose().getY() > (wallScore.getY() - 2.0) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-805) < 15)|| pathTimer.milliseconds()>8000){
                     if (runOnce) {
                         runOnce = false;
                         backDelay = true;
@@ -639,7 +640,7 @@ public class autoBucket5_135 extends OpMode{
         telemetry.addLine("Position: " + follower.getPose());
         telemetry.addLine("heading: " + follower.getTotalHeading());
 
-        telemetry.addLine("Vslide pos: " + robot.vSlides.vSlidesL.getCurrentPosition());
+        //telemetry.addLine("Vslide pos: " + robot.vSlides.vSlidesL.getCurrentPosition());
         //telemetry.addLine("Straight encoder: ");
         //telemetry.addLine("color: "+robot.sensorF.getColor());
         //telemetry.addLine("vLimit" + vlimitswitch.getState());

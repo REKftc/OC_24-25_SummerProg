@@ -120,7 +120,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
         thirdScore = new Pose(112,63, Math.PI);
         thirdScoreCloser = new Pose(128,90, Math.PI);
         fourthScoreSide = new Pose(132,63, Math.PI);
-        fourthScore = new Pose(112,64, Math.PI);
+        fourthScore = new Pose(112,68, Math.PI);
         grabFourthSample = new Pose(128,93, Math.PI);//maybe this too 134 maybe
         fourthScoreCloserSide = new Pose(131,63, Math.PI);
         fourthScoreCloser = new Pose(112,64, Math.PI);
@@ -203,7 +203,7 @@ public class autoRedSpecimenCurvedPath extends OpMode {
                 .addPath(new BezierCurve(
                         new Point(getThirdSample),
                         new Point(133.000, 94.000, Point.CARTESIAN),
-                        new Point(133.000, 64.000, Point.CARTESIAN),
+                        new Point(133.000, 68.000, Point.CARTESIAN),
                         new Point(thirdScore)))
                 .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                 .setZeroPowerAccelerationMultiplier(3.25)
