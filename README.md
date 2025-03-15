@@ -492,7 +492,7 @@ This is a bug fix only release to address the following four issues.
 * Fixes bug that caused blocks for DcMotorEx to be omitted from the blocks editor toolbox.
 * Fixes [Blocks Programs Stripped of Blocks (due to using TensorFlow Label block)](https://ftcforum.firstinspires.org/forum/ftc-technology/blocks-programming/87035-blocks-programs-stripped-of-blocks)
 
-## Version 7.1 (20211223-120805)
+## Version 7.1 (20211223-120845)
 
 * Fixes crash when calling `isPwmEnabled()` ([issue #223](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/233)).
 * Fixes lint error ([issue #4](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/4)).
