@@ -373,7 +373,7 @@ public class teleMirror extends OpMode{
             clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
         }
-        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 300){
+        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 400){
             cDelay= false;
             clawDelay = 0;
             robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
@@ -400,7 +400,7 @@ public class teleMirror extends OpMode{
             cDelay = true;
             slideHeight = SlideHeight.MID;
         }
-        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 300){
+        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 400){
             cDelay= false;
             clawDelay = 0;
             vslideOut = true;

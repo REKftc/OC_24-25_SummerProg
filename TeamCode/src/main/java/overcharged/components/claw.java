@@ -9,12 +9,12 @@ public class claw {
     public static final float INIT = 140f;
     // public static final float TRANSFER = 70f;//175f;
     // public static final float SPEC = 171f;//158f;
-    public static final float CLOSE = 93f;//104f;//105f;
+    public static final float CLOSE = 102f;//104f;//105f;
     public static final float SPEC = 93f;
     public static final float MORECLOSE = 90f;
     public static final float HALF_CLOSE = 130f;//257f;//255f;
-    public static final float OPEN = 140f;//149f;
-    public static final float BIG = 160f;
+    public static final float OPEN = 165f;//149f;
+    public static final float BIG = 171f;
 
 
     public claw(HardwareMap hardwareMap) {
