@@ -1,9 +1,6 @@
 package overcharged.components;
 
-import static overcharged.config.RobotConstants.TAG_R;
-
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,8 +34,7 @@ public class RobotMecanum {
     public latch latch;
     public trapdoor trapdoor;
     public vSlides vSlides;
-    public clawSmallTilt clawSmallTilt;
-    public clawBigTilt clawBigTilt;
+    public depoTilt depoTilt;
     public claw claw;
     public depoWrist depoWrist;
     public depoHslide depoHslide;
@@ -150,14 +146,7 @@ public class RobotMecanum {
             numberMissing++;
         }
         try {
-            clawSmallTilt = new clawSmallTilt(hardwareMap);
-        } catch (Exception e){
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: clawSmallTilt " + e.getMessage());
-            missing = missing + ", clawSmallTilt";
-            numberMissing++;
-        }
-        try {
-            clawBigTilt = new clawBigTilt(hardwareMap);
+            depoTilt = new depoTilt(hardwareMap);
         } catch (Exception e){
             RobotLog.ee(RobotConstants.TAG_R,  "missing: clawBigTilt " + e.getMessage());
             missing = missing + ", clawBigTilt";

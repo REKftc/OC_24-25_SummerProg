@@ -6,15 +6,15 @@ public class claw {
     //public OcServo intakeTilt;
     public OcServo claw;
     //public VoltageSensor intakeVolt;
-    public static final float INIT = 140f;
-    // public static final float TRANSFER = 70f;//175f;
-    // public static final float SPEC = 171f;//158f;
-    public static final float CLOSE = 102f;//104f;//105f;
+    public static final float INIT = 159f;
+    // public static final float TRANSFERL = 70f;//175f;
+    // public static final float SPECR = 171f;//158f;
+    public static final float CLOSE = 104f;//104f;//105f;
     public static final float SPEC = 93f;
     public static final float MORECLOSE = 90f;
     public static final float HALF_CLOSE = 130f;//257f;//255f;
-    public static final float OPEN = 165f;//149f;
-    public static final float BIG = 171f;
+    public static final float OPEN = 196f;//149f;
+    public static final float BIG = 206f;
 
 
     public claw(HardwareMap hardwareMap) {
@@ -36,7 +36,7 @@ public class claw {
 
     public void setMoreClose() {claw.setPosition(MORECLOSE);}
 
-    // public void setFlat() { intakeTilt.setPosition(SPEC); }
+    // public void setFlat() { intakeTilt.setPosition(SPECR); }
 
     public void setOpen() { claw.setPosition(OPEN); }
 

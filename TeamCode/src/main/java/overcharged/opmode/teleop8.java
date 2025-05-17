@@ -3,6 +3,8 @@ package overcharged.opmode;
 import static overcharged.config.RobotConstants.TAG_SL;
 import static overcharged.config.RobotConstants.TAG_T;
 
+import android.transition.Slide;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import overcharged.components.Button;
@@ -24,8 +27,8 @@ import overcharged.components.vSlides;
 
 
 @Config
-@TeleOp(name="new tele red", group="0Teleop")
-public class teleop6 extends OpMode{
+@TeleOp(name="turntable red", group="!!Teleop")
+public class teleop7 extends OpMode{
 
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -39,6 +42,10 @@ public class teleop6 extends OpMode{
     long manualDelay;
     long outDelay;
     long hangDelay;
+    long lastButtonPressTime = 0;
+    final long debounceTime = 200;
+    long clearDelay = 0;
+    ElapsedTime temp;
 
     double slowPower = 1;
     float turnConstant = 1f;
@@ -60,9 +67,11 @@ public class teleop6 extends OpMode{
     boolean manualOut = false;
     boolean sense = false;
     boolean manualCheck = false;
-    boolean trapOnce = false;
+    boolean trapOnce = true;
     boolean hangSeq = false;
     boolean runLeft = false;
+    boolean ptoOn = false;
+    boolean canYellow = true;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -112,42 +121,36 @@ public class teleop6 extends OpMode{
             telemetry.addData("Init Failed", e.getMessage());
             telemetry.update();
         }
+        robot.setBulkReadAuto();
+        temp = new ElapsedTime();
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
     }
 
     public void loop(){
+        temp.reset();
         robot.clearBulkCache();
         long timestamp = System.currentTimeMillis();
 
-        if(!hang2 || !hang3) {
-            double y = gamepad1.left_stick_y;
-            double x = -gamepad1.left_stick_x * 1.1;
-            double rx = -gamepad1.right_stick_x * turnConstant;
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double y = gamepad1.left_stick_y;
+        double x = -gamepad1.left_stick_x * 1.1;
+        double rx = -gamepad1.right_stick_x * turnConstant;
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
-            double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
-            double backLeftPower = ((y - x + rx) / denominator) * slowPower;
-            double frontRightPower = ((y - x - rx) / denominator) * slowPower;
-            double backRightPower = ((y + x - rx) / denominator) * slowPower;
+        double frontLeftPower = ((y + x + rx) / denominator) * slowPower;
+        double backLeftPower = ((y - x + rx) / denominator) * slowPower;
+        double frontRightPower = ((y - x - rx) / denominator) * slowPower;
+        double backRightPower = ((y + x - rx) / denominator) * slowPower;
 
-            robot.driveLeftFront.setPower(frontLeftPower);
-            robot.driveLeftBack.setPower(backLeftPower);
-            robot.driveRightFront.setPower(frontRightPower);
-            robot.driveRightBack.setPower(backRightPower);
-        }
-
-        if(slideHeight == slideHeight.HIGH1 | slideHeight == slideHeight.LOWER){
-            slowPower = 0.9f;
-        } else {
-            slowPower = 1f;
-        }
+        robot.driveLeftFront.setPower(frontLeftPower);
+        robot.driveLeftBack.setPower(backLeftPower);
+        robot.driveRightFront.setPower(frontRightPower);
+        robot.driveRightBack.setPower(backRightPower);
 
         if(gamepad1.right_bumper && Button.SLIDE_RESET.canPress(timestamp)){
             robot.intakeTilt.setGoOut();
-            robot.clawBigTilt.setSlides();
             robot.latch.setOut();
-            turnConstant = 0.50f;
+            turnConstant = 0.55f;
             robot.hslides.moveEncoderTo(robot.hslides.SMALL_OUT,1f);
             robot.intake.in();
             intakeMode = IntakeMode.IN;
@@ -156,14 +159,13 @@ public class teleop6 extends OpMode{
             manualDelay = System.currentTimeMillis();
             hslideOut = true;
             manualCheck = true;
-
         }
 
         if (manualOut) {
             float slidePower = -gamepad1.right_stick_y;
-            if (Math.abs(slidePower) > 0.65) {
+            if (Math.abs(slidePower) > 0.105) {
                 robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                robot.hslides.hslides.setPower(slidePower*0.5f);
+                robot.hslides.hslides.setPower(slidePower*0.8f);
             } else {
                 robot.hslides.hslides.setPower(0);
             }
@@ -171,7 +173,6 @@ public class teleop6 extends OpMode{
 
         if (gamepad1.left_bumper && Button.TRANSFER.canPress(timestamp)) {
             if (!intakeTransfer) {
-                robot.claw.setOpen();
                 clawOpen = true;
                 robot.intakeTilt.setTransfer();
                 intakeTransfer = true;
@@ -180,38 +181,45 @@ public class teleop6 extends OpMode{
                     cDelay = true;
                 }
             } else {
-                if(hslideOut) {
-                    robot.intakeTilt.setOut();
-                    intakeTiltDelay = System.currentTimeMillis();
-                    intTiltDelay = true;
-                }
-                else{
-                    robot.intakeTilt.setInOut();
-                }
+                robot.intakeTilt.setOut();
+                intakeTiltDelay = System.currentTimeMillis();
+                intTiltDelay = true;
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
                 intakeTransfer = false;
             }
         }
 
-        if (gamepad1.dpad_up && Button.TRANSFER.canPress(timestamp)) {
-            if (!intakeTransfer) {
-                robot.intakeTilt.setFlat();
-                if(hslideOut) {
-                    robot.intakeTilt.setInOut();
-                    intakeTiltDelay = System.currentTimeMillis();
-                    intTiltDelay = true;
-                }
-                else{
-                    robot.intakeTilt.setMid();
-                }
-                robot.intake.in();
-                intakeMode = IntakeMode.IN;
-                intakeTransfer = false;
+        if (gamepad1.b && Button.BTN_SLIDE_OUT.canPress(timestamp)) {
+            if (manualOut){
+                manualOut = false;
+                robot.intakeTilt.setOut();
+                robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+80, 1f);
+                clearDelay = System.currentTimeMillis();
+            } else{
+                robot.latch.setOut();
+                robot.hslides.moveEncoderTo(robot.hslides.PRESET1, 1f);
+                hslideOut = true;
+                sense = true;
+                clearDelay = System.currentTimeMillis();
             }
         }
 
-        if (gamepad1.right_trigger > 0.9 && Button.INTAKE.canPress(timestamp)) {
+        if(clearDelay > 400){
+            robot.intakeTilt.setInOut();
+            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()-80, 1f);
+        }
+        if(clearDelay > 750){
+            robot.intakeTilt.setOut();
+            manualOut = true;
+            clearDelay = 0;
+        }
+
+        if (gamepad1.back && Button.INTAKEDOOR.canPress(timestamp)){
+            canYellow = !canYellow;
+        }
+
+        if (gamepad1.right_trigger > 0.75 && Button.INTAKE.canPress(timestamp)) {
             if (intakeMode == IntakeMode.OFF ||intakeMode == IntakeMode.OUT) {
                 robot.intake.in();
                 intakeMode = IntakeMode.IN;
@@ -222,7 +230,8 @@ public class teleop6 extends OpMode{
                 sense = false;
             }
         }
-        if(gamepad1.left_trigger > 0.9 && Button.INTAKEOUT.canPress(timestamp)){
+
+        if(gamepad1.left_trigger > 0.75&& Button.INTAKEOUT.canPress(timestamp)){
             sense = false;
             if(intakeMode == IntakeMode.OFF || intakeMode == IntakeMode.IN) {
                 robot.intake.out();
@@ -234,16 +243,8 @@ public class teleop6 extends OpMode{
             }
         }
 
-        if(gamepad1.x) {
-            if(trapOnce) {
-                trapOnce = false;
-                robot.trapdoor.setOut();
-            }
-        } else {
-            if(!trapOnce) {
-                robot.trapdoor.setInit();
-                trapOnce = true;
-            }
+        if (gamepad1.x || gamepad2.right_bumper) { //TODO: fast outtake
+            //placeholder
         }
 
         if(gamepad1.y && Button.TRANSFER.canPress(timestamp)){
@@ -258,27 +259,23 @@ public class teleop6 extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>40){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>70){
             robot.intakeTilt.setTransfer();
-            robot.intake.out();
+            robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>270){
-            robot.intakeTilt.setTransfer();
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>400){
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
         }
 
-
         if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>90){ // Transfer System
             cDelay = false;
-            robot.depoWrist.setIn();
-            robot.clawBigTilt.setTransfer();
-            robot.clawSmallTilt.setTransfer();
+            robot.depoTilt.setTransfer();
             transferStep = 0;
             transferStep++;
             clawDelay = System.currentTimeMillis();
@@ -302,31 +299,42 @@ public class teleop6 extends OpMode{
 
         if(intakeMode == IntakeMode.IN && sense){
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
-                sense = false;
                 intakeOn = false;
                 robot.trapdoor.setInit();
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
                 transferNow();
+                sense = false;
                 hslideOut = false;
             }
-            if (robot.sensorF.getColor() == colorSensor.Color.YELLOW){
-                sense = false;
+            if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
                 intakeOn = false;
                 robot.trapdoor.setInit();
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
                 transferNow();
-                hslideOut = false;
-            }
-            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 sense = false;
+                hslideOut = false;
+            } else if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && !canYellow){
                 intakeMode = IntakeMode.OFF;
-                robot.intake.off();
+                robot.intake.out();
                 robot.trapdoor.setOut();
                 robot.intakeTilt.setFlat();
                 intakeOn = true;
+                manualOut = false;
                 intakeDelay = true;
+                sense = false;
+                outDelay = System.currentTimeMillis();
+            }
+            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+                intakeMode = IntakeMode.OFF;
+                robot.intake.out();
+                robot.trapdoor.setOut();
+                robot.intakeTilt.setFlat();
+                intakeOn = true;
+                manualOut = false;
+                intakeDelay = true;
+                sense = false;
                 outDelay = System.currentTimeMillis();
             }
         }
@@ -343,16 +351,25 @@ public class teleop6 extends OpMode{
             }
         }
 
-        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)){ //vSlides Up to Bucket
+        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
+            slowPower = 0.82f;
             robot.claw.setClose();
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
+            turnConstant = 0.7f;
             clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
+        }
+        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 400){
+            cDelay= false;
+            clawDelay = 0;
             robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
             dDelay = true;
             depoDelay = System.currentTimeMillis();
         }
 
         if (gamepad2.left_bumper && Button.BTN_LEVEL2.canPress(timestamp)){ // Lower Bucket
+            slowPower = 0.82f;
             robot.claw.setClose();
             clawOpen = false;
 
@@ -363,10 +380,16 @@ public class teleop6 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)){ // High Specimen
+        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             robot.claw.setClose();
             clawOpen = false;
+            clawDelay = System.currentTimeMillis();
+            cDelay = true;
             slideHeight = SlideHeight.MID;
+        }
+        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 400){
+            cDelay= false;
+            clawDelay = 0;
             vslideOut = true;
             dDelay = true;
             robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
@@ -378,6 +401,7 @@ public class teleop6 extends OpMode{
             robot.vSlides.moveEncoderTo(robot.vSlides.wall, 1f);
             vslideOut = true;
             wallStep = 0;
+            robot.depoHslide.setInit();
             robot.claw.setClose();
             clawOpen = false;
             depoDelay = System.currentTimeMillis();
@@ -385,23 +409,27 @@ public class teleop6 extends OpMode{
         }
 
         if(gamepad2.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
+            slowPower = 1f;
             robot.depoHslide.setInit();
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 vslideGoBottom = true;
-                robot.depoWrist.setIn();
                 robot.claw.setClose();
-                robot.intakeTilt.setFlat();
-                robot.clawBigTilt.setFlat();
-                robot.clawSmallTilt.setTranSeq();
+                robot.intakeTilt.setInOut();
+                robot.depoTilt.setFlat();
 
                 resetDelay = System.currentTimeMillis();
                 resetStep++;
+            } else if (slideHeight == SlideHeight.MID){
+                vslideGoBottom = true;
+                robot.depoTilt.setTransfer();
+
+                slideHeight = SlideHeight.DOWN;
+                resetDelay = System.currentTimeMillis();
+                dDelay = true;
             }
             else{
-                robot.depoWrist.setIn();
-                robot.clawSmallTilt.setTransfer();
-                robot.clawBigTilt.setTransfer();
-                robot.intakeTilt.setTransfer();
+                vslideGoBottom = true;
+                robot.depoTilt.setTransfer();
 
                 slideHeight = SlideHeight.DOWN;
                 resetDelay = System.currentTimeMillis();
@@ -427,6 +455,7 @@ public class teleop6 extends OpMode{
         }
 
         if(hslideOut && System.currentTimeMillis()-manualDelay>500 && manualCheck){
+            robot.depoTilt.setOut();
             manualCheck = false;
             manualDelay = 0;
             manualOut = true;
@@ -435,8 +464,8 @@ public class teleop6 extends OpMode{
         // Bucket(High & Low) sequence
         if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>290 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>290 &dDelay) { // Depo to Bucket
             vslideOut = true;
-            robot.depoWrist.setOut();
-            robot.clawSmallTilt.setOut();
+
+            robot.depoTilt.setOut();
             robot.depoHslide.setInit();
             score = ScoreType.BUCKET;
             bucketSeq = true;
@@ -446,46 +475,32 @@ public class teleop6 extends OpMode{
         if (bucketSeq && slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>130 || bucketSeq && slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>100){
             bucketSeq = false;
             depoDelay = 0;
-            robot.clawBigTilt.setBucket();
             robot.intakeTilt.setTransfer();
         }
 
 
-        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>620 && dDelay) { // Depo to Specimen
+        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>480 && dDelay) { // Depo to Specimen
             robot.claw.setSpec();
-            robot.clawBigTilt.setOut();
+            robot.depoTilt.setOut();
             robot.depoHslide.setOut();
-            robot.clawSmallTilt.setFlat();
             score = ScoreType.SPECIMEN;
             depoDelay = 0;
             dDelay = false;
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 30){
-            robot.claw.setClose();
-            clawOpen = false;
-        }
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 110){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 100){
             robot.intakeTilt.setInOut();
-            robot.clawSmallTilt.setWall();
-            robot.clawBigTilt.setFlat();
-            robot.depoHslide.setInit();
-
+            robot.depoTilt.setWall();
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
         if(wallStep==2 && System.currentTimeMillis() - depoDelay > 130){
-            robot.clawSmallTilt.setTranSeq();
-            robot.claw.setClose();
             clawOpen = false;
-            robot.clawBigTilt.setWall();
-
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 630){
-            robot.clawSmallTilt.setWall();
+        if(wallStep==3 && System.currentTimeMillis() - depoDelay > 640){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -493,24 +508,24 @@ public class teleop6 extends OpMode{
         }
 
         //slide reset seq
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>120 && dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>260 && dDelay){
+            robot.intakeTilt.setTransfer();
+            robot.depoTilt.setTransfer();
             robot.claw.setOpen();
             clawOpen = true;
-
-            vslideGoBottom = true;
             resetDelay =0;
             dDelay =false;
         }
-        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 240){
-            robot.clawSmallTilt.setTransfer();
-            robot.clawBigTilt.setTransfer();
+
+        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 230){
+            robot.depoTilt.setTransfer();
             robot.claw.setOpen();
             clawOpen = true;
 
             resetDelay = System.currentTimeMillis();
             resetStep++;
         }
-        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 470){
+        if(resetStep==2 && System.currentTimeMillis() - resetDelay > 450){
             robot.intakeTilt.setTransfer();
             slideHeight = SlideHeight.DOWN;
 
@@ -518,43 +533,71 @@ public class teleop6 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>240){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>20){
+            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 0.95f);
+        }
+        if(intakeDelay && System.currentTimeMillis()-outDelay>350){
             robot.trapdoor.setInit();
         }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>380){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>420){
             robot.intakeTilt.setOut();
             intakeDelay = false;
+            manualOut = true;
             sense = true;
             outDelay =0;
             intakeMode = IntakeMode.IN;
             robot.intake.in();
         }
 
-        if (!hlimitswitch.getState() && hSlideGoBottom) {
-            turnConstant = 1f;
-            robot.latch.setInit();
-            robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.hslides.hslides.setPower(-1f);
-        } else if (hlimitswitch.getState() && hSlideGoBottom) {
-            robot.intake.off();
-            intakeMode = IntakeMode.OFF;
-            robot.hslides.hslides.setPower(0);
-            robot.latch.setInit();
-            robot.intakeTilt.setTransfer();
-            robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            clawDelay = System.currentTimeMillis();
-            cDelay = true;
-            hSlideGoBottom = false;
+        if (hSlideGoBottom) {
+            if (!hlimitswitch.getState()) {
+                manualOut = false;
+                turnConstant = 1f;
+                robot.latch.setInit();
+                robot.claw.setOpen();
+                robot.hslides.hslides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.hslides.hslides.setPower(-1f);
+            } else if (hlimitswitch.getState()) {
+                robot.intake.off();
+                intakeMode = IntakeMode.OFF;
+                robot.hslides.hslides.setPower(0);
+                robot.latch.setInit();
+                robot.intakeTilt.setTransfer();
+                robot.depoTilt.setTransfer();
+                robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                robot.hslides.hslides.resetPosition();
+                clawDelay = System.currentTimeMillis();
+                cDelay = true;
+                hSlideGoBottom = false;
+            }
         }
-        telemetry.addData("sensorF color", robot.sensorF.getColor());
+
+        /*
+        if (vlimitswitch.getState()){
+            robot.vSlides.vSlidesR.resetPosition();
+            robot.vSlides.vSlidesL.resetPosition();
+        } */
+
+        //telemetry.addData("sensorF color", robot.sensorF.getColor());
+        //telemetry.addData("time: ", temp);
+        //telemetry.addData("vslides R power", robot.vSlides.getPowerR());
+        //telemetry.addData("vslides L power", robot.vSlides.getPowerL());
+        //telemetry.addData("vslides limit", vlimitswitch.getState());
+        //telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
+        //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        //telemetry.addData("Position trying to reach: ", slideHeight);
+        //telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
+
     }
+
 
     public void slideBottom() { //Slide bottom
         if (!vlimitswitch.getState() && vslideGoBottom) {
+            turnConstant = 1f;
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-1f);
-            robot.vSlides.vSlidesL.setPower(-1f);
+            robot.vSlides.vSlidesR.setPower(-0.6f);
+            robot.vSlides.vSlidesL.setPower(-0.6f);
         } else if (vlimitswitch.getState() && vslideGoBottom) {
             robot.vSlides.vSlidesR.setPower(0);
             robot.vSlides.vSlidesL.setPower(0);
@@ -569,15 +612,10 @@ public class teleop6 extends OpMode{
     public void transferNow(){
         manualOut = false;
         intakeOutDelay = true;
-        robot.clawBigTilt.setTransfer();
-        robot.intakeTilt.setTransfer();
-        robot.latch.setInit();
-        robot.depoWrist.setIn();
         outakeTime = System.currentTimeMillis();
         robot.intake.in();
         intakeMode = IntakeMode.IN;
         intakeTransfer = true;
-        robot.claw.setOpen();
         hSlideGoBottom = true;
     }
 

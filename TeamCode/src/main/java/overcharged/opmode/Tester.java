@@ -125,16 +125,16 @@ Tester
         OcServo latch = robot.latch.latch;
         OcServo trapdoor = robot.trapdoor.trapdoor;
         OcServo claw = robot.claw.claw;
-        OcServo clawSmallTilt = robot.clawSmallTilt.clawSmallTilt;
-        OcServo clawBigTilt = robot.clawBigTilt.clawBigTilt;
+        OcServo depoLeftTilt = robot.depoTilt.depoLeftTilt;
+        OcServo depoRightTilt = robot.depoTilt.depoLeftTilt;
         OcServo depoWrist = robot.depoWrist.depoWrist;
         OcServo depoHslide = robot.depoHslide.depoHslide;
         servos.add(intakeTilt);
         servos.add(latch);
         servos.add(trapdoor);
         servos.add(claw);
-        servos.add(clawSmallTilt);
-        servos.add(clawBigTilt);
+        servos.add(depoLeftTilt);
+        servos.add(depoRightTilt);
         servos.add(depoWrist);
         servos.add(depoHslide);
 
@@ -156,15 +156,13 @@ Tester
                         robot.trapdoor.CLOSED,
                         robot.trapdoor.OPEN),
                 new ServoTestInfo(
-                        clawSmallTilt,
-                        robot.clawSmallTilt.TRANSFER,
-                        robot.clawSmallTilt.BUCKET),
+                        depoLeftTilt,
+                        robot.depoTilt.TRANSFERL,
+                        robot.depoTilt.BUCKETL),
                 new ServoTestInfo(
-                        clawBigTilt,
-                        robot.clawBigTilt.TRANSFER,
-                        robot.clawBigTilt.OUT),
-
-
+                        depoRightTilt,
+                        robot.depoTilt.TRANSFERR,
+                        robot.depoTilt.BUCKETR),
         };
 
         int testCounter = 0;

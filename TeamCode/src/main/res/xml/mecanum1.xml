@@ -7,7 +7,7 @@
             <goBILDA5202SeriesMotor name="vslidesL" port="1" />
             <goBILDA5202SeriesMotor name="vslidesR" port="0" />
 
-            <DigitalDevice name="vlimitswitch" port="0" />
+            <DigitalDevice name="vlimitswitch" port="0" bus="0"/>
             <DigitalDevice name="hlimitswitch" port="0" bus="1" />
 
             <RevColorSensorV3 name="colorSensorF" port="3" bus="1" />
@@ -24,11 +24,11 @@
             <goBILDA5202SeriesMotor name="driveRF" port="2" />
 
 
-            <Servo name="depoWrist" port="0" />
+            <Servo name="depoWrist" port="5" />
             <Servo name="depoHslide" port="1" />
-            <Servo name="clawBigTilt" port="2" />
-            <Servo name="clawSmallTilt" port="4" />
-            <Servo name="claw" port="5" />
+            <Servo name="depoLeftTilt" port="2" />
+            <Servo name="depoRightTilt" port="4" />
+            <Servo name="claw" port="0" />
 
             <goBILDAPinpoint name="pinpoint" port="1" bus="1"/>
 

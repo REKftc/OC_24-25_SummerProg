@@ -7,8 +7,8 @@ public class latch {
     public OcServo latch;
     //public VoltageSensor intakeVolt;
     public static final float INIT = 137f;//206f;
-    // public static final float TRANSFER = 70f;//175f;
-    // public static final float SPEC = 171f;//158f;
+    // public static final float TRANSFERL = 70f;//175f;
+    // public static final float SPECR = 171f;//158f;
     public static final float OUT = 204f;//237f;
 
 
@@ -23,9 +23,9 @@ public class latch {
 
     public void setInit() { latch.setPosition(INIT); }
 
-    //public void setTransfer() { intakeTilt.setPosition(TRANSFER); }
+    //public void setTransfer() { intakeTilt.setPosition(TRANSFERL); }
 
-    // public void setFlat() { intakeTilt.setPosition(SPEC); }
+    // public void setFlat() { intakeTilt.setPosition(SPECR); }
 
     public void setOut() { latch.setPosition(OUT); }
 
