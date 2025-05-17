@@ -28,7 +28,7 @@ import overcharged.components.vSlides;
 
 @Config
 @TeleOp(name="turntable red", group="!!Teleop")
-public class teleop7 extends OpMode{
+public class teleop8 extends OpMode{
 
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -351,8 +351,9 @@ public class teleop7 extends OpMode{
             }
         }
 
-        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
-            slowPower = 0.82f;
+        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket //TODO: recode
+            robot.vSlides.moveEncoderTo(robot.vSlides.sequential, 1f);
+            slowPower = 0.85f;
             robot.claw.setClose();
             clawDelay = System.currentTimeMillis();
             cDelay = true;
@@ -368,7 +369,7 @@ public class teleop7 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if (gamepad2.left_bumper && Button.BTN_LEVEL2.canPress(timestamp)){ // Lower Bucket
+        if (gamepad2.left_bumper && Button.BTN_LEVEL2.canPress(timestamp)){ // Lower Bucket //TODO: recode
             slowPower = 0.82f;
             robot.claw.setClose();
             clawOpen = false;
@@ -380,7 +381,7 @@ public class teleop7 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
+        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen //TODO: recode
             robot.claw.setClose();
             clawOpen = false;
             clawDelay = System.currentTimeMillis();
@@ -396,7 +397,7 @@ public class teleop7 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad2.dpad_right && Button.WALL.canPress(timestamp)) {
+        if(gamepad2.dpad_right && Button.WALL.canPress(timestamp)) { //TODO: recode
             slideHeight = SlideHeight.WALL;
             robot.vSlides.moveEncoderTo(robot.vSlides.wall, 1f);
             vslideOut = true;
@@ -408,7 +409,7 @@ public class teleop7 extends OpMode{
             wallStep++;
         }
 
-        if(gamepad2.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
+        if(gamepad2.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset //TODO: recode
             slowPower = 1f;
             robot.depoHslide.setInit();
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
@@ -443,7 +444,6 @@ public class teleop7 extends OpMode{
             }
         }
 
-
         if(gamepad2.b && Button.SLIGHT_DOWN.canPress(timestamp)){
             if(robot.vSlides.vSlidesL.getCurrentPosition() > 100){
                 robot.vSlides.moveEncoderTo((int)(robot.vSlides.vSlidesL.getCurrentPosition())-90, 0.3f);
@@ -462,6 +462,7 @@ public class teleop7 extends OpMode{
         }
 
         // Bucket(High & Low) sequence
+        //TODO: recode
         if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>290 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>290 &dDelay) { // Depo to Bucket
             vslideOut = true;
 
@@ -532,6 +533,7 @@ public class teleop7 extends OpMode{
             resetStep=0;
             resetDelay = 0;
         }
+        //TODO: end of recode
 
         if(intakeDelay && System.currentTimeMillis()-outDelay>20){
             robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 0.95f);
@@ -571,12 +573,6 @@ public class teleop7 extends OpMode{
                 hSlideGoBottom = false;
             }
         }
-
-        /*
-        if (vlimitswitch.getState()){
-            robot.vSlides.vSlidesR.resetPosition();
-            robot.vSlides.vSlidesL.resetPosition();
-        } */
 
         //telemetry.addData("sensorF color", robot.sensorF.getColor());
         //telemetry.addData("time: ", temp);

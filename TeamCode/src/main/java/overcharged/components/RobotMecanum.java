@@ -36,7 +36,6 @@ public class RobotMecanum {
     public vSlides vSlides;
     public depoTilt depoTilt;
     public claw claw;
-    public depoWrist depoWrist;
     public depoHslide depoHslide;
     public hslides hslides;
     public intakeTilt intakeTilt;
@@ -157,13 +156,6 @@ public class RobotMecanum {
         } catch (Exception e){
             RobotLog.ee(RobotConstants.TAG_R,  "missing: claw " + e.getMessage());
             missing = missing + ", claw";
-            numberMissing++;
-        }
-        try {
-            depoWrist = new depoWrist(hardwareMap);
-        } catch (Exception e){
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: depoWrist " + e.getMessage());
-            missing = missing + ", depoWrist";
             numberMissing++;
         }
         try {

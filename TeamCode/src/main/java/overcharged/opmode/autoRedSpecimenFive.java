@@ -223,11 +223,9 @@ public class autoRedSpecimenFive extends OpMode {
                 follower.followPath(preload);
                 robot.vSlides.moveEncoderTo(robot.vSlides.mid+35, 1f);
                 robot.claw.setClose();
-                robot.clawBigTilt.setOut();
-                robot.depoWrist.setSpecimen();
+                robot.depoTilt.setOut();
                 robot.depoHslide.setOut();
                 waitFor(300);
-                robot.clawSmallTilt.setFlat();
                 setPathState(11);
                 break;
             case 11: //backs away
@@ -238,11 +236,8 @@ public class autoRedSpecimenFive extends OpMode {
                     robot.depoHslide.setInit();
                     follower.followPath(redPark);
                     waitFor(100);
-                    // robot.depoWrist.setIn();
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
-                    robot.clawSmallTilt.setWall();
+                    robot.depoTilt.setFlat();
                     robot.intake.off();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
@@ -361,11 +356,9 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.followPath(scoreSample3);
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoWrist.setSpecimen();
+                    robot.depoTilt.setOut();
                     robot.depoHslide.setMid();
                     waitFor(300);
-                    robot.clawSmallTilt.setFlat();
                     setPathState(28);
                 }
                 break;
@@ -378,9 +371,7 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(scoredSample3);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
-                    robot.clawSmallTilt.setWall();
+                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(29);
@@ -399,11 +390,9 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.followPath(scoreSample4);
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid+55, 1f);
                     robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoWrist.setSpecimen();
+                    robot.depoTilt.setOut();
                     robot.depoHslide.setMid();
                     waitFor(300);
-                    robot.clawSmallTilt.setFlat();
                     setPathState(31);
                 }
                 break;
@@ -416,9 +405,7 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(grabSample4);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
-                    robot.clawSmallTilt.setWall();
+                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(32);
@@ -437,11 +424,8 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.followPath(scoredSample4);
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoWrist.setSpecimen();
-                    //waitFor(1000);
+                    robot.depoTilt.setOut();
                     robot.depoHslide.setMid();
-                    robot.clawSmallTilt.setFlat();
                     setPathState(34);
                 }
                 break;
@@ -454,9 +438,7 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(getFifthSample);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setFlat();
-                    robot.depoWrist.setFlat();
-                    robot.clawSmallTilt.setWall();
+                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(35);
@@ -475,10 +457,8 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.followPath(scoredFifthSample);
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid+25, 1f);
                     robot.claw.setClose();
-                    robot.clawBigTilt.setOut();
-                    robot.depoWrist.setSpecimen();
+                    robot.depoTilt.setOut();
                     robot.depoHslide.setMid();
-                    robot.clawSmallTilt.setFlat();
                     setPathState(37);
                 }
                 break;
@@ -491,8 +471,7 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(endPark);
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
+                    robot.depoTilt.setTransfer();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(100);
@@ -586,10 +565,7 @@ public class autoRedSpecimenFive extends OpMode {
 
         //robot init
         robot.intakeTilt.setInOut();
-        robot.clawBigTilt.setOut();
-        robot.depoWrist.setSpecimen();
-        robot.clawSmallTilt.setFlat();
-        robot.depoWrist.setIn();
+        robot.depoTilt.setOut();
         robot.claw.setClose();
 
         hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");

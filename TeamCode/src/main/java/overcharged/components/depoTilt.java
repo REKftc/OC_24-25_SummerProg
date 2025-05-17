@@ -46,7 +46,7 @@ public class depoTilt {
         depoLeftTilt.setPosition(INITR);
     }
 
-    public void setOut() {
+    public void setOut() { //TODO: this is bucket
         depoLeftTilt.setPosition(INITR);
         depoLeftTilt.setPosition(INITR);
     }

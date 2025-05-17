@@ -184,9 +184,7 @@ public class autoBucket5_135 extends OpMode{
                 if(pathTimer.milliseconds()>200 && (robot.vSlides.vSlidesL.getCurrentPosition()>470 || pathTimer.milliseconds()>1400)) {
                     if (runOnce) {
                         runOnce = false;
-                        robot.clawSmallTilt.setOut();
-                        robot.clawBigTilt.setBucket();
-                        robot.depoWrist.setBucket();
+                        robot.depoTilt.setOut();
                         robot.depoHslide.setInit();
                         delayTimer.reset();
                         nowDelay = true;
@@ -212,9 +210,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 if (pathTimer.milliseconds() > 780 && backDelay) {
                     backDelay = false;
-                    robot.clawBigTilt.setTransfer();
-                    robot.depoWrist.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
+                    robot.depoTilt.setTransfer();
                     runOnce = true;
                     canScore = false;
                     setPathState(14);
@@ -283,9 +279,7 @@ public class autoBucket5_135 extends OpMode{
                 if(pathTimer.milliseconds()>300){
                     if (runOnce) {
                         runOnce = false;
-                        robot.depoWrist.setTransfer();
-                        robot.clawBigTilt.setTransfer();
-                        robot.clawSmallTilt.setTransfer();
+                        robot.depoTilt.setTransfer();
                         vslideGoBottom = true;
                         setPathState(160);
                     }
@@ -394,8 +388,7 @@ public class autoBucket5_135 extends OpMode{
                 }
                 if (s2Delay && robot.vSlides.vSlidesL.getCurrentPosition()>470) {
                     s2Delay = false;
-                    robot.clawBigTilt.setBucket();
-                    robot.depoWrist.setBucket();
+                    robot.depoTilt.setOut();
                     setPathState(171);
                 }
 
@@ -404,7 +397,6 @@ public class autoBucket5_135 extends OpMode{
             case 171:
                 if(pathTimer.milliseconds()>200){
                     robot.depoHslide.setInit();
-                    robot.clawSmallTilt.setRight();
                     robot.intakeTilt.setTransfer();
                     runOnce = true;
                     setPathState(1710);
@@ -453,9 +445,7 @@ public class autoBucket5_135 extends OpMode{
                     secTimer.reset();
                     nowDelay = false;
                     robot.claw.setOpen();
-                    robot.clawBigTilt.setTransfer();
-                    robot.depoWrist.setTransfer();
-                    robot.clawSmallTilt.setTransfer();
+                    robot.depoTilt.setTransfer();
                     setPathState(19);
                 }
                 break;
@@ -612,13 +602,11 @@ public class autoBucket5_135 extends OpMode{
                 break;
             case 241:
                 if(follower.getPose().getX() > (wallScore.getX() - 52) && follower.getPose().getY() < (wallScore.getY() + 32)){
-                    robot.clawBigTilt.setBucket();
-                    robot.depoWrist.setBucket();
+                    robot.depoTilt.setOut();
                     robot.depoHslide.setInit();
                     runningOutOfNames = true;
                 }
                 if(pathTimer.milliseconds()>200 && robot.vSlides.vSlidesL.getCurrentPosition() > 480 && runningOutOfNames){
-                    robot.clawSmallTilt.setRight();
                     robot.intakeTilt.setTransfer();
                     canScore = true;
                     runOnce = true;
@@ -646,8 +634,7 @@ public class autoBucket5_135 extends OpMode{
                 break;
             case 25:
                 if(pathTimer.milliseconds()>400){
-                    robot.clawBigTilt.setTransfer();
-                    robot.depoWrist.setTransfer();
+                    robot.depoTilt.setTransfer();
                     robot.claw.setOpen();
                 }
                 if(pathTimer.milliseconds()>750){
@@ -774,8 +761,7 @@ public class autoBucket5_135 extends OpMode{
         hlimitswitch = hardwareMap.get(DigitalChannel.class, "hlimitswitch");
         vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
         robot.intakeTilt.setTransfer();
-        robot.clawBigTilt.setTransfer();
-        robot.clawSmallTilt.setTransfer();
+        robot.depoTilt.setTransfer();
         robot.claw.setClose();
     }
 
