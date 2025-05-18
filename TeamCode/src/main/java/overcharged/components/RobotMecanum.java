@@ -147,8 +147,8 @@ public class RobotMecanum {
         try {
             depoTilt = new depoTilt(hardwareMap);
         } catch (Exception e){
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: clawBigTilt " + e.getMessage());
-            missing = missing + ", clawBigTilt";
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: depoTilt " + e.getMessage());
+            missing = missing + ", depoTilt";
             numberMissing++;
         }
         try {

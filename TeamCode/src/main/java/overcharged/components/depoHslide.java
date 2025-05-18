@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class depoHslide {
     public OcServo depoHslide;
-    public static final float INIT = 74f;
+    public static final float INIT = 202f;
     public static final float MID = 60f;
-    public static final float TRANSFER = 60f;
-    public static final float OUT = 174f;
+    public static final float TRANSFER = 188f;
+    public static final float OUT = 100f;
 
 
     public depoHslide(HardwareMap hardwareMap) {
-        depoHslide = new OcServo(hardwareMap, "depoHslide", INIT);
+        depoHslide = new OcServo(hardwareMap, "depoHslide", TRANSFER);
         //intakeTilt = hardwareMap.get(OcServo.class, "intakeTilt");
         //intakeVolt = hardwareMap.voltageSensor.iterator().next();
     }

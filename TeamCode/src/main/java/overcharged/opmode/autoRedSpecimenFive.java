@@ -237,7 +237,6 @@ public class autoRedSpecimenFive extends OpMode {
                     follower.followPath(redPark);
                     waitFor(100);
                     robot.claw.setOpen();
-                    robot.depoTilt.setFlat();
                     robot.intake.off();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
@@ -371,7 +370,6 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(scoredSample3);
                     robot.claw.setOpen();
-                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(29);
@@ -405,7 +403,6 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(grabSample4);
                     robot.claw.setOpen();
-                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(32);
@@ -438,7 +435,6 @@ public class autoRedSpecimenFive extends OpMode {
                     waitFor(100);
                     follower.followPath(getFifthSample);
                     robot.claw.setOpen();
-                    robot.depoTilt.setFlat();
                     robot.vSlides.moveEncoderTo(robot.vSlides.mid-30, 1f);
                     vslideGoBottom = true;
                     setPathState(35);

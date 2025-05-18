@@ -3,18 +3,20 @@ package overcharged.components;
 import static overcharged.config.RobotConstants.TAG_H;
 import static overcharged.config.RobotConstants.TAG_SL;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.RobotLog;
+
+import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import overcharged.config.RobotConstants;
 
+@Config
 public class vSlides {
-
     public final OcMotorEx vSlidesL;
     public final OcMotorEx vSlidesR;
     public OcSwitch switchSlideDown;
@@ -24,15 +26,17 @@ public class vSlides {
 
     public static int autoLevel = 0;
 
+    public float kp = 0.11f;
+
     public static final int START = 0;
     public static final int PRESET1 = 142;
     public static final int OUT = 1000;
-    public static final int wall = 0;
-    public static final int sequential = 300;
+    public static final int wall = 100;
+    public static final int sequential = 250;
     public static final int mid = 400;//400;
     public static final int lower = 450;
-    public static final int high1 = 870;
-    public static final int autohigh1 = 805;
+    public static final int high1 = 640;
+    public static final int autohigh1 = 645;
     public static final int high2 = 850;
     public static final int bar = 370;
     public static final int hang2 = 470;
@@ -42,14 +46,16 @@ public class vSlides {
     public static double d = 0;
     public static double f = 0;
 
+    private boolean useSquID = false;
+    private double target = 0;
+    private float multiplier = 1f;
+
     public vSlides(HardwareMap hardwareMap) {
 
-        vSlidesR = new OcMotorEx(hardwareMap, "vslidesR", DcMotor.Direction.REVERSE, DcMotor.RunMode.RUN_USING_ENCODER);
-        vSlidesL = new OcMotorEx(hardwareMap, "vslidesL", DcMotor.Direction.FORWARD, DcMotor.RunMode.RUN_USING_ENCODER);
+        vSlidesR = new OcMotorEx(hardwareMap, "vslidesR", DcMotor.Direction.REVERSE, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        vSlidesL = new OcMotorEx(hardwareMap, "vslidesL", DcMotor.Direction.FORWARD, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         vSlidesR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         vSlidesL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vSlidesR.setTargetPositionPIDFCoefficients(p, i, d, f);
-        vSlidesL.setTargetPositionPIDFCoefficients(p, i, d, f);
 
         String missing = "";
         int numberMissing = 0;
@@ -98,7 +104,15 @@ public class vSlides {
         vSlidesL.setPower(-1f);
     }
 
+    public float getSquid() {
+        double error = target - getCurrentPosition();
+        double sign = Math.signum(error);
+        return (float) (multiplier * sign * (kp*Math.sqrt(Math.abs(error))));
+    }
 
+    public double getCurrentPosition() {
+        return vSlidesR.getCurrentPosition();
+    }
 
     public boolean slideDown() {
         return switchSlideDown.isTouch() && vSlidesR.getCurrentPosition() <= start;
@@ -116,6 +130,7 @@ public class vSlides {
         vSlidesL.setPower(power);
         vSlidesR.setPower(power);
     }
+
     public void moveEncoderTo(int pos, float power) {
         vSlidesR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         vSlidesL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -152,6 +167,24 @@ public class vSlides {
         }
     }
 
+    public void setUseSquID(boolean useSquID, int target) {
+        this.useSquID = useSquID;
+        this.target = target;
+        multiplier = 1f;
+    }
+
+    public void setUseSquID(boolean useSquID, int target, float multiplier) {
+        this.useSquID = useSquID;
+        this.target = target;
+        this.multiplier = multiplier;
+    }
+
+    public void update() {
+        if (useSquID) {
+            setPowerBoth(getSquid());
+        }
+    }
+
     public void reset(OcMotorEx motor) {
         motor.setPower(0f);
         motor.setPower(0f);
@@ -172,6 +205,14 @@ public class vSlides {
         RobotLog.ii(TAG_SL, "Force stop the Slide component");
         vSlidesR.setPower(0f);
         vSlidesL.setPower(0f);
+    }
+
+    public double getTarget() {
+        return target;
+    }
+
+    public void setKp(float kp) {
+        this.kp = kp;
     }
 }
 
