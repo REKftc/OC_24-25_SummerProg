@@ -10,7 +10,7 @@
             <DigitalDevice name="vlimitswitch" port="0"/>
             <DigitalDevice name="hlimitswitch" port="1"/>
 
-            <RevColorSensorV3 name="colorSensorF" port="3" bus="1" />
+            <RevColorSensorV3 name="colorSensorF" port="0" bus="0" />
 
             <Servo name="intakeTilt" port="5" />
             <Servo name="latch" port="4" />

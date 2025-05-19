@@ -579,6 +579,7 @@ public class teleop8 extends OpMode{
         //telemetry.addData("vslides limit", vlimitswitch.getState());
         //telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
         telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        telemetry.addData("sensorF color", robot.sensorF.getColor());
         //telemetry.addData("Position trying to reach: ", slideHeight);
         //telemetry.addData("vlimit: ", vlimitswitch.getState());
         //telemetry.addData("hlimit: ", hlimitswitch.getState());
