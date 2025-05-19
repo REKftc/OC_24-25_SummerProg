@@ -26,12 +26,12 @@ public class vSlides {
 
     public static int autoLevel = 0;
 
-    public float kp = 0.11f;
+    public float kp = 0.1f;
 
     public static final int START = 0;
     public static final int PRESET1 = 142;
     public static final int OUT = 1000;
-    public static final int wall = 100;
+    public static final int wall = 67;
     public static final int sequential = 250;
     public static final int mid = 400;//400;
     public static final int lower = 450;

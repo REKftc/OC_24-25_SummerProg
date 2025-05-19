@@ -13,7 +13,7 @@ public class depoTilt {
 
     public static final float BUCKET = 77f;
 
-    public static final float WALL = 0f;
+    public static final float WALL = 6f;
 
 
     public depoTilt(HardwareMap hardwareMap) {

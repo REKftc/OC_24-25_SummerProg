@@ -123,6 +123,7 @@ public class teleop8 extends OpMode{
 
     public void loop(){
         temp.reset();
+        robot.sensorF.update();
         robot.clearBulkCache();
         long timestamp = System.currentTimeMillis();
         robot.vSlides.update();
@@ -205,7 +206,7 @@ public class teleop8 extends OpMode{
         }
 
         if(clearDelay > 400){
-            robot.intakeTilt.setInOut();
+            robot.intakeTilt.setFlat();
             robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()-80, 1f);
         }
         if(clearDelay > 750){
@@ -258,15 +259,20 @@ public class teleop8 extends OpMode{
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>70){
+        if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>200){
             robot.intakeTilt.setTransfer();
             robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
         }
-        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>400){
+        if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>420){
             robot.intake.in();
+            intakeMode = IntakeMode.IN;
+            intakeStep++;
+            outakeTime = System.currentTimeMillis();
+        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>1500){
+            robot.intake.off();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
@@ -285,7 +291,7 @@ public class teleop8 extends OpMode{
             transferStep++;
             clawDelay = System.currentTimeMillis();
         }
-        if (transferStep ==2 & System.currentTimeMillis()-clawDelay>140){
+        if (transferStep ==2 & System.currentTimeMillis()-clawDelay>400){
             robot.claw.setClose();
             clawOpen = false;
             transferStep = 0;
@@ -297,10 +303,11 @@ public class teleop8 extends OpMode{
             intTiltDelay = false;
         }
 
-        if(intakeMode == IntakeMode.IN && sense && intakeTransfer){
+        if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 intakeOn = false;
-                robot.trapdoor.setInit();
+                intakeTransfer = true;
+                robot.intakeTilt.setTransfer();
                 intakeMode = IntakeMode.OFF;
                 robot.intake.off();
                 transferNow();
@@ -309,8 +316,9 @@ public class teleop8 extends OpMode{
             }
             if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
                 intakeOn = false;
-                robot.trapdoor.setInit();
                 intakeMode = IntakeMode.OFF;
+                robot.intakeTilt.setTransfer();
+                intakeTransfer = true;
                 robot.intake.off();
                 transferNow();
                 sense = false;
@@ -318,22 +326,20 @@ public class teleop8 extends OpMode{
             } else if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && !canYellow){
                 intakeMode = IntakeMode.OFF;
                 robot.intake.out();
-                robot.trapdoor.setOut();
                 robot.intakeTilt.setFlat();
                 intakeOn = true;
                 manualOut = false;
-                intakeDelay = true;
+                //intakeDelay = true;
                 sense = false;
                 outDelay = System.currentTimeMillis();
             }
             if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 intakeMode = IntakeMode.OFF;
                 robot.intake.out();
-                robot.trapdoor.setOut();
                 robot.intakeTilt.setFlat();
                 intakeOn = true;
                 manualOut = false;
-                intakeDelay = true;
+                //intakeDelay = true;
                 sense = false;
                 outDelay = System.currentTimeMillis();
             }
@@ -354,7 +360,7 @@ public class teleop8 extends OpMode{
         if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
             intakeTransfer = false;
 
-            robot.depoHslide.setInit();
+            robot.claw.setClose();
             slowPower = 0.85f;
             robot.claw.setClose();
             clawDelay = System.currentTimeMillis();
@@ -363,9 +369,10 @@ public class teleop8 extends OpMode{
             clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
         }
-        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 400){
+        if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 200){
             cDelay= false;
             clawDelay = 0;
+            robot.depoHslide.setInit();
             robot.vSlides.setUseSquID(true, vSlides.high1, 1f);
             dDelay = true;
             depoDelay = System.currentTimeMillis();
@@ -381,13 +388,14 @@ public class teleop8 extends OpMode{
             slideHeight = SlideHeight.LOWER;
             robot.vSlides.setUseSquID(true, vSlides.lower, 1f);
 
+            robot.depoHslide.setInit();
+
             dDelay = true;
             depoDelay = System.currentTimeMillis();
         }
 
         if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             intakeTransfer = false;
-            robot.depoHslide.setInit();
 
             robot.claw.setClose();
             clawOpen = false;
@@ -395,7 +403,7 @@ public class teleop8 extends OpMode{
             cDelay = true;
             slideHeight = SlideHeight.MID;
         }
-        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 400){
+        if(cDelay && slideHeight == SlideHeight.MID && clawDelay > 200){
             cDelay= false;
             clawDelay = 0;
             vslideOut = true;
@@ -407,6 +415,7 @@ public class teleop8 extends OpMode{
         if(gamepad2.dpad_right && Button.WALL.canPress(timestamp)) {
             intakeTransfer = false;
             robot.depoHslide.setInit();
+
 
             slideHeight = SlideHeight.WALL;
             robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
@@ -425,7 +434,7 @@ public class teleop8 extends OpMode{
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 vslideGoBottom = true;
                 robot.claw.setClose();
-                robot.intakeTilt.setInOut();
+                robot.intakeTilt.setFlat();
                 robot.depoTilt.setTransfer();
 
                 resetDelay = System.currentTimeMillis();
@@ -456,47 +465,53 @@ public class teleop8 extends OpMode{
             slideBottom();
         }
 
-        if(hslideOut && System.currentTimeMillis()-manualDelay>500 && manualCheck){
+        if(hslideOut && System.currentTimeMillis()-manualDelay>600 && manualCheck){
             manualCheck = false;
             manualDelay = 0;
             manualOut = true;
         }
 
         // Bucket(High & Low) sequence
-        if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>290 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>290 &dDelay) { // Depo to Bucket
+        if (slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>240 &dDelay || slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>290 &dDelay) { // Depo to Bucket
             vslideOut = true;
 
             robot.depoTilt.setOut();
-            robot.depoHslide.setOut();
             score = ScoreType.BUCKET;
             bucketSeq = true;
             depoDelay = System.currentTimeMillis();
             dDelay = false;
         }
-        if (bucketSeq && slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>130 || bucketSeq && slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>100){
+        if (bucketSeq && slideHeight == SlideHeight.HIGH1 && System.currentTimeMillis()-depoDelay>150 || bucketSeq && slideHeight == SlideHeight.LOWER && System.currentTimeMillis()-depoDelay>100){
             bucketSeq = false;
             depoDelay = 0;
             robot.intakeTilt.setTransfer();
+            robot.depoHslide.setOut();
         }
 
 
-        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>480 && dDelay) { // Depo to Specimen
+        if (slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>100 && dDelay) { // Depo to Specimen
             robot.claw.setClose();
-            robot.depoTilt.setSpec();
-            robot.depoHslide.setOut();
             score = ScoreType.SPECIMEN;
+        }
+        if(slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>350 && dDelay) { // Depo to Specimen
+            robot.depoTilt.setSpec();
+        }
+        if(slideHeight == SlideHeight.MID && System.currentTimeMillis()-depoDelay>600 && dDelay) { // Depo to Specimen
+            robot.depoHslide.setOut();
             depoDelay = 0;
             dDelay = false;
         }
 
+
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 100){
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 250){
+            robot.intakeTilt.setFlat();
             robot.depoTilt.setWall();
             clawOpen = false;
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
-        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 800){
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay > 720){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -505,7 +520,7 @@ public class teleop8 extends OpMode{
 
 
         //slide reset seq
-        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>260 && dDelay){
+        if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>220 && dDelay){
             intakeTransfer = true;
             robot.intakeTilt.setTransfer();
             robot.depoTilt.setTransfer();
@@ -516,7 +531,7 @@ public class teleop8 extends OpMode{
             dDelay =false;
         }
 
-        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 230){
+        if(resetStep==1 && System.currentTimeMillis() - resetDelay > 200){
             robot.depoTilt.setTransfer();
             robot.claw.setOpen();
             clawOpen = true;
@@ -535,13 +550,10 @@ public class teleop8 extends OpMode{
         }
 
         if(intakeDelay && System.currentTimeMillis()-outDelay>20){
-            robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition()+55, 0.95f);
-        }
-        if(intakeDelay && System.currentTimeMillis()-outDelay>350){
-            robot.trapdoor.setInit();
+            robot.intakeTilt.setInOut();
+            robot.intake.out();
         }
         if(intakeDelay && System.currentTimeMillis()-outDelay>420){
-            robot.intakeTilt.setOut();
             intakeDelay = false;
             manualOut = true;
             sense = true;
@@ -572,14 +584,13 @@ public class teleop8 extends OpMode{
         }
 
 
-        //telemetry.addData("sensorF color", robot.sensorF.getColor());
-        telemetry.addData("time: ", temp);
+        telemetry.addData("lag: ", temp);
         //telemetry.addData("vslides R power", robot.vSlides.getPowerR());
         //telemetry.addData("vslides L power", robot.vSlides.getPowerL());
         //telemetry.addData("vslides limit", vlimitswitch.getState());
         //telemetry.addData("vslides L pos", robot.vSlides.vSlidesL.getCurrentPosition());
-        telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
-        telemetry.addData("sensorF color", robot.sensorF.getColor());
+        //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        //telemetry.addData("sensorF color", robot.sensorF.getColor());
         //telemetry.addData("Position trying to reach: ", slideHeight);
         //telemetry.addData("vlimit: ", vlimitswitch.getState());
         //telemetry.addData("hlimit: ", hlimitswitch.getState());
@@ -610,7 +621,6 @@ public class teleop8 extends OpMode{
         manualOut = false;
         intakeOutDelay = true;
         outakeTime = System.currentTimeMillis();
-        robot.intake.in();
         intakeMode = IntakeMode.IN;
         intakeTransfer = true;
         hSlideGoBottom = true;

@@ -11,6 +11,7 @@ public class colorSensor {
         RED,
         BLUE,
         YELLOW,
+        UNKNOWN,
         NONE;
     }
     public RevColorSensorV3 colorSensorF;
@@ -25,24 +26,26 @@ public class colorSensor {
         }
     }
     public Color getColor() {
-        float hue = getHSV()[0];
-        float saturation = getHSV()[0];
-        float value = getHSV()[2];
-        if(value > 0.35f) {
-            if (175 <= hue && hue <= 300) {
-                color = Color.BLUE;
-            } else if (0 <= hue && hue <= 30) {
-                color = Color.RED;
-            } else if (51 <= hue && hue <= 120) {
-                color = Color.YELLOW;
+        if (color == Color.UNKNOWN) {
+            float hue = getHSV()[0];
+            float saturation = getHSV()[0];
+            float value = getHSV()[2];
+            if (value > 0.35f) {
+                if (175 <= hue && hue <= 300) {
+                    color = Color.BLUE;
+                } else if (0 <= hue && hue <= 30) {
+                    color = Color.RED;
+                } else if (51 <= hue && hue <= 120) {
+                    color = Color.YELLOW;
+                }
+            } else {
+                color = Color.NONE;
             }
         }
 
-        else{
-            color = Color.NONE;
-        }
         return color;
     }
+
     public float[] getRGB(){
         rgb[0] = colorSensorF.getNormalizedColors().red*255;
 
@@ -87,4 +90,7 @@ public class colorSensor {
         return new float[] { h, s * 100, v * 100 };  // Hue in degrees, Saturation and Value in percentage
     }
 
+    public void update() {
+        color = Color.UNKNOWN;
+    }
 }

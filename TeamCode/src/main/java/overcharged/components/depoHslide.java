@@ -6,7 +6,7 @@ public class depoHslide {
     public OcServo depoHslide;
     public static final float INIT = 202f;
     public static final float MID = 60f;
-    public static final float TRANSFER = 188f;
+    public static final float TRANSFER = 191f;
     public static final float OUT = 100f;
 
 
