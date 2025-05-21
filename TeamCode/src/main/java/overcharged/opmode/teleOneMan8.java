@@ -27,8 +27,8 @@ import overcharged.components.vSlides;
 
 
 @Config
-@TeleOp(name="turntable red", group="!!Teleop")
-public class teleop8 extends OpMode{
+@TeleOp(name="solo tele", group="!!Teleop")
+public class teleOneMan8 extends OpMode{
 
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -206,7 +206,7 @@ public class teleop8 extends OpMode{
             }
         }
 
-        if (gamepad1.x || gamepad2.right_bumper) { //TODO: fast outtake
+        if (gamepad1.x) { //TODO: fast outtake
             sense = false;
             //placeholder
         }
@@ -300,7 +300,7 @@ public class teleop8 extends OpMode{
             }
         }
 
-        if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
+        if (gamepad1.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;
@@ -311,7 +311,7 @@ public class teleop8 extends OpMode{
             }
         }
 
-        if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
+        if(gamepad1.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
             intakeTransfer = false;
 
             robot.claw.setClose();
@@ -331,23 +331,7 @@ public class teleop8 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if (gamepad2.left_bumper && Button.BTN_LEVEL2.canPress(timestamp)){ // Lower Bucket
-            intakeTransfer = false;
-
-            slowPower = 0.85f;
-            robot.claw.setClose();
-            clawOpen = false;
-
-            slideHeight = SlideHeight.LOWER;
-            robot.vSlides.setUseSquID(true, vSlides.lower, 1f);
-
-            robot.depoHslide.setInit();
-
-            dDelay = true;
-            depoDelay = System.currentTimeMillis();
-        }
-
-        if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
+        if(gamepad1.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             intakeTransfer = false;
 
             robot.claw.setClose();
@@ -364,7 +348,7 @@ public class teleop8 extends OpMode{
             depoDelay = System.currentTimeMillis();
         }
 
-        if(gamepad2.dpad_right && Button.WALL.canPress(timestamp)) { // Wall sequence
+        if(gamepad1.dpad_right && Button.WALL.canPress(timestamp)) { // Wall sequence
             intakeTransfer = false;
             robot.depoHslide.setInit();
 
@@ -379,7 +363,7 @@ public class teleop8 extends OpMode{
             wallStep++;
         }
 
-        if(gamepad2.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
+        if(gamepad1.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
             robot.vSlides.setUseSquID(false, 0);
             slowPower = 1f;
             robot.depoHslide.setInit();
@@ -401,13 +385,13 @@ public class teleop8 extends OpMode{
             }
         }
 
-        if(gamepad2.x && Button.SLIGHT_UP.canPress(timestamp)){ // slight slides up
+        if(gamepad1.x && Button.SLIGHT_UP.canPress(timestamp)){ // slight slides up
             if(robot.vSlides.vSlidesL.getCurrentPosition() < robot.vSlides.high1){
                 robot.vSlides.setUseSquID(true, robot.vSlides.vSlidesL.getCurrentPosition()+50, 1f);
             }
         }
 
-        if(gamepad2.b && Button.SLIGHT_DOWN.canPress(timestamp)){ // slight slides down
+        if(gamepad1.b && Button.SLIGHT_DOWN.canPress(timestamp)){ // slight slides down
             if(robot.vSlides.vSlidesL.getCurrentPosition() > 70){
                 robot.vSlides.setUseSquID(true, robot.vSlides.vSlidesL.getCurrentPosition()-50, 1f);
             }
