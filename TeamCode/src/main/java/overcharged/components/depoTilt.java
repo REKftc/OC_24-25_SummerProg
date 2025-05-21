@@ -3,7 +3,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class depoTilt {
     public OcServo depoTilt;
-    public static final float INIT = 227;
+    public static final float INIT = 227f;
 
     public static final float TRANSFER = 227f;
 
