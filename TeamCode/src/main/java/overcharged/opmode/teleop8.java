@@ -63,6 +63,7 @@ public class teleop8 extends OpMode{
     boolean canYellow = true;
     boolean hslideManualOnce = false;
     boolean onlyUsedForInCheck = false;
+    boolean anotherBooleanWithOneSingularUse = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -204,6 +205,10 @@ public class teleop8 extends OpMode{
             }
         }
 
+        if(gamepad1.ps){
+            anotherBooleanWithOneSingularUse = !anotherBooleanWithOneSingularUse;
+        }
+
         if (gamepad1.x || gamepad2.right_bumper) { //TODO: fast outtake
             sense = false;
             //placeholder
@@ -246,7 +251,7 @@ public class teleop8 extends OpMode{
             transferStep++;
             clawDelay = System.currentTimeMillis();
         } if (transferStep ==1 & System.currentTimeMillis()-clawDelay>150){
-            if(!canYellow) {
+            if(canYellow) {
                 robot.claw.setClose();
                 clawOpen = false;
             }
@@ -256,12 +261,14 @@ public class teleop8 extends OpMode{
 
         if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){ // block sensing
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
-                intakeOn = false;
-                intakeTransfer = true;
-                robot.intakeTilt.setTransfer();
-                transferNow();
-                sense = false;
-                hslideOut = false;
+                if (!anotherBooleanWithOneSingularUse) {
+                    intakeOn = false;
+                    intakeTransfer = true;
+                    robot.intakeTilt.setTransfer();
+                    transferNow();
+                    sense = false;
+                    hslideOut = false;
+                }
             } if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
                 intakeOn = false;
                 intakeMode = IntakeMode.OFF;
