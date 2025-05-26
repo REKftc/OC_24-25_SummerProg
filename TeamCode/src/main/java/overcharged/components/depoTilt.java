@@ -3,9 +3,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class depoTilt {
     public OcServo depoTilt;
-    public static final float INIT = 227f;
+    public static final float INIT = 226f;
 
-    public static final float TRANSFER = 227f;
+    public static final float TRANSFER = 226f;
 
     public static final float FLAT = 212f;//TODO: This is transfer Sequence
 

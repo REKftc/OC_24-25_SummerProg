@@ -64,6 +64,7 @@ public class teleop8 extends OpMode{
     boolean hslideManualOnce = false;
     boolean onlyUsedForInCheck = false;
     boolean anotherBooleanWithOneSingularUse = false;
+    boolean curSpec = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -264,7 +265,7 @@ public class teleop8 extends OpMode{
                 if (!anotherBooleanWithOneSingularUse) {
                     intakeOn = false;
                     intakeTransfer = true;
-                    robot.intakeTilt.setTransfer();
+                    robot.intakeTilt.setHigh();
                     transferNow();
                     sense = false;
                     hslideOut = false;
@@ -272,7 +273,7 @@ public class teleop8 extends OpMode{
             } if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
                 intakeOn = false;
                 intakeMode = IntakeMode.OFF;
-                robot.intakeTilt.setTransfer();
+                robot.intakeTilt.setHigh();
                 intakeTransfer = true;
                 robot.intake.off();
                 transferNow();
@@ -347,6 +348,7 @@ public class teleop8 extends OpMode{
 
         if(gamepad2.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             intakeTransfer = false;
+            curSpec = true;
 
             robot.claw.setClose();
             clawOpen = false;
@@ -371,8 +373,10 @@ public class teleop8 extends OpMode{
             robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
             vslideOut = true;
             wallStep = 0;
-            robot.claw.setClose();
-            clawOpen = false;
+            if(!curSpec) {
+                robot.claw.setClose();
+                clawOpen = false;
+            }
             depoDelay = System.currentTimeMillis();
             wallStep++;
         }
@@ -381,6 +385,7 @@ public class teleop8 extends OpMode{
             robot.vSlides.setUseSquID(false, 0);
             slowPower = 1f;
             robot.depoHslide.setInit();
+            curSpec = false;
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 vslideGoBottom = true;
                 robot.claw.setClose();
@@ -448,13 +453,17 @@ public class teleop8 extends OpMode{
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 320){
-            robot.intakeTilt.setFlat();
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 150){
+            robot.intakeTilt.setOut();
+            depoDelay = System.currentTimeMillis();
+            wallStep++;
+        }
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay >180){
             robot.depoTilt.setWall();
             clawOpen = false;
             depoDelay = System.currentTimeMillis();
             wallStep++;
-        } if(wallStep==2 && System.currentTimeMillis() - depoDelay > 650){
+        } if(wallStep==3 && System.currentTimeMillis() - depoDelay > 650){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
@@ -507,6 +516,7 @@ public class teleop8 extends OpMode{
                 intakeMode = IntakeMode.OFF;
                 robot.hslides.hslides.setPower(0);
                 robot.depoHslide.setTransfer();
+                robot.intakeTilt.setTransfer();
                 robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.hslides.hslides.resetPosition();
                 clawDelay = System.currentTimeMillis();

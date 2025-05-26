@@ -103,6 +103,7 @@ public class autoBucket5_135 extends OpMode{
                 .build();
 
         goSafe = new Path(new BezierLine(new Point(ready2Score), new Point(beforeBucket)));
+        firstScore = new Path(new BezierCurve(new Point(beforeBucket2), new Point(120, 10, Point.CARTESIAN), new Point(subFront)));
 
         secondBack = new Path(new BezierLine(new Point(wallScore), new Point(beforeBucket2)));
         secondBack.setConstantHeadingInterpolation(Math.PI);
