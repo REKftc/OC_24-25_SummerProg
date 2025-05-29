@@ -1,18 +1,13 @@
 package overcharged.opmode;
 
-import static overcharged.config.RobotConstants.TAG_SL;
 import static overcharged.config.RobotConstants.TAG_T;
-
-import android.transition.Slide;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -20,8 +15,6 @@ import com.qualcomm.robotcore.util.RobotLog;
 import overcharged.components.Button;
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
-import overcharged.components.hang;
-import overcharged.components.hslides;
 import overcharged.components.vSlides;
 
 
@@ -38,7 +31,7 @@ public class teleop8 extends OpMode{
     long resetDelay;
     long clawDelay;
     long outakeTime;
-    long intakeTiltDelay;
+    long specOutDelay;
     long manualDelay;
     long outDelay;
     ElapsedTime temp;
@@ -47,6 +40,7 @@ public class teleop8 extends OpMode{
     float turnConstant = 1f;
 
     int wallStep = 0;
+    int specWallStep = 0;
     int resetStep = 0;
     int transferStep = 0;
     int intakeStep = 0;
@@ -65,6 +59,7 @@ public class teleop8 extends OpMode{
     boolean onlyUsedForInCheck = false;
     boolean anotherBooleanWithOneSingularUse = false;
     boolean curSpec = false;
+    boolean specOutRetract = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -172,13 +167,29 @@ public class teleop8 extends OpMode{
                 }
             } else {
                 robot.intakeTilt.setOut();
-                robot.intake.in();
-                intakeMode = IntakeMode.IN;
+                if(!anotherBooleanWithOneSingularUse) {
+                    robot.intake.in();
+                    intakeMode = IntakeMode.IN;
+                } else if(robot.sensorF.getColor() == colorSensor.Color.RED){
+                    robot.intake.out();
+                    intakeMode = IntakeMode.OUT;
+                    specOutRetract = true;
+                    specOutDelay = System.currentTimeMillis();
+                } else{
+                    robot.intake.in();
+                    intakeMode = IntakeMode.IN;
+                }
                 intakeTransfer = false;
             }
         }
 
-        if (gamepad1.back && Button.INTAKEDOOR.canPress(timestamp)){ //Take yellow, or not(boolean)
+        if(specOutRetract && System.currentTimeMillis()-specOutDelay>120){
+            hSlideGoBottom = true;
+            specOutDelay = 0;
+            specOutRetract = false;
+        }
+
+        if (gamepad1.share && Button.INTAKEDOOR.canPress(timestamp)){ //Take yellow, or not(boolean)
             canYellow = !canYellow;
         }
 
@@ -208,6 +219,11 @@ public class teleop8 extends OpMode{
 
         if(gamepad1.ps){
             anotherBooleanWithOneSingularUse = !anotherBooleanWithOneSingularUse;
+            if(anotherBooleanWithOneSingularUse){
+                gamepad1.setLedColor(255,0,0,1000);
+            } else{
+                gamepad1.setLedColor(0,0,255,1000);
+            }
         }
 
         if (gamepad1.x || gamepad2.right_bumper) { //TODO: fast outtake
@@ -226,50 +242,54 @@ public class teleop8 extends OpMode{
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>150){
-            robot.intakeTilt.setTransfer();
+        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>90){
             robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>400){
+        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>220){
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>600){
+        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>500){
+            robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
             intakeStep = 0;
             outakeTime = 0;
         }
 
-        if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>50){ // Transfer System with claw close
+        if(intakeTransfer && cDelay && System.currentTimeMillis()-clawDelay>40){ // Transfer System with claw close
             cDelay = false;
             robot.depoTilt.setTransfer();
             robot.depoHslide.setTransfer();
             transferStep = 0;
             transferStep++;
             clawDelay = System.currentTimeMillis();
-        } if (transferStep ==1 & System.currentTimeMillis()-clawDelay>150){
+        } if (transferStep == 1 & System.currentTimeMillis()-clawDelay>250){
             if(canYellow) {
                 robot.claw.setClose();
                 clawOpen = false;
             }
-            transferStep = 0;
-            clawDelay = 0;
+            transferStep++;
+            clawDelay = System.currentTimeMillis();
+        } if (transferStep == 2 & System.currentTimeMillis()-clawDelay>50){
+            if(canYellow) {
+                gamepad2.rumble(500);
+                transferStep = 0;
+                clawDelay = 0;
+            }
         }
 
         if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){ // block sensing
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
-                if (!anotherBooleanWithOneSingularUse) {
-                    intakeOn = false;
-                    intakeTransfer = true;
-                    robot.intakeTilt.setHigh();
-                    transferNow();
-                    sense = false;
-                    hslideOut = false;
-                }
+                intakeOn = false;
+                intakeTransfer = true;
+                robot.intakeTilt.setHigh();
+                transferNow();
+                sense = false;
+                hslideOut = false;
             } if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && canYellow){
                 intakeOn = false;
                 intakeMode = IntakeMode.OFF;
@@ -281,8 +301,7 @@ public class teleop8 extends OpMode{
                 hslideOut = false;
             } else if (robot.sensorF.getColor() == colorSensor.Color.YELLOW && !canYellow){
                 intakeMode = IntakeMode.OFF;
-                robot.intake.out();
-                robot.intakeTilt.setFlat();
+                robot.intake.slowOut();
                 intakeOn = true;
                 manualOut = false;
                 intakeDelay = true;
@@ -290,8 +309,7 @@ public class teleop8 extends OpMode{
                 outDelay = System.currentTimeMillis();
             } if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 intakeMode = IntakeMode.OFF;
-                robot.intake.out();
-                robot.intakeTilt.setFlat();
+                robot.intake.slowOut();
                 intakeOn = true;
                 manualOut = false;
                 intakeDelay = true;
@@ -367,18 +385,23 @@ public class teleop8 extends OpMode{
         if(gamepad2.dpad_right && Button.WALL.canPress(timestamp)) { // Wall sequence
             intakeTransfer = false;
             robot.depoHslide.setInit();
-
-
-            slideHeight = SlideHeight.WALL;
-            robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
-            vslideOut = true;
-            wallStep = 0;
-            if(!curSpec) {
+            if(curSpec){
+                robot.claw.setOpen();
+                clawOpen = true;
+                specWallStep = 0;
+                depoDelay = System.currentTimeMillis();
+                specWallStep++;
+            }
+            else {
+                slideHeight = SlideHeight.WALL;
+                robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
+                vslideOut = true;
+                wallStep = 0;
                 robot.claw.setClose();
                 clawOpen = false;
+                depoDelay = System.currentTimeMillis();
+                wallStep++;
             }
-            depoDelay = System.currentTimeMillis();
-            wallStep++;
         }
 
         if(gamepad2.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
@@ -470,6 +493,20 @@ public class teleop8 extends OpMode{
             depoDelay = 0;
         }
 
+        // Wall pickup Sequence from Specimen score
+        if(specWallStep==1 && System.currentTimeMillis() - depoDelay > 220){
+            robot.depoTilt.setWall();
+            depoDelay = System.currentTimeMillis();
+            specWallStep++;
+        }
+        if(specWallStep==2 && System.currentTimeMillis() - depoDelay >300){
+            slideHeight = SlideHeight.WALL;
+            robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
+            vslideOut = true;
+            specWallStep=0;
+            depoDelay = 0;
+        }
+
         //slide reset seq
         if(slideHeight == SlideHeight.DOWN && System.currentTimeMillis()-resetDelay>160 && dDelay){
             intakeTransfer = true;
@@ -490,15 +527,11 @@ public class teleop8 extends OpMode{
             resetDelay = 0;
         }
 
-        if(intakeDelay && System.currentTimeMillis()-outDelay>70){ // outtake if wrong block
-            robot.intakeTilt.setInOut();
-            robot.intake.slowOut();
-        } if(intakeDelay && System.currentTimeMillis()-outDelay>470){
+        if(intakeDelay && System.currentTimeMillis()-outDelay>600){
             intakeDelay = false;
             manualOut = true;
             sense = true;
             outDelay =0;
-            robot.intakeTilt.setOut();
             intakeMode = IntakeMode.IN;
             robot.intake.in();
         }

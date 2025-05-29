@@ -670,6 +670,7 @@ public class autoBucket5_135 extends OpMode{
     @Override
     public void loop() {
         follower.update();
+        robot.sensorF.update();
         autoPath();
         telemetry.addLine("TValue: " + follower.getCurrentTValue());
         telemetry.addLine("Case: " + pathState);
@@ -680,7 +681,6 @@ public class autoBucket5_135 extends OpMode{
 
         //telemetry.addLine("Vslide pos: " + robot.vSlides.vSlidesL.getCurrentPosition());
         //telemetry.addLine("Straight encoder: ");
-        //telemetry.addLine("color: "+robot.sensorF.getColor());
         //telemetry.addLine("vLimit" + vlimitswitch.getState());
         //telemetry.addLine("hLimit" + hlimitswitch.getState());
         telemetry.addLine("Rep Count: " + floorRep);
