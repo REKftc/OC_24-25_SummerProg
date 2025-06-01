@@ -248,12 +248,12 @@ public class teleop8 extends OpMode{
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>220){
+        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>210){
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>500){
+        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>600){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
@@ -268,10 +268,10 @@ public class teleop8 extends OpMode{
             transferStep = 0;
             transferStep++;
             clawDelay = System.currentTimeMillis();
-        } if (transferStep == 1 & System.currentTimeMillis()-clawDelay>250){
+        } if (transferStep == 1 & System.currentTimeMillis()-clawDelay>300){
             if(canYellow) {
-                robot.claw.setClose();
-                clawOpen = false;
+                //robot.claw.setClose();
+                //clawOpen = false;
             }
             transferStep++;
             clawDelay = System.currentTimeMillis();
@@ -333,12 +333,12 @@ public class teleop8 extends OpMode{
         if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
             intakeTransfer = false;
             robot.claw.setClose();
+            clawOpen = false;
             slowPower = 0.85f;
             robot.claw.setClose();
             clawDelay = System.currentTimeMillis();
             cDelay = true;
             turnConstant = 0.8f;
-            clawOpen = false;
             slideHeight = SlideHeight.HIGH1;
         } if(cDelay && slideHeight == SlideHeight.HIGH1 && clawDelay > 100){
             cDelay= false;
@@ -394,8 +394,6 @@ public class teleop8 extends OpMode{
                 specWallStep++;
             }
             else {
-                slideHeight = SlideHeight.WALL;
-                robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
                 vslideOut = true;
                 wallStep = 0;
                 robot.claw.setClose();

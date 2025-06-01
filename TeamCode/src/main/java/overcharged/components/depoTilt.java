@@ -3,17 +3,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class depoTilt {
     public OcServo depoTilt;
-    public static final float INIT = 226f;
+    public static final float INIT = 213f;
 
-    public static final float TRANSFER = 226f;
+    public static final float TRANSFER = 213f;
 
     public static final float FLAT = 212f;//TODO: This is transfer Sequence
 
-    public static final float SPEC = 180f;//TODO: This is specimen
+    public static final float SPEC = 168f;//TODO: This is specimen
 
-    public static final float BUCKET = 77f;
+    public static final float BUCKET = 64f;
 
-    public static final float WALL = 6f;
+    public static final float WALL = 4f;
 
 
     public depoTilt(HardwareMap hardwareMap) {

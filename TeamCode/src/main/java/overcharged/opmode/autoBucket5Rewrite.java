@@ -68,7 +68,7 @@ public class autoBucket5Rewrite extends OpMode{
     private PathChain initScore;
 
     public void buildPoses() {
-        bucketScore = new Point(128, 12, Point.CARTESIAN);
+        bucketScore = new Point(128.5, 12, Point.CARTESIAN);
         beforeBlock = new Pose(120, 12, Math.toRadians(180));
     }
 
