@@ -68,7 +68,7 @@ public class autoBucket5Rewrite extends OpMode{
     private PathChain initScore;
 
     public void buildPoses() {
-        bucketScore = new Point(128.5, 12, Point.CARTESIAN);
+        bucketScore = new Point(128.7, 11.5, Point.CARTESIAN);
         beforeBlock = new Pose(120, 12, Math.toRadians(180));
     }
 
@@ -76,7 +76,7 @@ public class autoBucket5Rewrite extends OpMode{
     public void buildPaths() {
         initScore = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose),bucketScore))
-                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(155))
+                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(156))
                 .build();
 
         toBlock = new Path(new BezierLine(bucketScore, new Point(beforeBlock)));
@@ -102,7 +102,7 @@ public class autoBucket5Rewrite extends OpMode{
                 }
                 break;
             case 11:
-                if(pathTimer.milliseconds()>180){
+                if(pathTimer.milliseconds()>150){
                     robot.latch.setOut();
                     robot.hslides.moveEncoderTo(robot.hslides.SMALL, 0.7f);
                     in = false;
@@ -112,30 +112,39 @@ public class autoBucket5Rewrite extends OpMode{
                 }
                 break;
             case 13:
-                if ((follower.getPose().getX() > (bucketScore.getX() - 1.5) && follower.getPose().getY() < (bucketScore.getY() + 1.5) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16) && pathTimer.milliseconds()>1200 || pathTimer.milliseconds()>1700) {
+                if ((follower.getPose().getX() > (bucketScore.getX() - 1.5) && follower.getPose().getY() < (bucketScore.getY() + 1.5) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16) && pathTimer.milliseconds()>800 || pathTimer.milliseconds()>1200) {
+                    setPathState(14);
+                }
+                break;
+            case 14:
+                if(pathTimer.milliseconds()>200) {
                     robot.claw.setOpen();
                     robot.intakeTilt.setOut();
                     robot.intake.in();
-                    setPathState(15);
+                    if (turnExtra < 3) {
+                        setPathState(15);
+                    } else {
+                        setPathState(18);
+                    }
                 }
                 break;
             case 15:
-                if(pathTimer.milliseconds()>250){
+                if(pathTimer.milliseconds()>300){
                     robot.depoTilt.setTransfer();
                     robot.depoHslide.setTransfer();
                     if (turnExtra > 0){
                         follower.followPath(toBlock, true);
                         if (turnExtra == 1){
-                            toBlock.setLinearHeadingInterpolation(Math.toRadians(155), Math.toRadians(180));
+                            toBlock.setLinearHeadingInterpolation(Math.toRadians(156), Math.toRadians(180));
                         } else if (turnExtra == 2){
-                            toBlock.setLinearHeadingInterpolation(Math.toRadians(155), Math.toRadians(200));
+                            toBlock.setLinearHeadingInterpolation(Math.toRadians(156), Math.toRadians(205));
                         }
                     }
                     setPathState(16);
                 }
                 break;
             case 16:
-                if(pathTimer.milliseconds() > 300 && follower.getCurrentTValue()>0.95) {
+                if(pathTimer.milliseconds() > 150 && follower.getCurrentTValue()>0.95) {
                     vslideGoBottom = true;
                     in = false;
                     if (turnExtra == 0) {
@@ -150,7 +159,7 @@ public class autoBucket5Rewrite extends OpMode{
                 }
                 break;
             case 161:
-                if(follower.getCurrentTValue() > 0.9){
+                if(follower.getCurrentTValue() > 0.93){
                     setPathState(17);
                 }
                 break;
@@ -168,14 +177,14 @@ public class autoBucket5Rewrite extends OpMode{
                     robot.intakeTilt.setTransfer();
                     robot.intake.in();
                 }
-                if(pathTimer.milliseconds() > 300) {
+                if(pathTimer.milliseconds() > 200) {
                     hSlideGoBottom = true;
                     if(turnExtra > 0) {
                         follower.followPath(backBucket, true);
                         if(turnExtra == 1){
-                            backBucket.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(155));
+                            backBucket.setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(156));
                         } else if (turnExtra == 2){
-                            backBucket.setLinearHeadingInterpolation(Math.toRadians(200), Math.toRadians(155));
+                            backBucket.setLinearHeadingInterpolation(Math.toRadians(205), Math.toRadians(156));
                         }
                     }
                     setPathState(1711);
@@ -184,14 +193,14 @@ public class autoBucket5Rewrite extends OpMode{
                 }
                 break;
             case 1711:
-                if(in && pathTimer.milliseconds()>100){
+                if(in && pathTimer.milliseconds()>90){
                     setPathState(1712);
                 }
                 break;
             case 1712:
                 if(pathTimer.milliseconds()>150){
                     robot.claw.setClose();
-                    if (turnExtra<2) {
+                    if (turnExtra<3) {
                         turnExtra += 1;
                         setPathState(102);
                     } else{
@@ -200,9 +209,11 @@ public class autoBucket5Rewrite extends OpMode{
                 }
                 break;
             case 18:
-                robot.depoTilt.setTransfer();
-                robot.depoHslide.setTransfer();
-                setPathState(19);
+                if(pathTimer.milliseconds()>300) {
+                    robot.depoTilt.setTransfer();
+                    robot.depoHslide.setTransfer();
+                    setPathState(19);
+                }
                 break;
             case 19:
                 if(pathTimer.milliseconds() > 250){

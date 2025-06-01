@@ -21,8 +21,8 @@ import overcharged.components.vSlides;
 
 
 @Config
-@TeleOp(name="turntable red", group="!!Teleop")
-public class teleop8 extends OpMode{
+@TeleOp(name="turntable blue", group="!!Teleop")
+public class teleop10 extends OpMode{
 
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
@@ -171,7 +171,7 @@ public class teleop8 extends OpMode{
                 if(!anotherBooleanWithOneSingularUse) {
                     robot.intake.in();
                     intakeMode = IntakeMode.IN;
-                } else if(robot.sensorF.getColor() == colorSensor.Color.RED){
+                } else if(robot.sensorF.getColor() == colorSensor.Color.BLUE){
                     robot.intake.out();
                     intakeMode = IntakeMode.OUT;
                     specOutRetract = true;
@@ -284,7 +284,7 @@ public class teleop8 extends OpMode{
         }
 
         if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){ // block sensing
-            if (robot.sensorF.getColor() == colorSensor.Color.RED){
+            if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
                 intakeOn = false;
                 intakeTransfer = true;
                 robot.intakeTilt.setHigh();
@@ -308,7 +308,7 @@ public class teleop8 extends OpMode{
                 intakeDelay = true;
                 sense = false;
                 outDelay = System.currentTimeMillis();
-            } if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
+            } if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 intakeMode = IntakeMode.OFF;
                 robot.intake.slowOut();
                 intakeOn = true;
