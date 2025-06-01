@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -560,6 +561,7 @@ public class teleop8 extends OpMode{
 
 
         telemetry.addData("lag: ", temp);
+        telemetry.addData("Can Yellow?: ", canYellow);
         //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
         //telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
         //telemetry.addData("sensorF color", robot.sensorF.getColor());
@@ -596,12 +598,4 @@ public class teleop8 extends OpMode{
             onlyUsedForInCheck = false;
         }
     }
-
-    public static void waitFor(int milliseconds) { //Waitor Function
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < milliseconds) {
-            // loop
-        }
-    }
-
 }
