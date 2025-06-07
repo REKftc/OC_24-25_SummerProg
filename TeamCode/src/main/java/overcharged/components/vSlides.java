@@ -36,7 +36,7 @@ public class vSlides {
     public static final int mid = 394;//400;
     public static final int lower = 220;
     public static final int high1 = 660;
-    public static final int autohigh1 = 645;
+    public static final int autohigh1 = 615;
     public static final int high2 = 850;
     public static final int bar = 370;
     public static final int hang2 = 470;

@@ -243,17 +243,17 @@ public class teleop8 extends OpMode{
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>90){
+        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>120){
             robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>210){
+        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>220){
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>600){
+        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>620){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
@@ -494,6 +494,7 @@ public class teleop8 extends OpMode{
 
         // Wall pickup Sequence from Specimen score
         if(specWallStep==1 && System.currentTimeMillis() - depoDelay > 220){
+            robot.depoHslide.setInit();
             robot.depoTilt.setWall();
             depoDelay = System.currentTimeMillis();
             specWallStep++;
@@ -560,7 +561,8 @@ public class teleop8 extends OpMode{
 
         telemetry.addData("lag: ", temp);
         telemetry.addData("Can Yellow?: ", canYellow);
-        //telemetry.addData("Slide encoder current: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        telemetry.addData("Slide encoder current R: ", robot.vSlides.vSlidesR.getCurrentPosition());
+        telemetry.addData("Slide encoder current L: ", robot.vSlides.vSlidesL.getCurrentPosition());
         //telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
         //telemetry.addData("sensorF color", robot.sensorF.getColor());
         //telemetry.addData("vlimit: ", vlimitswitch.getState());

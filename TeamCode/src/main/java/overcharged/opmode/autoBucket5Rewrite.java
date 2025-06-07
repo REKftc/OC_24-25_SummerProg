@@ -97,7 +97,7 @@ public class autoBucket5Rewrite extends OpMode{
                 break;
             case 102:
                 if(pathTimer.milliseconds()>90){
-                    robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
+                    robot.vSlides.moveEncoderTo(robot.vSlides.mid, 1f);
                     setPathState(11);
                 }
                 break;

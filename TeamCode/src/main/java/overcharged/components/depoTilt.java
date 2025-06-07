@@ -13,7 +13,9 @@ public class depoTilt {
 
     public static final float BUCKET = 64f;
 
-    public static final float WALL = 4f;
+    public static final float WALL = 6f;
+
+    public static final float WALLAUTO = 7f;
 
 
     public depoTilt(HardwareMap hardwareMap) {
@@ -45,6 +47,10 @@ public class depoTilt {
 
     public void setWall() {
         depoTilt.setPosition(WALL);
+    }
+
+    public void setWallAuto() {
+        depoTilt.setPosition(WALLAUTO);
     }
 
 }

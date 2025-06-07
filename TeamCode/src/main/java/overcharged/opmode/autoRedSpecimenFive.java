@@ -23,7 +23,7 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 
-@Autonomous(name = "red specimen 1+4", group = "1Autonomous")
+@Autonomous(name = "red specimen 1+4 old", group = "1Autonomous")
 public class autoRedSpecimenFive extends OpMode {
     boolean vslideGoBottom = false;
     boolean hSlideGoBottom = false;
