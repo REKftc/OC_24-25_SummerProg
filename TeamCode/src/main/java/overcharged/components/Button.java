@@ -19,6 +19,7 @@ public class Button
     public final static Button INTAKEDOOR = new Button();
     public final static Button INTAKETILT = new Button();
     public final static Button NOPOWER = new Button();
+    public final static Button VSLIDES_STOP = new Button();
     public final static Button CLAW = new Button();
     public final static Button RELEASE = new Button();
     public final static Button HANGRON = new Button();

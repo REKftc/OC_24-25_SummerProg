@@ -61,6 +61,7 @@ public class teleop8 extends OpMode{
     boolean hslideManualOnce = false;
     boolean onlyUsedForInCheck = false;
     boolean anotherBooleanWithOneSingularUse = false;
+    boolean vSlidesStopped = false;
     boolean curSpec = false;
     boolean specOutRetract = false;
 
@@ -244,16 +245,13 @@ public class teleop8 extends OpMode{
             transferNow();
         }
 
-        if(gamepad1.b && Button.NOPOWER.canPress(timestamp)){
-           /* vslideGoBottom = true;
-            vlimitswitch.setState(true);
-            robot.vSlides.vSlidesR.setPower(0);
-            robot.vSlides.vSlidesL.setPower(0);
+        if (gamepad1.b && Button.VSLIDES_STOP.canPress(timestamp)) {
+            vSlidesStopped = true;
+            robot.vSlides.vSlidesL.setPower(0.0f);
+            robot.vSlides.vSlidesR.setPower(0.0f);
             robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);*/
+            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-
-
 
         if(intakeOutDelay){ // automatic outtake after sensing right block
             intakeOutDelay = false;
@@ -361,6 +359,20 @@ public class teleop8 extends OpMode{
                 hangUp = false;
             }
         }
+
+       /* float hangPower = gamepad2.right_stick_y;
+        if (Math.abs(hangPower) > 0.1) {
+            if (joystickY > 0) {
+                robot.hangRight.upRight();
+                robot.hangLeft.upLeft();
+            } else {
+                robot.hangRight.downRight();
+                robot.hangLeft.downLeft();
+            }
+        } else {
+            robot.hangRight.stopRight();
+            robot.hangLeft.stopLeft();
+        }*/
 
         if (gamepad2.y && Button.RELEASE.canPress(timestamp)) {
                 robot.hangRelease.setOut();
@@ -605,21 +617,23 @@ public class teleop8 extends OpMode{
         //telemetry.addData("hlimit: ", hlimitswitch.getState());
     }
 
-    public void slideBottom() { //vSlide bottom
-        if (!vlimitswitch.getState() && vslideGoBottom) {
-            turnConstant = 1f;
-            robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setPower(-0.6f);
-            robot.vSlides.vSlidesL.setPower(-0.6f);
-        } else if (vlimitswitch.getState() && vslideGoBottom) {
-            robot.vSlides.vSlidesR.setPower(0);
-            robot.vSlides.vSlidesL.setPower(0);
-            robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            vslideGoBottom = false;
-            robot.vSlides.vSlidesR.resetPosition();
-            robot.vSlides.vSlidesL.resetPosition();
+    public void slideBottom() {
+        if (!vSlidesStopped) {  //vSlide bottom
+            if (!vlimitswitch.getState() && vslideGoBottom) {
+                turnConstant = 1f;
+                robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.vSlides.vSlidesR.setPower(-0.6f);
+                robot.vSlides.vSlidesL.setPower(-0.6f);
+            } else if (vlimitswitch.getState() && vslideGoBottom) {
+                robot.vSlides.vSlidesR.setPower(0);
+                robot.vSlides.vSlidesL.setPower(0);
+                robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                vslideGoBottom = false;
+                robot.vSlides.vSlidesR.resetPosition();
+                robot.vSlides.vSlidesL.resetPosition();
+            }
         }
     }
 
