@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -50,6 +51,7 @@ public class teleop8 extends OpMode{
     boolean intakeDelay = false;
     boolean intakeOn = false;
     boolean clawOpen = true;
+    boolean hangUp = false;
     boolean hslideOut = false;
     boolean vslideOut = false;
     boolean manualOut = false;
@@ -111,7 +113,13 @@ public class teleop8 extends OpMode{
         robot.sensorF.update();
         long timestamp = System.currentTimeMillis();
         robot.vSlides.update();
+
         telemetry.addData("target",robot.vSlides.getTarget());
+       /* if (robot.hangLeft == null || robot.hangRight == null) {
+            telemetry.addData("Error", "hangLeft or hangRight not initialized");
+            telemetry.update();
+            return;
+        }*/
 
         //Driving
         double y = gamepad1.left_stick_y;
@@ -236,6 +244,17 @@ public class teleop8 extends OpMode{
             transferNow();
         }
 
+        if(gamepad1.b && Button.NOPOWER.canPress(timestamp)){
+           /* vslideGoBottom = true;
+            vlimitswitch.setState(true);
+            robot.vSlides.vSlidesR.setPower(0);
+            robot.vSlides.vSlidesL.setPower(0);
+            robot.vSlides.vSlidesL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.vSlides.vSlidesR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);*/
+        }
+
+
+
         if(intakeOutDelay){ // automatic outtake after sensing right block
             intakeOutDelay = false;
             robot.intake.in();
@@ -319,7 +338,7 @@ public class teleop8 extends OpMode{
             }
         }
 
-        if (gamepad2.a && Button.CLAW.canPress(timestamp) || gamepad1.a) { // claw
+      if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;
@@ -328,6 +347,23 @@ public class teleop8 extends OpMode{
                 robot.claw.setClose();
                 clawOpen = false;
             }
+        }
+
+        if (gamepad1.a && Button.HANGRON.canPress(timestamp)) {
+            if(!hangUp) {
+                robot.hangRight.upRight();
+                robot.hangLeft.upLeft();
+                hangUp = true;
+            }
+            else if(hangUp){
+                robot.hangRight.downRight();
+                robot.hangLeft.downLeft();
+                hangUp = false;
+            }
+        }
+
+        if (gamepad2.y && Button.RELEASE.canPress(timestamp)) {
+                robot.hangRelease.setOut();
         }
 
         if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket

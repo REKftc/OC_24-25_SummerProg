@@ -41,7 +41,9 @@ public class RobotMecanum {
     public intakeTilt intakeTilt;
     public colorSensor sensorF;
     public pto pto;
-    public smallHang smallHang;
+    public hangRight hangRight;
+    public hangLeft hangLeft;
+    public hangRelease hangRelease;
 
     public final List<OcServo> servos = new ArrayList<>();
     public List<LynxModule> allHubs;
@@ -194,10 +196,24 @@ public class RobotMecanum {
             numberMissing++;
         }
         try {
-            smallHang = new smallHang(hardwareMap);
+            hangRight = new hangRight(hardwareMap);
         } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: smallHang " + e.getMessage());
-            missing = missing + ", smallHang";
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangRight " + e.getMessage());
+            missing = missing + ", hangRight";
+            numberMissing++;
+        }
+        try {
+            hangLeft = new hangLeft(hardwareMap);
+        } catch (Exception e) {
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangLeft " + e.getMessage());
+            missing = missing + ", hangLeft";
+            numberMissing++;
+        }
+        try {
+            hangRelease = new hangRelease(hardwareMap);
+        } catch (Exception e) {
+            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangRelease " + e.getMessage());
+            missing = missing + ", hangRelease";
             numberMissing++;
         }
 

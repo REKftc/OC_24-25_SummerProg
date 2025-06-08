@@ -14,6 +14,8 @@
 
             <Servo name="intakeTilt" port="5" />
             <Servo name="latch" port="4" />
+            <CRServo name="hangL" port="2" />
+
 
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
@@ -26,6 +28,9 @@
             <Servo name="depoHslide" port="2" />
             <Servo name="depoTilt" port="1" />
             <Servo name="claw" port="0" />
+            <Servo name="hangRelease" port="4" />
+            <CRServo name="hangR" port="5" />
+
 
             <goBILDAPinpoint name="pinpoint" port="1" bus="1"/>
 

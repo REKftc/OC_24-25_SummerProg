@@ -20,6 +20,8 @@ public class Button
     public final static Button INTAKETILT = new Button();
     public final static Button NOPOWER = new Button();
     public final static Button CLAW = new Button();
+    public final static Button RELEASE = new Button();
+    public final static Button HANGRON = new Button();
     public final static Button WALL = new Button();
     public final static Button HIGH1 = new Button();
     public final static Button HIGH2 = new Button();

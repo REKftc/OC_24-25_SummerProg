@@ -126,11 +126,17 @@ Tester
         OcServo claw = robot.claw.claw;
         OcServo depoTilt = robot.depoTilt.depoTilt;
         OcServo depoHslide = robot.depoHslide.depoHslide;
+        //OcServo hangRight = robot.hangRight.hangRight;
+       // CRServo hangLeft = robot.hangLeft.hangLeft;
+        OcServo hangRelease = robot.hangRelease.hangRelease;
         servos.add(intakeTilt);
         servos.add(latch);
         servos.add(claw);
         servos.add(depoTilt);
         servos.add(depoHslide);
+       // servos.add(hangRight);
+       // servos.add(hangLeft);
+        servos.add(hangRelease);
 
 
 
@@ -149,6 +155,18 @@ Tester
                         depoTilt,
                         robot.depoTilt.TRANSFER,
                         robot.depoTilt.BUCKET),
+              /*  new ServoTestInfo(
+                        hangRight,
+                        robot.hangRight.INIT,
+                        robot.hangRight.OUT),
+                new ServoTestInfo(
+                        hangLeft,
+                        robot.hangLeft.INIT,
+                        robot.hangLeft.OUT),
+                new ServoTestInfo(
+                        hangRelease,
+                        robot.hangRelease.INIT,
+                        robot.hangRelease.OUT),*/
         };
 
         int testCounter = 0;
