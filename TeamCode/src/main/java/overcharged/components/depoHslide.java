@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class depoHslide {
     public OcServo depoHslide;
-    public static final float INIT = 202f;
+    public static final float INIT = 183f;
     public static final float MID = 60f;
-    public static final float TRANSFER = 199f;
+    public static final float TRANSFER = 183f;
     public static final float OUT = 100f;
 
 

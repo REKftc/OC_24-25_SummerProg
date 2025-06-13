@@ -8,9 +8,9 @@ public class claw {
     //public VoltageSensor intakeVolt;
     public static final float INIT = 157f;
     // public static final float TRANSFERL = 70f;//175f;
-    // public static final float SPECR = 171f;//158f;
+    public static final float SPECCLOSE = 106f;//158f;
     public static final float CLOSE = 104f;//104f;//105f;
-    public static final float SPEC = 93f;
+    public static final float SPEC = 98f;
     public static final float MORECLOSE = 96f;
     public static final float HALF_CLOSE = 130f;//257f;//255f;
     public static final float OPEN = 157f;//149f;
@@ -36,7 +36,7 @@ public class claw {
 
     public void setMoreClose() {claw.setPosition(MORECLOSE);}
 
-    // public void setFlat() { intakeTilt.setPosition(SPECR); }
+    public void setSpecClose() { claw.setPosition(SPECCLOSE); }
 
     public void setOpen() { claw.setPosition(OPEN); }
 

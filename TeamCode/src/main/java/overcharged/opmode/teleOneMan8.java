@@ -48,6 +48,7 @@ public class teleOneMan8 extends OpMode{
 
     int wallStep = 0;
     int resetStep = 0;
+    int specWallStep = 0;
     int transferStep = 0;
     int intakeStep = 0;
 
@@ -64,6 +65,7 @@ public class teleOneMan8 extends OpMode{
     boolean canYellow = true;
     boolean hslideManualOnce = false;
     boolean onlyUsedForInCheck = false;
+    boolean curSpec = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -260,7 +262,7 @@ public class teleOneMan8 extends OpMode{
             intTiltDelay = false;
         }
 
-        if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){ // block sensing
+       /* if(intakeMode == IntakeMode.IN && sense && !intakeTransfer){ // block sensing
             if (robot.sensorF.getColor() == colorSensor.Color.RED){
                 intakeOn = false;
                 intakeTransfer = true;
@@ -292,6 +294,47 @@ public class teleOneMan8 extends OpMode{
                 intakeMode = IntakeMode.OFF;
                 robot.intake.out();
                 robot.intakeTilt.setFlat();
+                intakeOn = true;
+                manualOut = false;
+                intakeDelay = true;
+                sense = false;
+                outDelay = System.currentTimeMillis();
+            }
+        }*/
+
+        if (intakeMode == IntakeMode.IN && sense && !intakeTransfer) {
+            colorSensor.Color detectedColor = robot.sensorF.getColor();
+            //red
+            if (detectedColor == colorSensor.Color.RED) {
+                intakeOn = false;
+                intakeTransfer = true;
+                robot.intakeTilt.setHigh();
+                transferNow();
+                sense = false;
+                hslideOut = false;
+                //canYellow
+            } else if (detectedColor == colorSensor.Color.YELLOW && canYellow) {
+                intakeOn = false;
+                intakeMode = IntakeMode.OFF;
+                robot.intakeTilt.setHigh();
+                intakeTransfer = true;
+                robot.intake.off();
+                transferNow();
+                sense = false;
+                hslideOut = false;
+                //!canYellow
+            } else if (detectedColor == colorSensor.Color.YELLOW && !canYellow) {
+                intakeMode = IntakeMode.OFF;
+                robot.intake.slowOut();
+                intakeOn = true;
+                manualOut = false;
+                intakeDelay = true;
+                sense = false;
+                outDelay = System.currentTimeMillis();
+                //blue
+            } else if (detectedColor == colorSensor.Color.BLUE) {
+                intakeMode = IntakeMode.OFF;
+                robot.intake.slowOut();
                 intakeOn = true;
                 manualOut = false;
                 intakeDelay = true;
@@ -333,6 +376,7 @@ public class teleOneMan8 extends OpMode{
 
         if(gamepad1.dpad_left && Button.BTN_MID.canPress(timestamp)) { // High Specimen
             intakeTransfer = false;
+            curSpec = true;
 
             robot.claw.setClose();
             clawOpen = false;
@@ -351,22 +395,28 @@ public class teleOneMan8 extends OpMode{
         if(gamepad1.dpad_right && Button.WALL.canPress(timestamp)) { // Wall sequence
             intakeTransfer = false;
             robot.depoHslide.setInit();
-
-
-            slideHeight = SlideHeight.WALL;
-            robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
-            vslideOut = true;
-            wallStep = 0;
-            robot.claw.setClose();
-            clawOpen = false;
-            depoDelay = System.currentTimeMillis();
-            wallStep++;
+            if(curSpec){
+                robot.claw.setOpen();
+                clawOpen = true;
+                specWallStep = 0;
+                depoDelay = System.currentTimeMillis();
+                specWallStep++;
+            }
+            else {
+                vslideOut = true;
+                wallStep = 0;
+                robot.claw.setClose();
+                clawOpen = false;
+                depoDelay = System.currentTimeMillis();
+                wallStep++;
+            }
         }
 
         if(gamepad1.dpad_down && Button.SLIDE_RESET.canPress(timestamp)) { // Slide reset
             robot.vSlides.setUseSquID(false, 0);
             slowPower = 1f;
             robot.depoHslide.setInit();
+            curSpec = false;
             if(slideHeight == SlideHeight.DOWN || slideHeight == SlideHeight.WALL || slideHeight == SlideHeight.LOWER) {
                 vslideGoBottom = true;
                 robot.claw.setClose();
@@ -434,16 +484,35 @@ public class teleOneMan8 extends OpMode{
         }
 
         // Wall pickup Sequence
-        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 280){
-            robot.intakeTilt.setFlat();
+        if(wallStep==1 && System.currentTimeMillis() - depoDelay > 150){
+            robot.intakeTilt.setOut();
+            depoDelay = System.currentTimeMillis();
+            wallStep++;
+        }
+        if(wallStep==2 && System.currentTimeMillis() - depoDelay >180){
             robot.depoTilt.setWall();
             clawOpen = false;
             depoDelay = System.currentTimeMillis();
             wallStep++;
-        } if(wallStep==2 && System.currentTimeMillis() - depoDelay > 700){
+        } if(wallStep==3 && System.currentTimeMillis() - depoDelay > 650){
             robot.claw.setOpen();
             clawOpen = true;
             wallStep=0;
+            depoDelay = 0;
+        }
+
+        // Wall pickup Sequence from Specimen score
+        if(specWallStep==1 && System.currentTimeMillis() - depoDelay > 220){
+            robot.depoHslide.setInit();
+            robot.depoTilt.setWall();
+            depoDelay = System.currentTimeMillis();
+            specWallStep++;
+        }
+        if(specWallStep==2 && System.currentTimeMillis() - depoDelay >300){
+            slideHeight = SlideHeight.WALL;
+            //robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
+            vslideOut = true;
+            specWallStep=0;
             depoDelay = 0;
         }
 

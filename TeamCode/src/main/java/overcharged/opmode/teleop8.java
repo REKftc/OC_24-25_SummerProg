@@ -333,7 +333,7 @@ public class teleop8 extends OpMode{
             }
         }
 
-      if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
+        if (gamepad2.a && Button.CLAW.canPress(timestamp)) { // claw
             if(!clawOpen) {
                 robot.claw.setOpen();
                 clawOpen = true;
@@ -372,7 +372,7 @@ public class teleop8 extends OpMode{
         }*/
 
         if (gamepad2.y && Button.RELEASE.canPress(timestamp)) {
-                robot.hangRelease.setOut();
+            robot.hangRelease.setOut();
         }
 
         if(gamepad2.dpad_up && Button.HIGH1.canPress(timestamp)) { //vSlides Up to Bucket
@@ -414,7 +414,7 @@ public class teleop8 extends OpMode{
             intakeTransfer = false;
             curSpec = true;
 
-            robot.claw.setClose();
+            robot.claw.setSpec();
             clawOpen = false;
             clawDelay = System.currentTimeMillis();
             cDelay = true;
@@ -441,7 +441,7 @@ public class teleop8 extends OpMode{
             else {
                 vslideOut = true;
                 wallStep = 0;
-                robot.claw.setClose();
+                robot.claw.setSpecClose();
                 clawOpen = false;
                 depoDelay = System.currentTimeMillis();
                 wallStep++;
@@ -461,7 +461,14 @@ public class teleop8 extends OpMode{
 
                 resetDelay = System.currentTimeMillis();
                 resetStep++;
-            } else{
+            } else if (slideHeight == SlideHeight.MID){
+                vslideGoBottom = true;
+                robot.depoTilt.setWall();
+
+                slideHeight = SlideHeight.DOWN;
+                resetDelay = System.currentTimeMillis();
+                dDelay = true;
+            } else if (slideHeight == SlideHeight.HIGH1){
                 vslideGoBottom = true;
                 robot.depoTilt.setTransfer();
 
