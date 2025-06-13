@@ -199,10 +199,6 @@ public class teleop8 extends OpMode{
             specOutRetract = false;
         }
 
-        if (gamepad1.share && Button.INTAKEDOOR.canPress(timestamp)){ //Take yellow, or not(boolean)
-            canYellow = !canYellow;
-        }
-
         if (gamepad1.right_trigger > 0.75 && Button.INTAKE.canPress(timestamp)) { //Intake
             if (intakeMode == IntakeMode.OFF ||intakeMode == IntakeMode.OUT) {
                 robot.intake.in();
@@ -229,6 +225,7 @@ public class teleop8 extends OpMode{
 
         if(gamepad1.ps){
             anotherBooleanWithOneSingularUse = !anotherBooleanWithOneSingularUse;
+            canYellow = !canYellow;
             if(anotherBooleanWithOneSingularUse){
                 gamepad1.setLedColor(255,0,0,1000);
             } else{
@@ -260,17 +257,17 @@ public class teleop8 extends OpMode{
             intakeStep = 0;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>120){
+        } if(intakeStep == 1 && System.currentTimeMillis()-outakeTime>250){
             robot.intake.slowOut();
             intakeMode = IntakeMode.OUT;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>220){
+        } if(intakeStep == 2 && System.currentTimeMillis()-outakeTime>200){
             robot.intake.in();
             intakeMode = IntakeMode.IN;
             intakeStep++;
             outakeTime = System.currentTimeMillis();
-        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>620){
+        } if(intakeStep == 3 && System.currentTimeMillis()-outakeTime>800){
             robot.intakeTilt.setTransfer();
             robot.intake.off();
             intakeMode = IntakeMode.OFF;
@@ -549,7 +546,7 @@ public class teleop8 extends OpMode{
         }
         if(specWallStep==2 && System.currentTimeMillis() - depoDelay >300){
             slideHeight = SlideHeight.WALL;
-            robot.vSlides.setUseSquID(true, vSlides.wall, 1f);
+            robot.vSlides.setUseSquID(true, vSlides.START, 1f);
             vslideOut = true;
             specWallStep=0;
             depoDelay = 0;

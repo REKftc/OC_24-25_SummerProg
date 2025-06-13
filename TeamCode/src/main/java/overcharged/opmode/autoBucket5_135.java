@@ -750,8 +750,7 @@ public class autoBucket5_135 extends OpMode{
 
 
         //follower init
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
 
         //Pose init

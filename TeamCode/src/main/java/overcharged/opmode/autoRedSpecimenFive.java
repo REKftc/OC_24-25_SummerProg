@@ -14,6 +14,9 @@ import com.qualcomm.robotcore.util.RobotLog;
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
 import overcharged.drive.SampleMecanumDrive;
+import overcharged.pedroPathing.constants.FConstants;
+import overcharged.pedroPathing.constants.LConstants;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
@@ -551,7 +554,7 @@ public class autoRedSpecimenFive extends OpMode {
         robot.vSlides.vSlidesL.resetPosition();
 
         //follower init
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
 
 
