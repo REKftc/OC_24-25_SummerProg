@@ -5,6 +5,13 @@ import static overcharged.config.RobotConstants.TAG_T;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.Point;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -18,7 +25,9 @@ import overcharged.components.Button;
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
 import overcharged.components.vSlides;
-
+import overcharged.drive.SampleMecanumDrive;
+import overcharged.pedroPathing.constants.FConstants;
+import overcharged.pedroPathing.constants.LConstants;
 
 
 @Config
@@ -28,6 +37,8 @@ public class teleop8 extends OpMode{
     RobotMecanum robot;
     private DigitalChannel hlimitswitch;
     private DigitalChannel vlimitswitch;
+
+    private specCycle Spec;
 
     long depoDelay;
     long resetDelay;
@@ -64,6 +75,7 @@ public class teleop8 extends OpMode{
     boolean vSlidesStopped = false;
     boolean curSpec = false;
     boolean specOutRetract = false;
+    boolean sigma = false;
 
     boolean dDelay = false;
     boolean cDelay = false;
@@ -90,6 +102,66 @@ public class teleop8 extends OpMode{
         HIGH1,
     }
 
+    private Follower follower;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    SampleMecanumDrive drive;
+    MultipleTelemetry telems;
+    private Pose startPose = new Pose(0, 0, Math.toRadians(90));
+    private int pathState;
+    private ElapsedTime pathTimer;
+
+    private Pose getSpec2, getSpec2Back, scoreSpec2Mid, scoreSpec2End, scoreSpec3Mid, scoreSpec3End, scoreSpec4Mid, scoreSpec4End, scoreSpec5Mid, scoreSpec5End, park;
+
+    private Path curve5, curve6, curve7, curve8, curve9, curve10, curveLast, parkEnd;
+
+    public void buildPoses() {
+        getSpec2 = new Pose(122, 90, Math.PI);
+        getSpec2Back = new Pose(131, 90, Math.PI);
+        scoreSpec2Mid = new Pose(131, 62, Math.PI);
+        scoreSpec2End = new Pose(106, 62, Math.PI);
+        scoreSpec3Mid = new Pose(131, 66, Math.PI);
+        scoreSpec3End = new Pose(106, 66, Math.PI);
+        scoreSpec4Mid = new Pose(131, 60, Math.PI);
+        scoreSpec4End = new Pose(106, 60, Math.PI);
+        scoreSpec5Mid = new Pose(131, 58, Math.PI);
+        scoreSpec5End = new Pose(106, 58, Math.PI);
+        park = new Pose(132, 105, Math.PI);
+    }
+
+    public void buildPaths() {
+
+        curve5 = new Path(new BezierCurve(new Point(getSpec2Back), new Point(scoreSpec2Mid), new Point(scoreSpec2End)));
+        curve5.setLinearHeadingInterpolation(getSpec2Back.getHeading(), scoreSpec2End.getHeading());
+        curve5.setPathEndTimeoutConstraint(0);
+
+        curve6 = new Path(new BezierCurve(new Point(scoreSpec2End), new Point(scoreSpec2Mid), new Point(getSpec2), new Point(getSpec2Back)));
+        curve6.setLinearHeadingInterpolation(scoreSpec2End.getHeading(), getSpec2Back.getHeading());
+        curve6.setPathEndTimeoutConstraint(0);
+
+        curve7 = new Path(new BezierCurve(new Point(getSpec2Back), new Point(scoreSpec3Mid), new Point(scoreSpec3End)));
+        curve7.setLinearHeadingInterpolation(getSpec2Back.getHeading(), scoreSpec3End.getHeading());
+        curve7.setPathEndTimeoutConstraint(0);
+
+        curve8 = new Path(new BezierCurve(new Point(scoreSpec3End), new Point(scoreSpec3Mid), new Point(getSpec2), new Point(getSpec2Back)));
+        curve8.setLinearHeadingInterpolation(scoreSpec3End.getHeading(), getSpec2Back.getHeading());
+        curve8.setPathEndTimeoutConstraint(0);
+
+        curve9 = new Path(new BezierCurve(new Point(getSpec2Back), new Point(scoreSpec4Mid), new Point(scoreSpec4End)));
+        curve9.setLinearHeadingInterpolation(getSpec2Back.getHeading(), scoreSpec4End.getHeading());
+        curve9.setPathEndTimeoutConstraint(0);
+
+        curve10 = new Path(new BezierCurve(new Point(scoreSpec4End), new Point(scoreSpec4Mid), new Point(getSpec2), new Point(getSpec2Back)));
+        curve10.setLinearHeadingInterpolation(scoreSpec4End.getHeading(), getSpec2Back.getHeading());
+        curve10.setPathEndTimeoutConstraint(0);
+
+        curveLast = new Path(new BezierCurve(new Point(getSpec2Back), new Point(scoreSpec5Mid), new Point(scoreSpec5End)));
+        curveLast.setLinearHeadingInterpolation(getSpec2Back.getHeading(), scoreSpec5End.getHeading());
+        curveLast.setPathEndTimeoutConstraint(0);
+
+        parkEnd = new Path(new BezierLine(new Point(scoreSpec5End), new Point(park)));
+        parkEnd.setLinearHeadingInterpolation(scoreSpec5End.getHeading(), park.getHeading());
+    }
+
     public void init() {
         try {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -102,10 +174,20 @@ public class teleop8 extends OpMode{
             telemetry.addData("Init Failed", e.getMessage());
             telemetry.update();
         }
+        buildPaths();
+        buildPoses();
+
         temp = new ElapsedTime();
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
         robot.hslides.hslides.resetPosition();
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+        follower.setStartingPose(getSpec2Back);
+        telems = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
+        robot = new RobotMecanum(this, true, false);
+        drive = new SampleMecanumDrive(hardwareMap);
+        pathTimer = new ElapsedTime();
+        vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
     }
 
     public void loop(){
@@ -357,19 +439,17 @@ public class teleop8 extends OpMode{
             }
         }
 
-       /* float hangPower = gamepad2.right_stick_y;
-        if (Math.abs(hangPower) > 0.1) {
-            if (joystickY > 0) {
-                robot.hangRight.upRight();
-                robot.hangLeft.upLeft();
-            } else {
-                robot.hangRight.downRight();
-                robot.hangLeft.downLeft();
-            }
-        } else {
-            robot.hangRight.stopRight();
-            robot.hangLeft.stopLeft();
-        }*/
+       if (gamepad1.touchpad) {
+           sigma = !sigma;
+       }
+
+       if (sigma) {
+            Spec.runOpMode();
+       }
+
+       if (Math.abs(gamepad1.left_stick_x) > 0.1 || Math.abs(gamepad1.left_stick_y) > 0.1){
+           sigma = false;
+       }
 
         if (gamepad2.y && Button.RELEASE.canPress(timestamp)) {
             robot.hangRelease.setOut();
@@ -601,7 +681,11 @@ public class teleop8 extends OpMode{
                 intakeMode = IntakeMode.OFF;
                 robot.hslides.hslides.setPower(0);
                 robot.depoHslide.setTransfer();
-                robot.intakeTilt.setTransfer();
+                if(canYellow) {
+                    robot.intakeTilt.setTransfer();
+                } else {
+                    robot.intakeTilt.setGoOut();
+                }
                 robot.hslides.hslides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 robot.hslides.hslides.resetPosition();
                 clawDelay = System.currentTimeMillis();

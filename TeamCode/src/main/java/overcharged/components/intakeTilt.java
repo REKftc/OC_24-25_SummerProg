@@ -11,7 +11,7 @@ public class intakeTilt {
     public static final float TRANSFER = 121f;//159f;//180f;//225f;//255f;//84f;//36f;//175f;
     public static final float HIGHER = 180f;
     public static final float HIGH = 203f;//16f;
-    public static final float LOWER = 124f;
+    public static final float LOWER = 60f;
     public static final float FLAT = 100f;//158f;
     public static final float INOUT = 48f;//122f;
     public static final float OUT = 48f;//64f;//112f;//120f;//255f;//52f;
