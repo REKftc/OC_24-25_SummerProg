@@ -23,13 +23,13 @@ public class hslides {
 
     public static int autoLevel = 0;
 
-    public static final int START = 0;
+    public static final int FAIL = 340;
     public static final int SMALL = 170;
-    public static final int PRESET1 = 400;
-    public static final int PRESET2 = 380;
-    public static final int PRESET3 = 450;
+    public static final int PRESET1 = 540;
+    public static final int PRESET2 = 470;
+    public static final int PRESET3 = 600;
     public static final int OUT = 590;
-    public static final int SMALL_OUT = 420;
+    public static final int SMALL_OUT = 400;
     public static double p = 18;
     public static double i = 0;
     public static double d = 0;
