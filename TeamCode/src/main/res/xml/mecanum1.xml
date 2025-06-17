@@ -26,7 +26,8 @@
 
 
             <Servo name="depoHslide" port="2" />
-            <Servo name="depoTilt" port="1" />
+            <Servo name="depoTiltL" port="1" />
+            <Servo name="depoTiltR" port="3" />
             <Servo name="claw" port="0" />
             <Servo name="hangRelease" port="4" />
             <CRServo name="hangR" port="5" />

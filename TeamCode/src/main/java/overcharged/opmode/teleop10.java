@@ -565,7 +565,7 @@ public class teleop10 extends OpMode{
         //telemetry.addData("hslides encoder: ", robot.hslides.hslides.getCurrentPosition());
         //telemetry.addData("sensorF color", robot.sensorF.getColor());
         //telemetry.addData("vlimit: ", vlimitswitch.getState());
-        //telemetry.addData("hlimit: ", hlimitswitch.getState());
+        telemetry.addData("hlimit: ", hlimitswitch.getState());
     }
 
     public void slideBottom() { //vSlide bottom

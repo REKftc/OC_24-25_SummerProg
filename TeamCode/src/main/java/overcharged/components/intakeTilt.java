@@ -7,14 +7,14 @@ public class intakeTilt {
     //public OcServo intakeTilt;
     public OcServo intakeTilt;
     public VoltageSensor intakeVolt;
-    public static final float INIT = 205f;//172f;//224f; //36f;//230f;
+    public static final float INIT = 190f;//172f;//224f; //36f;//230f;
     public static final float TRANSFER = 121f;//159f;//180f;//225f;//255f;//84f;//36f;//175f;
-    public static final float HIGHER = 180f;
+    public static final float HIGHER = 170f;
     public static final float HIGH = 203f;//16f;
     public static final float LOWER = 60f;
     public static final float FLAT = 100f;//158f;
-    public static final float INOUT = 48f;//122f;
-    public static final float OUT = 48f;//64f;//112f;//120f;//255f;//52f;
+    public static final float INOUT = 54f;//122f;
+    public static final float OUT = 54f;//64f;//112f;//120f;//255f;//52f;
     public static final float MOVE_TO_WALL = 124f;//136f;
     public static final float MID = 20f;//136f;
 

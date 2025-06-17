@@ -9,7 +9,7 @@ public class claw {
     public static final float INIT = 157f;
     // public static final float TRANSFERL = 70f;//175f;
     public static final float SPECCLOSE = 106f;//158f;
-    public static final float CLOSE = 104f;//104f;//105f;
+    public static final float CLOSE = 103f;//104f;//105f;
     public static final float SPEC = 98f;
     public static final float MORECLOSE = 96f;
     public static final float HALF_CLOSE = 130f;//257f;//255f;

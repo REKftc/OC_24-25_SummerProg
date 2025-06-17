@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import overcharged.components.Button;
 import overcharged.components.RobotMecanum;
 import overcharged.components.colorSensor;
 import overcharged.components.hslides;
@@ -55,6 +56,7 @@ public class autoBucketReal5 extends OpMode{
     boolean in = true;
     boolean brokeCheck = false;
     int turnExtra = 0;
+    int slideLength = 1;
 
     boolean runOnce;
 
@@ -65,23 +67,27 @@ public class autoBucketReal5 extends OpMode{
     //TODO: poses
     private Pose startPose = new Pose(134, 25, Math.toRadians(135));
     private Point bucketScore, toSub;
-    private Pose onSub;
+    private Pose onSub, subBucket;
 
     private Path hi;
 
-    private PathChain initScore, subCycle, subToBucket;
+    private PathChain initScore, subCycle, subToBucket, firstSub, firstBuc;
 
-    private CustomPIDFCoefficients strongHead = new CustomPIDFCoefficients(2,0,0.0,0);
+    private CustomPIDFCoefficients strongHead = new CustomPIDFCoefficients(2.5,0,0.0,0);
     private CustomPIDFCoefficients normHead = new CustomPIDFCoefficients(0.95,0,0.0,0);
+    private CustomPIDFCoefficients strongSecHead = new CustomPIDFCoefficients(3.5,0,0.0,0);
+    private CustomPIDFCoefficients normSecHead = new CustomPIDFCoefficients(2.5,0,0.05,0);
     private CustomFilteredPIDFCoefficients weakDrive = new CustomFilteredPIDFCoefficients(1.5, 0.000001,0,0.6, 0);
     private CustomFilteredPIDFCoefficients normDrive = new CustomFilteredPIDFCoefficients(1, 0.000001,0,0.6, 0);
 
     public void buildPoses() {
 
-        bucketScore = new Point(129, 12, Point.CARTESIAN);
+        bucketScore = new Point(126.5, 13, Point.CARTESIAN);
 
-        toSub = new Point(90, 25, Point.CARTESIAN);
-        onSub = new Pose(84, 49, Math.toRadians(90));
+        toSub = new Point(83, 30, Point.CARTESIAN);
+        onSub = new Pose(82, 45, Math.toRadians(90));
+
+        subBucket = new Pose(125, 13, Math.toRadians(155));
     }
 
     //TODO: here are where the paths are defined
@@ -89,19 +95,25 @@ public class autoBucketReal5 extends OpMode{
         initScore = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), bucketScore))
                 //.addPath(new BezierCurve(new Point(startPose), new Point(138, 10), bucketScore))
-                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(155))
+                .setLinearHeadingInterpolation(startPose.getHeading(), Math.toRadians(155), .9)
+                .build();
+
+        firstSub = follower.pathBuilder()
+                .addPath(new BezierCurve(bucketScore, toSub, new Point(onSub)))
+                .setLinearHeadingInterpolation(Math.toRadians(155), onSub.getHeading())
+                .setZeroPowerAccelerationMultiplier(3.25)
                 .build();
 
         subCycle = follower.pathBuilder()
-                .addPath(new BezierCurve(bucketScore, toSub, new Point(onSub)))
+                .addPath(new BezierCurve(new Point(subBucket), toSub, new Point(onSub)))
                 .setLinearHeadingInterpolation(Math.toRadians(155), onSub.getHeading())
-                .setZeroPowerAccelerationMultiplier(4.5)
+                .setZeroPowerAccelerationMultiplier(3.25)
                 .build();
 
         subToBucket = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(onSub), toSub, bucketScore))
                 .setLinearHeadingInterpolation(onSub.getHeading(), Math.toRadians(155))
-                .setZeroPowerAccelerationMultiplier(4.5)
+                .setZeroPowerAccelerationMultiplier(3.25)
                 .build();
 
 
@@ -113,41 +125,35 @@ public class autoBucketReal5 extends OpMode{
     public void autoPath() {
         switch (pathState) {
             case 10: // start
-                robot.intakeTilt.setTransfer();
+                follower.setHeadingPIDF(strongHead);
+                follower.setSecondaryHeadingPIDF(strongSecHead);
                 follower.followPath(initScore, true);
                 follower.setMaxPower(0.8f);
                 setPathState(102);
                 break;
             case 102:
                 if(pathTimer.milliseconds()>90){
-                    follower.setHeadingPIDF(normHead);
                     robot.vSlides.moveEncoderTo(robot.vSlides.high1, 1f);
                     setPathState(11);
                 }
                 break;
             case 11:
-                if(pathTimer.milliseconds()>150){
+                if(pathTimer.milliseconds()>100){
                     robot.latch.setOut();
                     robot.hslides.moveEncoderTo(robot.hslides.SMALL, 0.7f);
                     in = false;
                     robot.depoTilt.setOut();
                     robot.depoHslide.setOut();
-                    setPathState(12);
-                }
-                break;
-            case 12:
-                if(follower.getCurrentTValue() > 0.7){
-                    //follower.setHeadingPIDF(strongHead);
                     setPathState(13);
                 }
                 break;
             case 13:
-                if ((follower.getPose().getX() > (bucketScore.getX() - 1) && follower.getPose().getY() < (bucketScore.getY() + 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16) && pathTimer.milliseconds()>800 || pathTimer.milliseconds()>1100 || pathTimer.milliseconds() > 380 && turnExtra >0) {
+                if ((follower.getPose().getX() > (bucketScore.getX() - 1) && follower.getPose().getY() < (bucketScore.getY() + 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16) && pathTimer.milliseconds()>700 || pathTimer.milliseconds()>1100 || pathTimer.milliseconds() > 390 && turnExtra >0) {
                     setPathState(14);
                 }
                 break;
             case 14:
-                if(pathTimer.milliseconds()>180) {
+                if(pathTimer.milliseconds()>120 && turnExtra == 0 || pathTimer.milliseconds()>180 && turnExtra > 0) {
                     robot.claw.setOpen();
                     robot.intakeTilt.setOut();
                     robot.intake.in();
@@ -162,16 +168,17 @@ public class autoBucketReal5 extends OpMode{
                 if(pathTimer.milliseconds()>250){
                     //follower.setHeadingPIDF(normHead);
                     robot.depoTilt.setTransfer();
+                    follower.setMaxPower(1f);
                     robot.depoHslide.setTransfer();
                     if(turnExtra > 0) {
                         follower.setHeadingPIDF(strongHead);
                         if (turnExtra == 1) {
-                            follower.turnDegrees(22, true);
+                            follower.turnDegrees(21, true);
                         } else if (turnExtra == 2) {
                             if(!brokeCheck) {
                                 follower.turnDegrees(50, true);
                             } else{
-                                follower.turnDegrees(28, true);
+                                follower.turnDegrees(29, true);
                             }
                         }
                     }
@@ -179,7 +186,7 @@ public class autoBucketReal5 extends OpMode{
                 }
                 break;
             case 16:
-                if(pathTimer.milliseconds() > 180) {
+                if(pathTimer.milliseconds() > 200) {
                     vslideGoBottom = true;
                     in = false;
                     if (turnExtra == 0) {
@@ -194,7 +201,7 @@ public class autoBucketReal5 extends OpMode{
                 }
                 break;
             case 161:
-                if(pathTimer.milliseconds() > 200){
+                if(pathTimer.milliseconds() > 300){
                     follower.setHeadingPIDF(normHead);
                     setPathState(17);
                 }
@@ -202,9 +209,9 @@ public class autoBucketReal5 extends OpMode{
             case 17:
                 if(robot.sensorF.getColor() == colorSensor.Color.YELLOW){
                     setPathState(171);
-                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1500 && robot.hslides.hslides.getCurrentPosition() < 700) {
+                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1700 && robot.hslides.hslides.getCurrentPosition() < 790) {
                     robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 100, 1f);
-                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>1700 || robot.hslides.hslides.getCurrentPosition() > 700)  {
+                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>1710 || robot.hslides.hslides.getCurrentPosition() > 790)  {
                     setPathState(1701);
                 }
 
@@ -215,7 +222,7 @@ public class autoBucketReal5 extends OpMode{
                 setPathState(1702);
                 break;
             case 1702:
-                if(pathTimer.milliseconds()>200){
+                if(pathTimer.milliseconds()>150){
                     turnExtra += 1;
                     brokeCheck = true;
                     setPathState(14);
@@ -232,7 +239,7 @@ public class autoBucketReal5 extends OpMode{
                     if(turnExtra > 0) {
                         follower.setHeadingPIDF(strongHead);
                         if (turnExtra == 1) {
-                            follower.turnDegrees(22, false);
+                            follower.turnDegrees(21, false);
                         } else if (turnExtra == 2) {
                             follower.turnDegrees(50, false);
                         }
@@ -243,23 +250,35 @@ public class autoBucketReal5 extends OpMode{
                 }
                 break;
             case 1711:
-                if(in && pathTimer.milliseconds()>90){
+                if(in && pathTimer.milliseconds()>50){
                     setPathState(1712);
                 }
                 break;
             case 1712:
-                if(pathTimer.milliseconds()>150){
+                if(pathTimer.milliseconds()>90){
                     robot.claw.setClose();
                     if (turnExtra<3) {
                         turnExtra += 1;
                         setPathState(102);
                     } else{
-                        setPathState(18);
+                        setPathState(175);
                     }
                 }
                 break;
-            case 18:
-                if(pathTimer.milliseconds()>200) {
+            case 175: //First sub
+                if(pathTimer.milliseconds()>180) {
+                    robot.intakeTilt.setTransfer();
+                    follower.setHeadingPIDF(normHead);
+                    follower.setSecondaryHeadingPIDF(normSecHead);
+                    follower.setDrivePIDF(weakDrive);
+                    follower.followPath(firstSub, true);
+                    robot.depoTilt.setTransfer();
+                    robot.depoHslide.setTransfer();
+                    setPathState(19);
+                }
+                break;
+            case 18: //cycle sub
+                if(pathTimer.milliseconds()>180) {
                     robot.intakeTilt.setTransfer();
                     follower.setDrivePIDF(weakDrive);
                     follower.followPath(subCycle, true);
@@ -269,20 +288,20 @@ public class autoBucketReal5 extends OpMode{
                 }
                 break;
             case 19:
-                if(pathTimer.milliseconds() > 150){
+                if(pathTimer.milliseconds() > 120){
                     vslideGoBottom = true;
                     robot.latch.setOut();
                     setPathState(20);
                 }
                 break;
             case 20:
-                if(follower.getCurrentTValue() > 0.8){
-                    robot.hslides.moveEncoderTo(hslides.SMALL, 1f);
+                if(follower.getCurrentTValue() > 0.7){
+                    robot.hslides.moveEncoderTo(hslides.SMALL + 30 + slideLength*10, 1f);
                     setPathState(201);
                 }
                 break;
             case 201:
-                if(follower.getCurrentTValue() > 0.95 || follower.getCurrentTValue() == 0.0) {
+                if(follower.getCurrentTValue() > 0.99 || follower.getCurrentTValue() == 0.0) {
                     robot.intakeTilt.setOut();
                     setPathState(21);
                 }
@@ -290,17 +309,21 @@ public class autoBucketReal5 extends OpMode{
             case 21:
                 if(robot.sensorF.getColor() == colorSensor.Color.YELLOW || robot.sensorF.getColor() == colorSensor.Color.RED){
                     setPathState(22);
-                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1900 && robot.hslides.hslides.getCurrentPosition() < 700) {
-                    robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 70, 0.9f);
-                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>2000 || robot.hslides.hslides.getCurrentPosition() > 700) {
+                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()<1900 && robot.hslides.hslides.getCurrentPosition() < 900) {
+                    robot.hslides.moveEncoderTo(robot.hslides.hslides.getCurrentPosition() + 100, 0.9f);
+                } else if(robot.sensorF.getColor() == colorSensor.Color.NONE && pathTimer.milliseconds()>1900 || robot.hslides.hslides.getCurrentPosition() > 900) {
                     setPathState(211);
                 } else if (robot.sensorF.getColor() == colorSensor.Color.BLUE){
-                    robot.intake.out();
-                    waitFor(350);
+                    setPathState(210);
+                    robot.intakeTilt.setFlat();
+                    robot.intake.slowOut();
+                }
+                break;
+            case 210:
+                if(pathTimer.milliseconds()>350){
                     robot.intake.in();
-                } else {
-                    brokeCheck = true;
-                    setPathState(211);
+                    robot.intakeTilt.setOut();
+                    setPathState(21);
                 }
                 break;
             case 211:
@@ -308,17 +331,23 @@ public class autoBucketReal5 extends OpMode{
                 hSlideGoBottom = true;
                 in = false;
                 follower.setHeadingPIDF(strongHead);
-                follower.turnDegrees(10, true);
+                follower.turnDegrees(12, true);
                 setPathState(212);
                 break;
             case 212:
                 if(in){
+                    setPathState(2120);
+                }
+                break;
+            case 2120:
+                if(pathTimer.milliseconds()>100) {
+                    robot.latch.setOut();
                     robot.hslides.moveEncoderTo(hslides.SMALL, 1f);
                     setPathState(2121);
                 }
                 break;
             case 2121:
-                if(pathTimer.milliseconds()>300) {
+                if(pathTimer.milliseconds()>200) {
                     setPathState(201);
                 }
                 break;
@@ -337,6 +366,7 @@ public class autoBucketReal5 extends OpMode{
                 setPathState(23);
                 break;
             case 23:
+                follower.setMaxPower(0.95f);
                 follower.followPath(subToBucket, true);
                 setPathState(231);
                 break;
@@ -373,20 +403,21 @@ public class autoBucketReal5 extends OpMode{
             case 2403:
                 if(pathTimer.milliseconds()>150) {
                     robot.depoTilt.setOut();
-                    robot.depoHslide.setOut();
+                    robot.depoHslide.setMid();
                     setPathState(241);
                 }
                 break;
             case 241:
-                if(follower.getCurrentTValue() > 0.9 && follower.getPose().getX() > (bucketScore.getX() - 1) && follower.getPose().getY() < (bucketScore.getY() + 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16 && pathTimer.milliseconds()>400){
+                if(follower.getCurrentTValue() > 0.9 && follower.getPose().getX() > (bucketScore.getX() - 1) && follower.getPose().getY() < (bucketScore.getY() + 1) && Math.abs(robot.vSlides.vSlidesL.getCurrentPosition()-660) < 16 && pathTimer.milliseconds()>320 || pathTimer.milliseconds()>1350){
+                    follower.setMaxPower(1f);
                     setPathState(25);
                 }
                 break;
             case 25:
-                if(pathTimer.milliseconds() > 250){
+                if(pathTimer.milliseconds() > 150){
                     robot.claw.setOpen();
                     //follower.setDrivePIDF(normDrive);
-                    setPathState(18);
+                    setPathState(175);
                 }
 
 
@@ -483,15 +514,23 @@ public class autoBucketReal5 extends OpMode{
         vlimitswitch = hardwareMap.get(DigitalChannel.class, "vlimitswitch");
         robot.vSlides.vSlidesR.resetPosition();
         robot.vSlides.vSlidesL.resetPosition();
-        robot.intakeTilt.setTransfer();
-        robot.depoTilt.setTransfer();
+        robot.claw.setOpen();
+        robot.intakeTilt.setFlat();
+        robot.depoTilt.setSpec();
+        waitFor(1000);
         robot.claw.setClose();
     }
 
     //loop de loop but initialized
     @Override
     public void init_loop() {
-
+        long timestamp = System.currentTimeMillis();
+        if(gamepad1.a && Button.CLAW.canPress(timestamp)){
+            slideLength += 1;
+        }
+        if(gamepad1.x && Button.CLAW.canPress(timestamp)) {
+            slideLength = 1;
+        }
     }
 
     @Override
