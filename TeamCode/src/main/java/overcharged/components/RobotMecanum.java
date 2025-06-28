@@ -30,20 +30,13 @@ public class RobotMecanum {
     public MecanumDrive drive;
 
     public Intake intake;
-    public hang hang;
     public latch latch;
-    public trapdoor trapdoor;
     public vSlides vSlides;
     public depoTilt depoTilt;
     public claw claw;
     public depoHslide depoHslide;
     public hslides hslides;
     public intakeTilt intakeTilt;
-    public colorSensor sensorF;
-    public pto pto;
-    public hangRight hangRight;
-    public hangLeft hangLeft;
-    public hangRelease hangRelease;
 
     public final List<OcServo> servos = new ArrayList<>();
     public List<LynxModule> allHubs;
@@ -168,59 +161,9 @@ public class RobotMecanum {
             numberMissing++;
         }
         try {
-            hang = new hang(hardwareMap);
-        } catch (Exception e){
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: hang " + e.getMessage());
-            missing = missing + ", hang";
-            numberMissing++;
-        }
-        try {
             latch = new latch(hardwareMap);
         } catch (Exception e) {
             RobotLog.ee(RobotConstants.TAG_R,  "missing: latch " + e.getMessage());
-            missing = missing + ", latch";
-            numberMissing++;
-        }
-        try {
-            trapdoor = new trapdoor(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: trapdoor " + e.getMessage());
-            missing = missing + ", trapdoor";
-            numberMissing++;
-        }
-        try {
-            pto = new pto(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: pto " + e.getMessage());
-            missing = missing + ", pto";
-            numberMissing++;
-        }
-        try {
-            hangRight = new hangRight(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangRight " + e.getMessage());
-            missing = missing + ", hangRight";
-            numberMissing++;
-        }
-        try {
-            hangLeft = new hangLeft(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangLeft " + e.getMessage());
-            missing = missing + ", hangLeft";
-            numberMissing++;
-        }
-        try {
-            hangRelease = new hangRelease(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: hangRelease " + e.getMessage());
-            missing = missing + ", hangRelease";
-            numberMissing++;
-        }
-
-        try {
-            sensorF = new colorSensor(hardwareMap);
-        } catch (Exception e) {
-            RobotLog.ee(RobotConstants.TAG_R,  "missing: sensor " + e.getMessage());
             missing = missing + ", latch";
             numberMissing++;
         }
